@@ -26,7 +26,7 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 // Creates a Gaussian Kernel of a user specified size
 //-------------------------------------------------------------------
-auto create_gaussian_kernel(int64_t kernel_size, double sigma)
+inline auto create_gaussian_kernel(int64_t kernel_size, double sigma)
 {
     int64_t actual_kernel_size = (kernel_size / 2) * 2 + 1;
     int64_t half_kernel_size = (kernel_size / 2);
@@ -68,7 +68,7 @@ auto create_gaussian_kernel(int64_t kernel_size, double sigma)
 //-------------------------------------------------------------------
 template<typename DataType>
 
-auto create_laplacian_kernel()
+inline auto create_laplacian_kernel()
 {
     auto laplacian_kernel = LazyMatrix::Matrix<DataType>(3,3);
 
@@ -92,7 +92,7 @@ template<typename MatrixType1,
          std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
          std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
-auto filter(const MatrixType1& source_matrix, const MatrixType2& filter_kernel)
+inline auto filter(const MatrixType1& source_matrix, const MatrixType2& filter_kernel)
 {
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
 

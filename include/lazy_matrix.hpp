@@ -11,16 +11,12 @@
 #include "numerical_constants.hpp"
 #include "convert_numbers.hpp"
 
-#include "color.hpp"
-
 #include "circular_iterator.hpp"
 
 #include "base_matrix.hpp"
 #include "base_matrix3d.hpp"
 
 #include "polymorphic_matrix.hpp"
-
-#include "channel.hpp"
 
 #include "matrix.hpp"
 #include "matrix3d.hpp"
@@ -64,6 +60,8 @@
 
 #include "element_by_element_binary_expression.hpp"
 #include "element_by_element_unary_expression.hpp"
+
+#include "output_operators.hpp"
 //-------------------------------------------------------------------
 
 

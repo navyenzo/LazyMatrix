@@ -159,35 +159,6 @@ struct is_type_a_matrix< BaseMatrix<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Utility function used to print an expression to an output stream
-//-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
-
-inline std::ostream&
-
-operator<<(std::ostream& os, const MatrixType& expression)
-{
-    os << "(" << expression.rows() << "x" << expression.columns() << ")\n";
-
-    for(int i = 0; i < expression.rows(); ++i)
-    {
-        for(int j = 0; j < expression.columns() - 1; ++j)
-        {
-            os << expression(i,j) << ",";
-        }
-
-        if(expression.columns() > 0)
-            os << expression(i,expression.columns() - 1) << "\n";
-    }
-
-    return os;
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 } // namespace LazyMatrix
 //-------------------------------------------------------------------
 

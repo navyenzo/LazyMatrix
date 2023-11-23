@@ -139,39 +139,6 @@ struct is_type_a_matrix3d< BaseMatrix3D<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Utility function used to print an expression to an output stream
-//-------------------------------------------------------------------
-template<typename MatrixType>
-
-inline std::ostream&
-
-operator<<(std::ostream& os, const BaseMatrix3D<MatrixType>& expression)
-{
-    os << "(" << expression.pages() << "x" << expression.rows() << "x" << expression.columns() << ")\n";
-
-    for(int i = 0; i < expression.pages(); ++i)
-    {
-        os << "(" << expression.rows() << "x" << expression.columns() << ")\n";
-
-        for(int j = 0; j < expression.rows(); ++j)
-        {
-            for(int k = 0; k < expression.columns() - 1; ++k)
-            {
-                os << expression(i,j,k) << ",";
-            }
-
-            if(expression.columns() > 0)
-                os << expression(i,j,expression.columns() - 1) << "\n";
-        }
-    }
-
-    return os;
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 } // namespace LazyMatrix
 //-------------------------------------------------------------------
 
