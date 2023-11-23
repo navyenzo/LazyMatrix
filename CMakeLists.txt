@@ -78,11 +78,11 @@ add_definitions(-DDLIB_GIF_SUPPORT)
 # Build unit tests or not
 ###############################################################
 # Option to build or not build the provided tests
-option(BUILD_TESTS "Build the tests." ON)
+option(LazyMatrix_BUILD_TESTS "Build the tests." ON)
 
-message("BUILD_TEST option: " ${BUILD_TESTS})
+message("LazyMatrix_BUILD_TESTS option: " ${BUILD_TESTS})
 
-if(${BUILD_TESTS})
+if(${LazyMatrix_BUILD_TESTS})
     enable_testing()
     add_subdirectory(tests)
 endif()
