@@ -29,16 +29,18 @@
 
 
 //-------------------------------------------------------------------
-// Define every thing within the namespace Files
-//-------------------------------------------------------------------
-namespace LazyMatrix
+namespace LazyMatrix 
 {
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Function used to get the absolute path of the executable
+/**
+ * @brief Get the absolute path of the executable.
+ * 
+ * @return fs::path Absolute path of the executable.
+ */
 //-------------------------------------------------------------------
 inline fs::path get_absolute_path_of_executable()
 {
@@ -49,7 +51,7 @@ inline fs::path get_absolute_path_of_executable()
     #else
         char path[FILENAME_MAX];
         ssize_t count = readlink("/proc/self/exe", path, FILENAME_MAX);
-        return fs::path(std::string(path, (count > 0) ? count: 0));
+        return fs::path(std::string(path, (count > 0) ? count : 0));
     #endif
 }
 //-------------------------------------------------------------------
@@ -57,7 +59,11 @@ inline fs::path get_absolute_path_of_executable()
 
 
 //-------------------------------------------------------------------
-// Function used to get the absolute directory path of the executable
+/**
+ * @brief Get the absolute directory path of the executable's parent directory.
+ * 
+ * @return fs::path Absolute path of the executable's parent directory.
+ */
 //-------------------------------------------------------------------
 inline fs::path get_absolute_path_of_executable_parent_directory()
 {
@@ -68,7 +74,7 @@ inline fs::path get_absolute_path_of_executable_parent_directory()
     #else
         char path[FILENAME_MAX];
         ssize_t count = readlink("/proc/self/exe", path, FILENAME_MAX);
-        return fs::path(std::string(path, (count > 0) ? count: 0)).parent_path().string();
+        return fs::path(std::string(path, (count > 0) ? count : 0)).parent_path().string();
     #endif
 }
 //-------------------------------------------------------------------
@@ -76,59 +82,61 @@ inline fs::path get_absolute_path_of_executable_parent_directory()
 
 
 //-------------------------------------------------------------------
-// Function used to generate a unique filename in a specified
-// directory
+/**
+ * @brief Create a file with a specified size and unique name based on a template in a specified directory.
+ * 
+ * This function generates a unique filename, creates the file with the specified size, 
+ * and returns an error code. It handles the creation of the file differently on Windows and Linux.
+ * 
+ * @param desired_file_size Size of the file to be created.
+ * @param file_creation_error Error code for file creation.
+ * @param filename_template Template for the filename, should end with "XXXXXX".
+ * @param directory_where_file_will_reside Directory where the file will reside.
+ * @return fs::path Path to the created file.
+ */
 //-------------------------------------------------------------------
-inline fs::path generate_unique_filename(const std::string filename_template = "XXXXXX",
-                                         const fs::path& directory_where_file_will_reside = fs::temp_directory_path())
+inline fs::path create_file_with_specified_size_and_unique_name(
+    std::size_t desired_file_size,
+    std::error_code& file_creation_error,
+    std::string filename_template = "XXXXXX",
+    const fs::path& directory_where_file_will_reside = fs::temp_directory_path())
 {
+    // Ensure the filename template ends with exactly "XXXXXX"
+    const size_t x_count = 6;
+    size_t found_x = filename_template.find_last_not_of('X');
+    size_t num_x_to_append = (found_x == std::string::npos) ? x_count : std::min(x_count, x_count - (filename_template.length() - found_x - 1));
+    filename_template.append(num_x_to_append, 'X');
+
+    fs::path filename; // Variable to store the generated filename
+
     #ifdef _WIN32
-        fs::path unique_filename_path = directory_where_file_will_reside;
-        unique_filename_path += filename_template;
+        // Construct the full path for the unique filename in Windows
+        fs::path unique_filename_path = directory_where_file_will_reside / filename_template;
         std::string unique_filename_string = unique_filename_path.string();
+
+        // Generate a unique filename
         _mktemp_s(unique_filename_string.data(), unique_filename_string.size() + 1);
-        unique_filename_path = unique_filename_string;
-        return unique_filename_path;
+        filename = unique_filename_string; // Update filename with the generated unique filename
     #else
-        fs::path unique_filename_path = std::string(fs::path(std::tmpnam(nullptr)));
-        return unique_filename_path;
+        // Construct the full template path for unique filename in Linux
+        std::string full_template = (directory_where_file_will_reside / filename_template).string();
+
+        // Create and open a unique temporary file using mkstemp
+        int fd = mkstemp(&full_template[0]);
+        if (fd != -1) {
+            close(fd); // Close the file descriptor as we only need the unique filename
+            filename = fs::path(full_template); // Update filename with the generated unique filename
+        } else {
+            // Handle errors in file creation
+            file_creation_error.assign(errno, std::generic_category());
+            return fs::path(); // Return an empty path on failure
+        }
     #endif
-}
-//-------------------------------------------------------------------
 
-
-
-//-------------------------------------------------------------------
-// Function used to create a file with a specified size with a unique
-// filename based on a template in a user specified directory
-// - This function first generates a unique filename, then creates
-//   the file with the specified size and then returns and error code
-// - The function returns the absolute path to the created file
-//-------------------------------------------------------------------
-inline fs::path create_file_with_specified_size_and_unique_name(std::size_t desired_file_size,
-                                                                std::error_code& file_creation_error,
-                                                                const std::string filename_template = "XXXXXX",
-                                                                const fs::path& directory_where_file_will_reside = fs::temp_directory_path())
-{
-    // First we generate the unique name in the user
-    // specified directory
-    fs::path filename = generate_unique_filename(filename_template, directory_where_file_will_reside);
-
-    // Create the file
-    std::fstream file_to_create(filename.string(), std::fstream::in | std::fstream::out | std::fstream::trunc);
-
-    if(!file_to_create.is_open())
-    {
-        file_creation_error.assign(1,std::iostream_category());
-        return filename;
-    }
-    
-    file_to_create.close();
-
-    // Resize the file to the correct size
+    // Resize the file to the desired size
     fs::resize_file(filename, desired_file_size, file_creation_error);
 
-    return filename;
+    return filename; // Return the path of the created file
 }
 //-------------------------------------------------------------------
 
