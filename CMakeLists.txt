@@ -102,11 +102,12 @@ add_library(${PROJECT_NAME} INTERFACE)
 # Specify the include directories for the interface library
 ###############################################################
 target_include_directories(${PROJECT_NAME} INTERFACE 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
     ${CMAKE_BINARY_DIR}/_deps/mio-src
     ${CMAKE_BINARY_DIR}/_deps/eigen-src
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
-    ${CMAKE_SOURCE_DIR}/include
 )
 ###############################################################
 
