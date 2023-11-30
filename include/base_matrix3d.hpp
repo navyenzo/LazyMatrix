@@ -60,24 +60,24 @@ public:
 
     
     
-    decltype(auto) at(int pages, int row, int column)const
+    decltype(auto) at(int page, int row, int column)const
     {
-        return underlying()(pages, row, column);
+        return underlying()(page, row, column);
     }
 
-    decltype(auto) at(int pages, int row, int column)
+    decltype(auto) at(int page, int row, int column)
     {
-        return underlying()(pages, row, column);
+        return underlying()(page, row, column);
     }
     
-    decltype(auto) operator()(int pages, int row, int column)const
+    decltype(auto) operator()(int page, int row, int column)const
     {
-        return this->at(pages, row, column);
+        return this->at(page, row, column);
     }
     
-    decltype(auto) operator()(int pages, int row, int column)
+    decltype(auto) operator()(int page, int row, int column)
     {
-        return this->at(pages, row, column);
+        return this->at(page, row, column);
     }
 
     decltype(auto) operator()(int index)const

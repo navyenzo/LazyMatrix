@@ -16,6 +16,9 @@
 #include "base_matrix.hpp"
 #include "base_matrix3d.hpp"
 
+#include "simple_data_2d_matrix_wrapper.hpp"
+#include "simple_data_3d_matrix_wrapper.hpp"
+
 #include "polymorphic_matrix.hpp"
 
 #include "matrix.hpp"
