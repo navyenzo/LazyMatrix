@@ -29,79 +29,46 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Used to generate values on the fly (deterministically or randomly)
-//-------------------------------------------------------------------
-template<typename GeneratorType>
-
-class MatrixGenerator : public BaseMatrix< MatrixGenerator<GeneratorType> >
-{
-public:
-
-    MatrixGenerator<GeneratorType>(int rows, int columns)
-    : BaseMatrix< MatrixGenerator<GeneratorType> >(),
-      rows_(rows),
-      columns_(columns)
-    {
-    }
-
-    int64_t rows()const
-    {
-        return rows_;
-    }
-
-    int64_t columns()const
-    {
-        return columns_;
-    }
-
-    decltype(auto) at(int row, int column)const
-    {
-        return static_cast<const GeneratorType&>(*this).at(row, column);
-    }
-
-private:
-
-    int64_t rows_ = 0;
-    int64_t columns_ = 0;
-};
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Compile time functions to check if the type is an expression type
-//-------------------------------------------------------------------
-template<typename GeneratorType>
-
-struct is_type_a_matrix< MatrixGenerator<GeneratorType> > : std::true_type
-{
-};
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 // Iota matrix generator
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class Iota : public MatrixGenerator< Iota<DataType> >
+class Iota : public BaseMatrix< Iota<DataType> >
 {
 public:
 
     Iota<DataType>(int rows, int columns, DataType starting_value = static_cast<DataType>(0), DataType step = static_cast<DataType>(1))
-    : MatrixGenerator< Iota<DataType> >(rows, columns),
+    : BaseMatrix< Iota<DataType> >(),
+      rows_(rows),
+      columns_(columns),
       starting_value_(starting_value),
       step_(step)
     {
     }
 
-    DataType at(int row, int column)const
+    uintptr_t rows()const
+    {
+        return rows_;
+    }
+
+    uintptr_t columns()const
+    {
+        return columns_;
+    }
+    
+
+
+    DataType at_(int64_t row, int64_t column)const
     {
         return static_cast<DataType>(row * this->columns() + column) * step_ + starting_value_;
     }
 
+
+
 private:
+
+    uintptr_t rows_ = 0;
+    uintptr_t columns_ = 0;
 
     DataType starting_value_ = static_cast<DataType>(0);
     DataType step_ = static_cast<DataType>(1);
@@ -127,26 +94,45 @@ struct is_type_a_matrix< Iota<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class RandomMatrix : public MatrixGenerator< RandomMatrix<DataType> >
+class RandomMatrix : public BaseMatrix< RandomMatrix<DataType> >
 {
 public:
 
     RandomMatrix<DataType>(int rows, int columns, DataType min_value, DataType max_value, int64_t steps = 4294967296)
-    : MatrixGenerator< RandomMatrix<DataType> >(rows, columns),
+    : BaseMatrix< RandomMatrix<DataType> >(),
+      rows_(rows),
+      columns_(columns),
       min_value_(min_value),
       max_value_(max_value),
       steps_(steps)
     {
     }
 
-    DataType at(int row, int column)const
+    uintptr_t rows()const
+    {
+        return rows_;
+    }
+
+    uintptr_t columns()const
+    {
+        return columns_;
+    }
+    
+
+
+    DataType at_(int64_t row, int64_t column)const
     {
         static XoshiroCpp::Xoshiro256PlusPlus rng(time(NULL));
 
         return min_value_ + (double(rng() % (steps_ + 1)) / double(steps_)) * double(max_value_ - min_value_);
     }
 
+
+
 private:
+
+    uintptr_t rows_ = 0;
+    uintptr_t columns_ = 0;
 
     DataType min_value_ = 0;
     DataType max_value_ = 1;
@@ -173,7 +159,7 @@ struct is_type_a_matrix< RandomMatrix<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class SineWaveMatrix : public MatrixGenerator< SineWaveMatrix<DataType> >
+class SineWaveMatrix : public BaseMatrix< SineWaveMatrix<DataType> >
 {
 public:
 
@@ -184,7 +170,9 @@ public:
                              DataType y_offset = 0,
                              DataType delta_time = 0.1,
                              DataType initial_time = 0)
-    : MatrixGenerator< SineWaveMatrix<DataType> >(number_of_data_points, 1),
+    : BaseMatrix< SineWaveMatrix<DataType> >(),
+      rows_(number_of_data_points),
+      columns_(1),
       amplitude_(amplitude),
       frequency_(frequency),
       phase_offset_in_radians_(phase_offset_in_radians),
@@ -194,7 +182,19 @@ public:
     {
     }
 
-    DataType at(int row, int column)const
+    uintptr_t rows()const
+    {
+        return rows_;
+    }
+
+    uintptr_t columns()const
+    {
+        return columns_;
+    }
+    
+
+
+    DataType at_(int64_t row, int64_t column)const
     {
         DataType time = initial_time_ + DataType(row * this->columns() + column) * delta_time_;
 
@@ -203,7 +203,12 @@ public:
         return value;
     }
 
+
+
 private:
+
+    uintptr_t rows_ = 0;
+    uintptr_t columns_ = 0;
 
     DataType amplitude_ = 1;
     DataType frequency_ = 1;

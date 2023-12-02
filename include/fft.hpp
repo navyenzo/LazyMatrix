@@ -25,11 +25,12 @@ namespace LazyMatrix
 // Function to compute the moving FFT of a matrix
 //-------------------------------------------------------------------
 template<typename Scalar>
-void fft_moving_window(const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& data, // Input matrix of data
-                       Eigen::Matrix<std::complex<Scalar>, Eigen::Dynamic, Eigen::Dynamic>& result, // Output matrix of FFT results
-                       const double window_duration_sec, // Duration of the time window in seconds
-                       const double sampling_period_sec, // Sampling period or frequency of the data in seconds
-                       const int num_overlap_steps) // Number of overlap steps between successive windows
+
+inline void fft_moving_window(const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& data, // Input matrix of data
+                              Eigen::Matrix<std::complex<Scalar>, Eigen::Dynamic, Eigen::Dynamic>& result, // Output matrix of FFT results
+                              const double window_duration_sec, // Duration of the time window in seconds
+                              const double sampling_period_sec, // Sampling period or frequency of the data in seconds
+                              const int num_overlap_steps) // Number of overlap steps between successive windows
 {
     // Create an FFT object for computing the FFT
     Eigen::FFT<typename Eigen::Matrix<Scalar, Eigen::Dynamic, 1>::Index> fft;

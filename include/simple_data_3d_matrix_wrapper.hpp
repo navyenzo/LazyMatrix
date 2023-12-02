@@ -44,7 +44,7 @@ public:
      * 
      * @return Number of pages (1).
      */
-    int64_t pages() const
+    uintptr_t pages() const
     {
         return 1;
     }
@@ -54,7 +54,7 @@ public:
      * 
      * @return Number of rows (1).
      */
-    int64_t rows() const
+    uintptr_t rows() const
     {
         return 1;
     }
@@ -64,19 +64,35 @@ public:
      * 
      * @return Number of columns (1).
      */
-    int64_t columns() const
+    uintptr_t columns() const
     {
         return 1;
     }
 
+
+
+protected:
+
     /**
-     * @brief Access the wrapped value, ignoring page, row and column indices.
+     * @brief const access of the wrapped value, ignoring page, row and column indices.
      * 
      * @param row Row index (ignored).
      * @param column Column index (ignored).
      * @return The wrapped value.
      */
-    SimpleDataType at(int page, int row, int column)const
+    SimpleDataType at_(int64_t page, int64_t row, int64_t column)const
+    {
+        return value_; // Since it's a single value, ignore page, row and column indices
+    }
+
+    /**
+     * @brief Non-const access of the wrapped value, ignoring page, row and column indices.
+     * 
+     * @param row Row index (ignored).
+     * @param column Column index (ignored).
+     * @return The wrapped value.
+     */
+    SimpleDataType at_(int64_t page, int64_t row, int64_t column)
     {
         return value_; // Since it's a single value, ignore page, row and column indices
     }

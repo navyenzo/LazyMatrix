@@ -1,4 +1,5 @@
 #define CATCH_CONFIG_MAIN // This define is needed once only when using Catch2
+#define CATCH_CONFIG_ENABLE_BENCHMARKING
 
 
 
@@ -90,4 +91,38 @@ TEST_CASE("2D Matrix Multiplication", "[Matrix2D]")
     REQUIRE(result(0, 1) == 22);
     REQUIRE(result(1, 0) == 43);
     REQUIRE(result(1, 1) == 50);
+}
+
+
+
+TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
+{
+    // Create two random 10x10 matrices
+    LazyMatrix::RandomMatrix<int> random_mat1(10, 10, -10, 10);
+    LazyMatrix::RandomMatrix<int> random_mat2(10, 10, -10, 10);
+
+    // Convert random generators to actual matrices for multiplication
+    LazyMatrix::Matrix<int> mat1(random_mat1);
+    LazyMatrix::Matrix<int> mat2(random_mat2);
+
+    // Perform multiplication using naive method
+    auto result_naive = mat1 * mat2;
+
+    // Perform multiplication using Strassen algorithm
+    auto result_strassen = LazyMatrix::strassen_matrix_multiply(mat1, mat2);
+
+    // Check dimensions
+    REQUIRE(result_naive.rows() == 10);
+    REQUIRE(result_naive.columns() == 10);
+    REQUIRE(result_strassen.rows() == 10);
+    REQUIRE(result_strassen.columns() == 10);
+
+    // Check each element
+    for (int64_t i = 0; i < 10; ++i)
+    {
+        for (int64_t j = 0; j < 10; ++j)
+        {
+            REQUIRE(result_naive(i, j) == result_strassen(i, j));
+        }
+    }
 }

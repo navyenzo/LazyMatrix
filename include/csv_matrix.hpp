@@ -50,71 +50,29 @@ public:
 
 
 
-    char get_string_delimiter()const
-    {
-        return string_delimiter_;
-    }
+    char get_string_delimiter()const { return string_delimiter_; }
+    const std::string& get_row_delimiters()const { return row_delimiters_; }
+    const std::string& get_column_delimiters()const { return column_delimiters_; }
+    char get_decimal_point_delimiter()const { return decimal_point_delimiter_; }
+    void set_string_delimiter(const char& string_delimiter) { string_delimiter_ = string_delimiter; }
+    void set_row_delimiters(const std::string& row_delimiters) { row_delimiters_ = row_delimiters; }
+    void set_column_delimiters(const std::string& column_delimiters) { column_delimiters_ = column_delimiters; }
+    void set_decimal_point_delimiter(char decimal_point_delimiter) { decimal_point_delimiter_ = decimal_point_delimiter; }
 
-    const std::string& get_row_delimiters()const
-    {
-        return row_delimiters_;
-    }
+    uintptr_t rows()const { return rows_; }
+    uintptr_t columns()const { return columns_; }
 
-    const std::string& get_column_delimiters()const
-    {
-        return column_delimiters_;
-    }
-
-    char get_decimal_point_delimiter()const
-    {
-        return decimal_point_delimiter_;
-    }
-
-    void set_string_delimiter(const char& string_delimiter)
-    {
-        string_delimiter_ = string_delimiter;
-    }
-
-    void set_row_delimiters(const std::string& row_delimiters)
-    {
-        row_delimiters_ = row_delimiters;
-    }
-
-    void set_column_delimiters(const std::string& column_delimiters)
-    {
-        column_delimiters_ = column_delimiters;
-    }
-
-    void set_decimal_point_delimiter(char decimal_point_delimiter)
-    {
-        decimal_point_delimiter_ = decimal_point_delimiter;
-    }
-
-    
-    
-    int rows()const
-    {
-        return rows_;
-    }
-
-    int columns()const
-    {
-        return columns_;
-    }
-
-
-
-    decltype(auto) at(int row, int column)const;
-    decltype(auto) string_at(int row, int column)const;
+    decltype(auto) string_at(uintptr_t row, uintptr_t column)const;
+    decltype(auto) at_(int64_t row, int64_t column)const;
     
 
 
-    const std::string& get_row_header(int index)const;
-    const std::string& get_column_header(int index)const;
+    const std::string& get_row_header(uintptr_t index)const;
+    const std::string& get_column_header(uintptr_t index)const;
 
 
 
-    // Function used to load (actually map not load) the data from a CSV file
+    // Function used to load (actually map the file, not load) the data from a CSV file
     std::error_code load(const std::string& csv_data_filename,
                          bool does_first_row_contain_column_header_names,
                          bool does_first_column_contain_row_header_names);
@@ -123,17 +81,17 @@ public:
 
 private: // Private functions
     
-    int find_end_of_current_row(int current_position_in_csv_string)const;
-    int find_end_of_current_column(int current_position_in_csv_string, int end_of_row)const;
+    uintptr_t find_end_of_current_row(uintptr_t current_position_in_csv_string)const;
+    uintptr_t find_end_of_current_column(uintptr_t current_position_in_csv_string, uintptr_t end_of_row)const;
     
-    int find_nth_row(int row_index)const;
-    int find_nth_column_in_current_row(int column_index, int current_position, int end_of_row)const;
+    uintptr_t find_nth_row(uintptr_t row_index)const;
+    uintptr_t find_nth_column_in_current_row(uintptr_t column_index, uintptr_t current_position, uintptr_t end_of_row)const;
 
-    std::pair<int, int> find_begin_end_indeces_of_csv_entry(int row, int column)const;
+    std::pair<int, int> find_begin_end_indeces_of_csv_entry(uintptr_t row, uintptr_t column)const;
 
     
     
-    int count_number_of_columns_for_current_row(int start_of_row, int end_of_row)const;    
+    uintptr_t count_number_of_columns_for_current_row(uintptr_t start_of_row, uintptr_t end_of_row)const;    
     void count_number_of_rows_and_columns();
 
 
@@ -146,8 +104,8 @@ private: // Private functions
 private: // Private variables
 
     // Size of csv matrix (not counting row/column headers)
-    int rows_ = 0;
-    int columns_ = 0;
+    uintptr_t rows_ = 0;
+    uintptr_t columns_ = 0;
 
     // The memory map holding the csv data
     mio::shared_mmap_sink mapped_csv_;
@@ -220,7 +178,7 @@ inline CSVMatrix<DataType>::CSVMatrix(char string_delimiter,
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline decltype(auto) CSVMatrix<DataType>::at(int row, int column)const
+inline decltype(auto) CSVMatrix<DataType>::at_(int64_t row, int64_t column)const
 {
     auto [begin,end] = find_begin_end_indeces_of_csv_entry(row, column);
     
@@ -240,7 +198,7 @@ inline decltype(auto) CSVMatrix<DataType>::at(int row, int column)const
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline decltype(auto) CSVMatrix<DataType>::string_at(int row, int column)const
+inline decltype(auto) CSVMatrix<DataType>::string_at(uintptr_t row, uintptr_t column)const
 {
     auto [begin,end] = find_begin_end_indeces_of_csv_entry(row, column);
 
@@ -260,7 +218,7 @@ inline decltype(auto) CSVMatrix<DataType>::string_at(int row, int column)const
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline const std::string& CSVMatrix<DataType>::get_row_header(int index)const
+inline const std::string& CSVMatrix<DataType>::get_row_header(uintptr_t index)const
 {
     auto name_found_iter = row_headers_.find(index);
 
@@ -274,7 +232,7 @@ inline const std::string& CSVMatrix<DataType>::get_row_header(int index)const
 
 template<typename DataType>
 
-inline const std::string& CSVMatrix<DataType>::get_column_header(int index)const
+inline const std::string& CSVMatrix<DataType>::get_column_header(uintptr_t index)const
 {
     auto name_found_iter = column_headers_.find(index);
 
@@ -339,14 +297,14 @@ inline std::error_code CSVMatrix<DataType>::load(const std::string& csv_data_fil
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::pair<int, int> CSVMatrix<DataType>::find_begin_end_indeces_of_csv_entry(int row, int column)const
+inline std::pair<int, int> CSVMatrix<DataType>::find_begin_end_indeces_of_csv_entry(uintptr_t row, uintptr_t column)const
 {
-    int nth_row_position_in_csv = find_nth_row(row);
+    uintptr_t nth_row_position_in_csv = find_nth_row(row);
 
     if(nth_row_position_in_csv >= mapped_csv_.size())
         return std::pair<int, int>(0,0);
     
-    int end_of_nth_row = find_end_of_current_row(nth_row_position_in_csv);
+    uintptr_t end_of_nth_row = find_end_of_current_row(nth_row_position_in_csv);
 
     std::pair<int,int> begin_end_of_column;
 
@@ -374,7 +332,7 @@ inline void CSVMatrix<DataType>::parse_row_headers()
     // But if the csv file also contains column headers
     // we skip the first column of the first row
 
-    int header_begin = 0;
+    uintptr_t header_begin = 0;
 
     if(does_first_row_contain_column_header_names_)
     {
@@ -383,11 +341,11 @@ inline void CSVMatrix<DataType>::parse_row_headers()
     }
     
     
-    int header_end = header_begin;
+    uintptr_t header_end = header_begin;
 
-    int end_of_row = 0;
+    uintptr_t end_of_row = 0;
 
-    int header_index = 0;
+    uintptr_t header_index = 0;
 
     while(header_begin < mapped_csv_.size())
     {
@@ -419,8 +377,8 @@ inline void CSVMatrix<DataType>::parse_column_headers()
     // But if the csv also contains row headers, we
     // skip the first column
 
-    int headers_row_begin = 0;
-    int headers_row_end = find_end_of_current_row(headers_row_begin);
+    uintptr_t headers_row_begin = 0;
+    uintptr_t headers_row_end = find_end_of_current_row(headers_row_begin);
 
     if(does_first_column_contain_row_header_names_)
     {
@@ -428,10 +386,10 @@ inline void CSVMatrix<DataType>::parse_column_headers()
         headers_row_begin = find_end_of_current_column(0, headers_row_end) + 1;
     }
 
-    int header_begin = headers_row_begin;
-    int header_end = headers_row_begin;
+    uintptr_t header_begin = headers_row_begin;
+    uintptr_t header_end = headers_row_begin;
 
-    int header_index = 0;
+    uintptr_t header_index = 0;
 
     while(header_begin < headers_row_end)
     {
@@ -472,10 +430,10 @@ inline void CSVMatrix<DataType>::count_number_of_rows_and_columns()
     if(!mapped_csv_.is_open())
         return;
 
-    int number_of_columns_in_current_row = 0;
+    uintptr_t number_of_columns_in_current_row = 0;
 
-    int current_position = 0;
-    int end_of_row = 0;
+    uintptr_t current_position = 0;
+    uintptr_t end_of_row = 0;
 
     while(current_position < mapped_csv_.size())
     {
@@ -492,11 +450,11 @@ inline void CSVMatrix<DataType>::count_number_of_rows_and_columns()
         current_position = end_of_row + 1;
     }
 
-    if(does_first_row_contain_column_header_names_)
-        rows_ = std::max(0, rows_ - 1);
+    if(does_first_row_contain_column_header_names_ && rows_ > 0)
+        --rows_;
     
-    if(does_first_column_contain_row_header_names_)
-        columns_ = std::max(0, columns_ - 1);
+    if(does_first_column_contain_row_header_names_ && columns_ > 0)
+        --columns_;
 }
 //-------------------------------------------------------------------
 
@@ -508,12 +466,12 @@ inline void CSVMatrix<DataType>::count_number_of_rows_and_columns()
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline int CSVMatrix<DataType>::find_nth_row(int row_index)const
+inline uintptr_t CSVMatrix<DataType>::find_nth_row(uintptr_t row_index)const
 {
-    int nth_row_begin_position = 0;
-    int nth_row_end_position = 0;
+    uintptr_t nth_row_begin_position = 0;
+    uintptr_t nth_row_end_position = 0;
 
-    int current_row = -1;
+    uintptr_t current_row = -1;
 
     if(does_first_row_contain_column_header_names_)
     {
@@ -552,10 +510,10 @@ inline int CSVMatrix<DataType>::find_nth_row(int row_index)const
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline int CSVMatrix<DataType>::find_nth_column_in_current_row(int column_index, int current_position, int end_of_row)const
+inline uintptr_t CSVMatrix<DataType>::find_nth_column_in_current_row(uintptr_t column_index, uintptr_t current_position, uintptr_t end_of_row)const
 {
-    int nth_column_position = current_position;
-    int current_column = 0;
+    uintptr_t nth_column_position = current_position;
+    uintptr_t current_column = 0;
 
     if(does_first_column_contain_row_header_names_)
     {
@@ -590,16 +548,16 @@ inline int CSVMatrix<DataType>::find_nth_column_in_current_row(int column_index,
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline int CSVMatrix<DataType>::count_number_of_columns_for_current_row(int start_of_row, int end_of_row)const
+inline uintptr_t CSVMatrix<DataType>::count_number_of_columns_for_current_row(uintptr_t start_of_row, uintptr_t end_of_row)const
 {
-    int number_of_columns = 0;
+    uintptr_t number_of_columns = 0;
 
     if(start_of_row >= end_of_row)
         return number_of_columns;
 
-    int current_number_of_string_delimiters = 0;
+    uintptr_t current_number_of_string_delimiters = 0;
 
-    int current_position = start_of_row;
+    uintptr_t current_position = start_of_row;
 
     while(current_position < end_of_row)
     {
@@ -632,13 +590,13 @@ inline int CSVMatrix<DataType>::count_number_of_columns_for_current_row(int star
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline int CSVMatrix<DataType>::find_end_of_current_row(int current_position_in_csv_string)const
+inline uintptr_t CSVMatrix<DataType>::find_end_of_current_row(uintptr_t current_position_in_csv_string)const
 {
     // This is to avoid counting row delimiters
     // inside string quotes
-    int number_of_found_string_delimiters = 0;
+    uintptr_t number_of_found_string_delimiters = 0;
 
-    int end_of_current_row = current_position_in_csv_string;
+    uintptr_t end_of_current_row = current_position_in_csv_string;
 
     while(end_of_current_row < mapped_csv_.size())
     {
@@ -669,13 +627,13 @@ inline int CSVMatrix<DataType>::find_end_of_current_row(int current_position_in_
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline int CSVMatrix<DataType>::find_end_of_current_column(int current_position_in_csv_string, int end_of_row)const
+inline uintptr_t CSVMatrix<DataType>::find_end_of_current_column(uintptr_t current_position_in_csv_string, uintptr_t end_of_row)const
 {
     // This is to avoid counting row/column delimiters
     // inside string quotes
-    int number_of_found_string_delimiters = 0;
+    uintptr_t number_of_found_string_delimiters = 0;
 
-    int end_of_current_column = current_position_in_csv_string;
+    uintptr_t end_of_current_column = current_position_in_csv_string;
 
     while(end_of_current_column < end_of_row)
     {

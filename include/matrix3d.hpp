@@ -28,11 +28,11 @@ struct Matrix3DHeader
 {
     char header[16] = {'-', '-', '-', 'b', 'e', 'g', 'i', 'n', '_', '3', 'd', '_', '-', '-', '-', '\n'};
     std::mutex lock;
-    int size_of_data_type = 8;
+    uintptr_t size_of_data_type = 8;
 
-    int pages = 0;
-    int rows = 0;
-    int columns = 0;
+    uintptr_t pages = 0;
+    uintptr_t rows = 0;
+    uintptr_t columns = 0;
 };
 
 struct Matrix3DFooter
@@ -48,16 +48,16 @@ struct Matrix3DFooter
 // contain a memory mapped matrix
 //-------------------------------------------------------------------
 inline bool does_memory_contain_mapped_matrix3d(const char* memory_mapped_matrix3d,
-                                                int memory_size_in_bytes)
+                                                uintptr_t memory_size_in_bytes)
 {
-    int minimum_size = sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter);
+    uintptr_t minimum_size = sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter);
 
     if(memory_size_in_bytes < minimum_size)
         return false;
     
     const Matrix3DHeader* header = reinterpret_cast<const Matrix3DHeader*>(memory_mapped_matrix3d);
 
-    int expected_size = minimum_size + header->size_of_data_type * header->rows * header->columns;
+    uintptr_t expected_size = minimum_size + header->size_of_data_type * header->rows * header->columns;
 
     return memory_size_in_bytes >= expected_size;
 }
@@ -83,11 +83,11 @@ public:
         this->resize(expression.pages(), expression.rows(), expression.columns());
 
         // We then copy the values from the expression
-        for(int i = 0; i < this->pages(); ++i)
+        for(int64_t i = 0; i < this->pages(); ++i)
         {
-            for(int j = 0; j < this->rows(); ++j)
+            for(int64_t j = 0; j < this->rows(); ++j)
             {
-                for(int k = 0; k < this->columns(); ++k)
+                for(int64_t k = 0; k < this->columns(); ++k)
                 {
                     (*this)(i,j,k) = expression(i,j,k);
                 }
@@ -102,7 +102,7 @@ public:
     }
 
     // Constructor from rows, columns and initial value
-    Matrix3D<DataType>(int pages = 0, int rows = 0, int columns = 0, const DataType& initial_value = static_cast<DataType>(0))
+    Matrix3D<DataType>(uintptr_t pages = 0, uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     : BaseMatrix3D< Matrix3D<DataType> >()
     {
         this->resize(pages, rows, columns, initial_value);
@@ -123,11 +123,11 @@ public:
         this->resize(matrix.pages(), matrix.rows(), matrix.columns());
 
         // We then copy the values from the expression
-        for(int i = 0; i < this->pages(); ++i)
+        for(int64_t i = 0; i < this->pages(); ++i)
         {
-            for(int j = 0; j < this->rows(); ++j)
+            for(int64_t j = 0; j < this->rows(); ++j)
             {
-                for(int k = 0; k < this->columns(); ++k)
+                for(int64_t k = 0; k < this->columns(); ++k)
                 {
                     (*this)(i,j,k) = matrix(i,j,k);
                 }
@@ -182,11 +182,11 @@ public:
 
         error = this->resize(matrix_to_copy.pages(), matrix_to_copy.rows(), matrix_to_copy.columns());
 
-        for(int i = 0; i < this->pages(); ++i)
+        for(int64_t i = 0; i < this->pages(); ++i)
         {
-            for(int j = 0; j < this->rows(); ++j)
+            for(int64_t j = 0; j < this->rows(); ++j)
             {
-                for(int k = 0; k < this->columns(); ++k)
+                for(int64_t k = 0; k < this->columns(); ++k)
                 {
                     (*this)(i,j,k) = matrix_to_copy(i,j,k);
                 }
@@ -215,27 +215,26 @@ public:
 
 
 
-    int pages()const
+    uintptr_t pages()const
     {
         return this->get_header()->pages;
     }
 
-    int rows()const
+    uintptr_t rows()const
     {
         return this->get_header()->rows;
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->get_header()->columns;
     }
 
 
 
-    int capacity()const
+    uintptr_t capacity()const
     {
-        int cap = (get_mapped_file_size() - sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter)) / sizeof(DataType);
-        return std::max(0, cap);
+        return (get_mapped_file_size() - sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter)) / sizeof(DataType);
     }
 
 
@@ -244,28 +243,16 @@ public:
     {
         return mapped_file_.size();
     }
-    
-    
-    
-    const DataType& at(int page, int row, int column)const
-    {
-        return reinterpret_cast<const DataType*>(mapped_file_.cbegin() + sizeof(Matrix3DHeader))[page*row*columns() + row*columns() + column];
-    }
-
-    DataType& at(int page, int row, int column)
-    {
-        return reinterpret_cast<DataType*>(mapped_file_.begin() + sizeof(Matrix3DHeader))[page*row*columns() + row*columns() + column];
-    }
 
 
 
     void initialize(const DataType& initial_value)
     {
-        for(int i = 0; i < this->pages(); ++i)
+        for(int64_t i = 0; i < this->pages(); ++i)
         {
-            for(int j = 0; j < this->rows(); ++j)
+            for(int64_t j = 0; j < this->rows(); ++j)
             {
-                for(int k = 0; k < this->columns(); ++k)
+                for(int64_t k = 0; k < this->columns(); ++k)
                 {
                     (*this)(i,j,k) = initial_value;
                 }
@@ -275,9 +262,9 @@ public:
 
 
 
-    std::error_code resize(int pages,
-                           int rows,
-                           int columns,
+    std::error_code resize(uintptr_t pages,
+                           uintptr_t rows,
+                           uintptr_t columns,
                            const DataType& initial_value = static_cast<DataType>(0))
     {
         return this->create_matrix(pages, rows, columns, initial_value);
@@ -285,9 +272,9 @@ public:
 
 
 
-    std::error_code create_matrix(int pages,
-                                  int rows,
-                                  int columns,
+    std::error_code create_matrix(uintptr_t pages,
+                                  uintptr_t rows,
+                                  uintptr_t columns,
                                   const DataType& initial_value = static_cast<DataType>(0),
                                   const std::string& matrix_filename = "");
 
@@ -305,6 +292,18 @@ public:
     const std::string& get_filename_of_memory_mapped_file()const
     {
         return filename_of_memory_mapped_file_;
+    }
+    
+    
+
+    const DataType& at_(int64_t page, int64_t row, int64_t column)const
+    {
+        return reinterpret_cast<const DataType*>(mapped_file_.cbegin() + sizeof(Matrix3DHeader))[page*row*columns() + row*columns() + column];
+    }
+
+    DataType& at_(int64_t page, int64_t row, int64_t column)
+    {
+        return reinterpret_cast<DataType*>(mapped_file_.begin() + sizeof(Matrix3DHeader))[page*row*columns() + row*columns() + column];
     }
 
 
@@ -364,9 +363,9 @@ struct is_type_a_matrix3d< Matrix3D<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::error_code Matrix3D<DataType>::create_matrix(int pages,
-                                                         int rows,
-                                                         int columns,
+inline std::error_code Matrix3D<DataType>::create_matrix(uintptr_t pages,
+                                                         uintptr_t rows,
+                                                         uintptr_t columns,
                                                          const DataType& initial_value,
                                                          const std::string& matrix_filename)
 {
@@ -420,7 +419,7 @@ inline std::error_code Matrix3D<DataType>::create_matrix(int pages,
 
     // Calculate the necessary size of the file
     // so that it can hold the matrix
-    int size_of_file = sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter) + pages*rows*columns*sizeof(DataType);
+    uintptr_t size_of_file = sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter) + pages*rows*columns*sizeof(DataType);
 
     // Create the file
     std::fstream file_to_create(filename_of_memory_mapped_file_,std::fstream::in | std::fstream::out | std::fstream::trunc);
@@ -493,7 +492,7 @@ inline std::error_code Matrix3D<DataType>::load_matrix(const std::string& file_t
     // We now know the file exists, so we check its size
     // to make sure it is sized correctly to host the
     // matrix it supposedly hosts
-    int minimum_file_size_needed_to_hold_a_matrix = sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter);
+    uintptr_t minimum_file_size_needed_to_hold_a_matrix = sizeof(Matrix3DHeader) + sizeof(Matrix3DFooter);
 
     if(fs::file_size(filename_of_memory_mapped_file_) < minimum_file_size_needed_to_hold_a_matrix)
     {

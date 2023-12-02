@@ -26,10 +26,10 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 // Creates a Gaussian Kernel of a user specified size
 //-------------------------------------------------------------------
-inline auto create_gaussian_kernel(int64_t kernel_size, double sigma)
+inline auto create_gaussian_kernel(uintptr_t kernel_size, double sigma)
 {
-    int64_t actual_kernel_size = (kernel_size / 2) * 2 + 1;
-    int64_t half_kernel_size = (kernel_size / 2);
+    uintptr_t actual_kernel_size = (kernel_size / 2) * 2 + 1;
+    uintptr_t half_kernel_size = (kernel_size / 2);
 
     auto kernel = LazyMatrix::Matrix<double>(actual_kernel_size, actual_kernel_size, 0);
 

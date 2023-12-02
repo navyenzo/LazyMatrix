@@ -40,14 +40,26 @@ struct AugmentRows : public BaseMatrix< AugmentRows<MatrixType1, MatrixType2> >
     
 
 
-    int64_t rows()const
+    uintptr_t rows()const
     {
         return this->left_side_expression_.rows() + this->right_side_expression_.rows();
     }
 
-    int64_t columns()const
+    uintptr_t columns()const
     {
         return std::max(this->left_side_expression_.columns(), this->right_side_expression_.columns());
+    }
+
+
+
+    const MatrixType1& get_left_side_expression()const
+    {
+        return left_side_expression_;
+    }
+
+    const MatrixType2& get_right_side_expression()const
+    {
+        return right_side_expression_;
     }
 
 
@@ -68,18 +80,6 @@ struct AugmentRows : public BaseMatrix< AugmentRows<MatrixType1, MatrixType2> >
             else
                 return zero_;
         }
-    }
-
-
-
-    const MatrixType1& get_left_side_expression()const
-    {
-        return left_side_expression_;
-    }
-
-    const MatrixType2& get_right_side_expression()const
-    {
-        return right_side_expression_;
     }
 
 

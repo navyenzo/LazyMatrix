@@ -32,40 +32,22 @@ struct SimpleMovingAverageOfRows : public BaseMatrix< SimpleMovingAverageOfRows<
 
 
     SimpleMovingAverageOfRows<MatrixType>(const MatrixType& expression,
-                                          int number_of_data_points_to_average)
+                                          int64_t number_of_data_points_to_average)
     : expression_(expression),
-      number_of_data_points_to_average_(std::max(1, std::abs(number_of_data_points_to_average)))
+      number_of_data_points_to_average_(std::max(int64_t(1), std::abs(number_of_data_points_to_average)))
     {
     }
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return expression_.columns();
-    }
-
-
-
-    value_type at(int row, int column)const
-    {
-        int first_column = std::max(0, column - number_of_data_points_to_average_ + 1);
-
-        auto avg = expression_.at(row, first_column);
-
-        for(int i = first_column + 1; i <= column; ++ i)
-        {
-            avg += expression_.at(row, i);
-        }
-
-        avg /= static_cast<value_type>(column + 1 - first_column);
-
-        return avg;
     }
 
 
@@ -77,11 +59,29 @@ struct SimpleMovingAverageOfRows : public BaseMatrix< SimpleMovingAverageOfRows<
 
 
 
+    value_type at_(int64_t row, int64_t column)const
+    {
+        int64_t first_column = std::max(int64_t(0), column - number_of_data_points_to_average_ + 1);
+
+        auto avg = expression_.at(row, first_column);
+
+        for(int64_t i = first_column + 1; i <= column; ++ i)
+        {
+            avg += expression_.at(row, i);
+        }
+
+        avg /= static_cast<value_type>(column + 1 - first_column);
+
+        return avg;
+    }
+
+
+
 private:
 
     const MatrixType& expression_;
     
-    int number_of_data_points_to_average_ = 1;
+    int64_t number_of_data_points_to_average_ = 1;
 };
 //-------------------------------------------------------------------
 
@@ -113,40 +113,22 @@ struct SimpleMovingAverageOfColumns : public BaseMatrix< SimpleMovingAverageOfCo
 
 
     SimpleMovingAverageOfColumns<MatrixType>(const MatrixType& expression,
-                                             int number_of_data_points_to_average)
+                                             int64_t number_of_data_points_to_average)
     : expression_(expression),
-      number_of_data_points_to_average_(std::max(1, std::abs(number_of_data_points_to_average)))
+      number_of_data_points_to_average_(std::max(int64_t(1), std::abs(number_of_data_points_to_average)))
     {
     }
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return expression_.columns();
-    }
-
-
-
-    value_type at(int row, int column)const
-    {
-        int first_row = std::max(0, row - number_of_data_points_to_average_ + 1);
-
-        auto avg = expression_.at(first_row, column);
-
-        for(int i = first_row + 1; i <= row; ++ i)
-        {
-            avg += expression_.at(i, column);
-        }
-
-        avg /= static_cast<value_type>(row + 1 - first_row);
-
-        return avg;
     }
 
 
@@ -158,11 +140,29 @@ struct SimpleMovingAverageOfColumns : public BaseMatrix< SimpleMovingAverageOfCo
 
 
 
+    value_type at_(int64_t row, int64_t column)const
+    {
+        int64_t first_row = std::max(int64_t(0), row - number_of_data_points_to_average_ + 1);
+
+        auto avg = expression_.at(first_row, column);
+
+        for(int64_t i = first_row + 1; i <= row; ++ i)
+        {
+            avg += expression_.at(i, column);
+        }
+
+        avg /= static_cast<value_type>(row + 1 - first_row);
+
+        return avg;
+    }
+
+
+
 private:
 
     const MatrixType& expression_;
     
-    int number_of_data_points_to_average_ = 1;
+    int64_t number_of_data_points_to_average_ = 1;
 };
 //-------------------------------------------------------------------
 
@@ -188,7 +188,7 @@ template<typename MatrixType,
 
 inline auto
 
-simple_moving_average_of_rows(const MatrixType& m1, int number_of_data_points_to_average)
+simple_moving_average_of_rows(const MatrixType& m1, int64_t number_of_data_points_to_average)
 {
     return SimpleMovingAverageOfRows<MatrixType>(m1, number_of_data_points_to_average);
 }
@@ -204,7 +204,7 @@ template<typename MatrixType,
 
 inline auto
 
-simple_moving_average_of_columns(const MatrixType& m1, int number_of_data_points_to_average)
+simple_moving_average_of_columns(const MatrixType& m1, int64_t number_of_data_points_to_average)
 {
     return SimpleMovingAverageOfColumns<MatrixType>(m1, number_of_data_points_to_average);
 }

@@ -13,7 +13,7 @@
 #include "base_matrix.hpp"
 
 // mio library for cross-platform memory-mapping
-#include "single_include/mio/mio.hpp"
+#include <single_include/mio/mio.hpp>
 
 // eigen library for fast/efficient matrix math
 #include "Eigen/Eigen"
@@ -34,20 +34,39 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Header and Footer section of a memory mapped matrix
-//-------------------------------------------------------------------
 const std::string matrix_header_byte_sequence = "::---begin---::\n";
 const std::string matrix_footer_byte_sequence = "::----end----::\n";
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Struct representing the header of a memory-mapped matrix.
+ * 
+ * Contains metadata for the matrix including its size, row and column count. 
+ * It also contains a mutex for synchronizing access in a multi-threaded environment.
+ */
+//-------------------------------------------------------------------
 struct MatrixHeader
 {
     char header[16] = {':', ':', '-', '-', '-', 'b', 'e', 'g', 'i', 'n', '-', '-', '-', ':', ':', '\n'};
     std::mutex lock;
-    int size_of_data_type = 8;
-    int rows = 0;
-    int columns = 0;
+    uintptr_t size_of_data_type = 8;
+    uintptr_t rows = 0;
+    uintptr_t columns = 0;
 };
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Struct representing the footer of a memory-mapped matrix.
+ * 
+ * Used to mark the end of the memory-mapped matrix data.
+ */
+//-------------------------------------------------------------------
 struct MatrixFooter
 {
     char footer[16] = {':', ':', '-', '-', '-', '-', 'e', 'n', 'd', '-', '-', '-', '-', ':', ':', '\n'};
@@ -57,20 +76,29 @@ struct MatrixFooter
 
 
 //-------------------------------------------------------------------
-// Function used to check whether a memory section does indeed
-// contain a memory mapped matrix
+/**
+ * @brief Checks if the given memory region contains a memory-mapped matrix.
+ * 
+ * It inspects the memory region to determine if it adheres to the layout 
+ * and size requirements of a memory-mapped matrix, as specified by the MatrixHeader.
+ * 
+ * @param memory_mapped_matrix Pointer to the start of the memory-mapped region.
+ * @param memory_size_in_bytes Size of the memory region in bytes.
+ * @return true If the memory region contains a valid memory-mapped matrix.
+ * @return false If the memory region does not contain a valid memory-mapped matrix.
+ */
 //-------------------------------------------------------------------
 inline bool does_memory_contain_mapped_matrix(const char* memory_mapped_matrix,
-                                              int memory_size_in_bytes)
+                                              uintptr_t memory_size_in_bytes)
 {
-    int minimum_size = sizeof(MatrixHeader) + sizeof(MatrixFooter);
+    uintptr_t minimum_size = sizeof(MatrixHeader) + sizeof(MatrixFooter);
 
     if(memory_size_in_bytes < minimum_size)
         return false;
     
     const MatrixHeader* header = reinterpret_cast<const MatrixHeader*>(memory_mapped_matrix);
 
-    int expected_size = minimum_size + header->size_of_data_type * header->rows * header->columns;
+    uintptr_t expected_size = minimum_size + header->size_of_data_type * header->rows * header->columns;
 
     return memory_size_in_bytes >= expected_size;
 }
@@ -79,8 +107,15 @@ inline bool does_memory_contain_mapped_matrix(const char* memory_mapped_matrix,
 
 
 //-------------------------------------------------------------------
-// Defines a Matrix that lives in a memory mapped file, which can
-// be shared across multiple processes/threads
+/**
+ * @brief Template class for a matrix that utilizes memory-mapped files for storage.
+ * 
+ * This allows the matrix to be shared across multiple processes. 
+ * It inherits from BaseMatrix using CRTP (Curiously Recurring Template Pattern) 
+ * to gain a polymorphic behavior while avoiding virtual functions.
+ * 
+ * @tparam DataType The type of data stored in the matrix.
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 class Matrix : public BaseMatrix< Matrix<DataType> >
@@ -98,11 +133,11 @@ public:
         this->resize(matrix.rows(), matrix.columns());
 
         // We then copy the values from the matrix
-        for(int i = 0; i < this->rows(); ++i)
+        for(int64_t i = 0; i < this->rows(); ++i)
         {
-            for(int j = 0; j < this->columns(); ++j)
+            for(int64_t j = 0; j < this->columns(); ++j)
             {
-                this->at(i,j) = matrix(i,j);
+                (*this)(i,j) = matrix(i,j);
             }
         }
     }
@@ -114,7 +149,7 @@ public:
     }
 
     // Constructor from rows, columns and initial value
-    Matrix<DataType>(int rows = 0, int columns = 0, const DataType& initial_value = static_cast<DataType>(0))
+    Matrix<DataType>(int64_t rows = 0, int64_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     : BaseMatrix< Matrix<DataType> >()
     {
         resize(rows, columns, initial_value);
@@ -138,7 +173,7 @@ public:
         {
             for(int64_t j = 0; j < this->columns(); ++j)
             {
-                this->at(i,j) = dlib_matrix(i,j);
+                (*this)(i,j) = dlib_matrix(i,j);
             }
         }
     }
@@ -161,7 +196,7 @@ public:
         {
             for(int64_t j = 0; j < m.cols(); ++j)
             {
-                this->at(i,j) = m(i,j);
+                (*this)(i,j) = m(i,j);
             }
         }
 
@@ -178,7 +213,7 @@ public:
         {
             for(int64_t j = 0; j < this->columns(); ++j)
             {
-                this->at(i,j) = dlib_matrix(i,j);
+                (*this)(i,j) = dlib_matrix(i,j);
             }
         }
 
@@ -195,7 +230,7 @@ public:
         {
             for(int j = 0; j < this->columns(); ++j)
             {
-                this->at(i,j) = matrix(i,j);
+                (*this)(i,j) = matrix(i,j);
             }
         }
         
@@ -217,17 +252,25 @@ public:
 
     const_EigenMapType to_const_eigen_map()const
     {
-        return const_EigenMapType(&this->at(0,0),this->rows(),this->columns());
+        return const_EigenMapType(&(*this)(0,0),this->rows(),this->columns());
     }
 
     EigenMapType to_eigen_map()
     {
-        return EigenMapType(&this->at(0,0),this->rows(),this->columns());
+        return EigenMapType(&(*this)(0,0),this->rows(),this->columns());
     }
 
 
 
-    // Carry out a shallow copy of another mapped matrix
+   /**
+     * @brief Shallow copy of another mapped matrix into this matrix.
+     * 
+     * It copies the filename and re-maps the file into memory. This results in 
+     * both matrices sharing the same underlying data.
+     * 
+     * @param matrix_to_copy The matrix to be shallow copied.
+     * @return std::error_code Error code indicating success or failure of the operation.
+     */
     std::error_code shallow_copy(const Matrix<DataType>& matrix_to_copy)
     {
         filename_of_memory_mapped_file_ = matrix_to_copy.get_filename_of_memory_mapped_file();
@@ -240,7 +283,15 @@ public:
 
 
 
-    // Carry out a deep copy of another mapped matrix
+    /**
+     * @brief Deep copy of another mapped matrix into this matrix.
+     * 
+     * It creates a new memory-mapped file and copies each element of the matrix. 
+     * This results in two independent matrices with identical data.
+     * 
+     * @param matrix_to_copy The matrix to be deep copied.
+     * @return std::error_code Error code indicating success or failure of the operation.
+     */
     std::error_code deep_copy(const Matrix<DataType>& matrix_to_copy)
     {
         std::error_code error;
@@ -250,11 +301,11 @@ public:
         if(error)
             return error;
         
-        for(int i = 0; i < rows(); ++i)
+        for(int64_t i = 0; i < rows(); ++i)
         {
-            for(int j = 0; j < columns(); ++j)
+            for(int64_t j = 0; j < columns(); ++j)
             {
-                this->at(i,j) = matrix_to_copy(i,j);
+                (*this)(i,j) = matrix_to_copy(i,j);
             }
         }
 
@@ -276,34 +327,30 @@ public:
         return mapped_file_.is_open();
     }
     
-    int rows()const
+    uintptr_t rows()const
     {
         return this->get_header()->rows;
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->get_header()->columns;
     }
 
-    int capacity()const
+    uintptr_t capacity()const
     {
-        int cap = (get_mapped_file_size() - sizeof(MatrixHeader) + sizeof(MatrixFooter)) / sizeof(DataType);
-        return std::max(0, cap);
+        return (get_mapped_file_size() - sizeof(MatrixHeader) + sizeof(MatrixFooter)) / sizeof(DataType);
     }
 
-    std::size_t get_mapped_file_size()const
+    uintptr_t get_mapped_file_size()const
     {
         return mapped_file_.size();
     }
-    
-    const DataType& at(int row, int column)const;
-    DataType& at(int row, int column);
 
     void initialize(const DataType& initial_value);
 
-    std::error_code resize(int rows, int columns, const DataType& initial_value = static_cast<DataType>(0));
-    std::error_code create_matrix(int rows, int columns, const DataType& initial_value = static_cast<DataType>(0));
+    std::error_code resize(int64_t rows, int64_t columns, const DataType& initial_value = static_cast<DataType>(0));
+    std::error_code create_matrix(int64_t rows, int64_t columns, const DataType& initial_value = static_cast<DataType>(0));
     std::error_code load_matrix(const std::string& file_to_load_matrix_from);
 
     std::mutex& get_lock()
@@ -315,6 +362,11 @@ public:
     {
         return filename_of_memory_mapped_file_;
     }
+    
+    
+
+    const DataType& at_(int64_t row, int64_t column)const;
+    DataType& at_(int64_t row, int64_t column);
 
 
 
@@ -372,7 +424,7 @@ struct is_type_a_matrix< Matrix<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline const DataType& Matrix<DataType>::at(int row, int column)const
+inline const DataType& Matrix<DataType>::at_(int64_t row, int64_t column)const
 {
     return reinterpret_cast<const DataType*>(mapped_file_.cbegin() + sizeof(MatrixHeader))[row*columns() + column];
 }
@@ -381,7 +433,7 @@ inline const DataType& Matrix<DataType>::at(int row, int column)const
 
 template<typename DataType>
 
-inline DataType& Matrix<DataType>::at(int row, int column)
+inline DataType& Matrix<DataType>::at_(int64_t row, int64_t column)
 {
     return reinterpret_cast<DataType*>(mapped_file_.begin() + sizeof(MatrixHeader))[row*columns() + column];
 }
@@ -396,11 +448,11 @@ template<typename DataType>
 
 inline void Matrix<DataType>::initialize(const DataType& initial_value)
 {
-    for(int i = 0; i < this->rows(); ++i)
+    for(int64_t i = 0; i < this->rows(); ++i)
     {
-        for(int j = 0; j < this->columns(); ++j)
+        for(int64_t j = 0; j < this->columns(); ++j)
         {
-            this->at(i,j) = initial_value;
+            (*this)(i,j) = initial_value;
         }
     }
 }
@@ -413,7 +465,7 @@ inline void Matrix<DataType>::initialize(const DataType& initial_value)
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::error_code Matrix<DataType>::resize(int rows, int columns, const DataType& initial_value)
+inline std::error_code Matrix<DataType>::resize(int64_t rows, int64_t columns, const DataType& initial_value)
 {
     return this->create_matrix(rows, columns, initial_value);
 }
@@ -426,8 +478,8 @@ inline std::error_code Matrix<DataType>::resize(int rows, int columns, const Dat
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::error_code Matrix<DataType>::create_matrix(int rows,
-                                                       int columns,
+inline std::error_code Matrix<DataType>::create_matrix(int64_t rows,
+                                                       int64_t columns,
                                                        const DataType& initial_value)
 {
     std::error_code mapping_error;
@@ -526,7 +578,7 @@ inline std::error_code Matrix<DataType>::load_matrix(const std::string& file_to_
     // We now know the file exists, so we check its size
     // to make sure it is sized correctly to host the
     // matrix it supposedly hosts
-    int minimum_file_size_needed_to_hold_a_matrix = sizeof(MatrixHeader) + sizeof(MatrixFooter);
+    uintptr_t minimum_file_size_needed_to_hold_a_matrix = sizeof(MatrixHeader) + sizeof(MatrixFooter);
 
     if(fs::file_size(filename_of_memory_mapped_file_) < minimum_file_size_needed_to_hold_a_matrix)
     {

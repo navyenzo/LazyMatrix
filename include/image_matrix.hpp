@@ -105,23 +105,11 @@ public:
     }
 
     /**
-     * @brief Gets the pixel at the specified row and column.
-     * 
-     * @param row The row index.
-     * @param column The column index.
-     * @return PixelType The pixel at the specified location.
-     */
-    PixelType at(int64_t row, int64_t column) const
-    {
-        return image_data_(row, column);
-    }
-
-    /**
      * @brief Returns the number of rows in the image.
      * 
      * @return int64_t The number of rows.
      */
-    int64_t rows() const
+    uintptr_t rows() const
     {
         return image_data_.nr();
     }
@@ -131,12 +119,26 @@ public:
      * 
      * @return int64_t The number of columns.
      */
-    int64_t columns() const
+    uintptr_t columns() const
     {
         return image_data_.nc();
     }
+    
+    
 
-    // Additional functionalities can be added here as needed.
+    /**
+     * @brief Gets the pixel at the specified row and column.
+     * 
+     * @param row The row index.
+     * @param column The column index.
+     * @return PixelType The pixel at the specified location.
+     */
+    PixelType at_(int64_t row, int64_t column) const
+    {
+        return image_data_(row, column);
+    }
+
+
 
 private:
 

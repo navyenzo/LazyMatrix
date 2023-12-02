@@ -30,7 +30,7 @@ template<typename MatrixType>
 struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
 {
     RowSelectorView<MatrixType>(MatrixType& expression,
-                                const std::vector<int>& selected_rows)
+                                const std::vector<int64_t>& selected_rows)
     : expression_(expression),
       selected_rows_(selected_rows)
     {
@@ -38,7 +38,7 @@ struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         if(expression_.rows() == 0)
             return 0;
@@ -46,21 +46,9 @@ struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
         return selected_rows_.size();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return expression_.columns();
-    }
-
-
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
-    {
-        return expression_.circ_at(selected_rows_[row], column);
-    }
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)
-    {
-        return expression_.circ_at(selected_rows_[row], column);
     }
 
 
@@ -72,10 +60,24 @@ struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
 
 
 
+protected:
+
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        return expression_.circ_at(selected_rows_[row], column);
+    }
+
+    decltype(auto) at_(int64_t row, int64_t column)
+    {
+        return expression_.circ_at(selected_rows_[row], column);
+    }
+
+
+
 private:
 
     MatrixType& expression_;
-    std::vector<int> selected_rows_;
+    std::vector<int64_t> selected_rows_;
 };
 //-------------------------------------------------------------------
 
@@ -101,7 +103,7 @@ template<typename MatrixType>
 struct ColumnSelectorView : public BaseMatrix< ColumnSelectorView<MatrixType> >
 {
     ColumnSelectorView<MatrixType>(MatrixType& expression,
-                                   const std::vector<int>& selected_columns)
+                                   const std::vector<int64_t>& selected_columns)
     : expression_(expression),
       selected_columns_(selected_columns)
     {
@@ -109,29 +111,17 @@ struct ColumnSelectorView : public BaseMatrix< ColumnSelectorView<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         if(expression_.columns() == 0)
             return 0;
 
         return selected_columns_.size();
-    }
-
-
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
-    {
-        return expression_.circ_at(row, selected_columns_[column]);
-    }
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)
-    {
-        return expression_.circ_at(row, selected_columns_[column]);
     }
 
 
@@ -143,10 +133,24 @@ struct ColumnSelectorView : public BaseMatrix< ColumnSelectorView<MatrixType> >
 
 
 
+protected:
+
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        return expression_.circ_at(row, selected_columns_[column]);
+    }
+
+    decltype(auto) at_(int64_t row, int64_t column)
+    {
+        return expression_.circ_at(row, selected_columns_[column]);
+    }
+
+
+
 private:
 
     MatrixType& expression_;
-    std::vector<int> selected_columns_;
+    std::vector<int64_t> selected_columns_;
 };
 //-------------------------------------------------------------------
 
@@ -172,8 +176,8 @@ template<typename MatrixType>
 struct RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<MatrixType> >
 {
     RowAndColumnSelectorView<MatrixType>(MatrixType& expression,
-                                         const std::vector<int>& selected_rows,
-                                         const std::vector<int>& selected_columns)
+                                         const std::vector<int64_t>& selected_rows,
+                                         const std::vector<int64_t>& selected_columns)
     : expression_(expression),
       selected_rows_(selected_rows),
       selected_columns_(selected_columns)
@@ -182,7 +186,7 @@ struct RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<Ma
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         if(expression_.rows() == 0)
             return 0;
@@ -190,24 +194,12 @@ struct RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<Ma
         return selected_rows_.size();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         if(expression_.columns() == 0)
             return 0;
 
         return selected_columns_.size();
-    }
-
-
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
-    {
-        return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
-    }
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)
-    {
-        return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
     }
 
 
@@ -219,11 +211,25 @@ struct RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<Ma
 
 
 
+protected:
+
+    decltype(auto) at_(int64_t row,int64_t column)const
+    {
+        return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
+    }
+
+    decltype(auto) at_(int64_t row,int64_t column)
+    {
+        return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
+    }
+
+
+
 private:
 
     MatrixType& expression_;
-    std::vector<int> selected_rows_;
-    std::vector<int> selected_columns_;
+    std::vector<int64_t> selected_rows_;
+    std::vector<int64_t> selected_columns_;
 };
 //-------------------------------------------------------------------
 
@@ -248,7 +254,7 @@ template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
 inline auto select_rows_view(MatrixType& m,
-                             const std::vector<int>& selected_rows)
+                             const std::vector<int64_t>& selected_rows)
 {
     return RowSelectorView<MatrixType>(m, selected_rows);
 }
@@ -259,7 +265,7 @@ template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
 inline auto select_columns_view(MatrixType& m,
-                                const std::vector<int>& selected_columns)
+                                const std::vector<int64_t>& selected_columns)
 {
     return ColumnSelectorView<MatrixType>(m, selected_columns);
 }
@@ -270,8 +276,8 @@ template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
 inline auto select_rows_and_columns_view(MatrixType& m,
-                                         const std::vector<int>& selected_rows,
-                                         const std::vector<int>& selected_columns)
+                                         const std::vector<int64_t>& selected_rows,
+                                         const std::vector<int64_t>& selected_columns)
 {
     return RowAndColumnSelectorView<MatrixType>(m, selected_rows, selected_columns);
 }

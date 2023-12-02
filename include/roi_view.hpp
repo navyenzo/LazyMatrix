@@ -26,7 +26,7 @@ template<typename MatrixType>
 struct ROIView : public BaseMatrix< ROIView<MatrixType> >
 {
     ROIView<MatrixType>(MatrixType& expression,
-                        int row1, int column1, int row2, int column2)
+                        int64_t row1, int64_t column1, int64_t row2, int64_t column2)
     : expression_(expression),
       row1_(row1),
       column1_(column1),
@@ -37,64 +37,14 @@ struct ROIView : public BaseMatrix< ROIView<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return std::abs(row2_ - row1_) + 1;
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return std::abs(column2_ - column1_) + 1;
-    }
-
-
-
-    decltype(auto) at(int row, int column)const
-    {
-        int actual_row = row1_;
-        int actual_column = column1_;
-
-        if(rows() > 1)
-        {
-            if(row2_ > row1_)
-                actual_row += row;
-            else
-                actual_row -= row;
-        }
-
-        if(columns() > 1)
-        {
-            if(column2_ > column1_)
-                actual_column += column;
-            else
-                actual_column -= column;
-        }
-
-        return expression_.circ_at(actual_row, actual_column);
-    }
-
-    decltype(auto) at(int row, int column)
-    {
-        int actual_row = row1_;
-        int actual_column = column1_;
-
-        if(rows() > 1)
-        {
-            if(row2_ > row1_)
-                actual_row += row;
-            else
-                actual_row -= row;
-        }
-
-        if(columns() > 1)
-        {
-            if(column2_ > column1_)
-                actual_column += column;
-            else
-                actual_column -= column;
-        }
-
-        return expression_.circ_at(actual_row, actual_column);
     }
 
 
@@ -106,14 +56,66 @@ struct ROIView : public BaseMatrix< ROIView<MatrixType> >
 
 
 
+protected:
+
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        int64_t actual_row = row1_;
+        int64_t actual_column = column1_;
+
+        if(rows() > 1)
+        {
+            if(row2_ > row1_)
+                actual_row += row;
+            else
+                actual_row -= row;
+        }
+
+        if(columns() > 1)
+        {
+            if(column2_ > column1_)
+                actual_column += column;
+            else
+                actual_column -= column;
+        }
+
+        return expression_.circ_at(actual_row, actual_column);
+    }
+
+    decltype(auto) at_(int64_t row, int64_t column)
+    {
+        int64_t actual_row = row1_;
+        int64_t actual_column = column1_;
+
+        if(rows() > 1)
+        {
+            if(row2_ > row1_)
+                actual_row += row;
+            else
+                actual_row -= row;
+        }
+
+        if(columns() > 1)
+        {
+            if(column2_ > column1_)
+                actual_column += column;
+            else
+                actual_column -= column;
+        }
+
+        return expression_.circ_at(actual_row, actual_column);
+    }
+
+
+
 private:
 
     const MatrixType& expression_;
     
-    int row1_ = 0;
-    int column1_ = 0;
-    int row2_ = 0;
-    int column2_ = 0;
+    int64_t row1_ = 0;
+    int64_t column1_ = 0;
+    int64_t row2_ = 0;
+    int64_t column2_ = 0;
 };
 //-------------------------------------------------------------------
 
@@ -139,7 +141,7 @@ template<typename MatrixType,
 
 inline auto
 
-roi_view(MatrixType& m1, int row1, int column1, int row2, int column2)
+roi_view(MatrixType& m1, int64_t row1, int64_t column1, int64_t row2, int64_t column2)
 {
     return ROIView(m1, row1, column1, row2, column2);
 }

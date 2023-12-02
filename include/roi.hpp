@@ -26,7 +26,7 @@ template<typename MatrixType>
 struct ROI : public BaseMatrix< ROI<MatrixType> >
 {
     ROI<MatrixType>(const MatrixType& expression,
-                    int row1, int column1, int row2, int column2)
+                    int64_t row1, int64_t column1, int64_t row2, int64_t column2)
     : expression_(expression),
       row1_(row1),
       column1_(column1),
@@ -37,22 +37,31 @@ struct ROI : public BaseMatrix< ROI<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return std::abs(row2_ - row1_) + 1;
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return std::abs(column2_ - column1_) + 1;
     }
 
 
 
-    decltype(auto) at(int row, int column)const
+    const MatrixType& get_expression()const
     {
-        int actual_row = row1_;
-        int actual_column = column1_;
+        return expression_;
+    }
+
+
+
+protected:
+
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        int64_t actual_row = row1_;
+        int64_t actual_column = column1_;
 
         if(rows() > 1)
         {
@@ -71,13 +80,6 @@ struct ROI : public BaseMatrix< ROI<MatrixType> >
         }
 
         return expression_.circ_at(actual_row, actual_column);
-    }
-
-
-
-    const MatrixType& get_expression()const
-    {
-        return expression_;
     }
 
 

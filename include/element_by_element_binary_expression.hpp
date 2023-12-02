@@ -54,22 +54,14 @@ struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBin
 
     // This operation assumes both expressions are the
     // same size
-    int rows()const
+    uintptr_t rows()const
     {
         return this->left_side_expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->left_side_expression_.columns();
-    }
-
-
-
-    decltype(auto) at(int row, int column)const
-    {
-        return static_cast<value_type>(operation_function_(this->left_side_expression_.at(row,column),
-                                                           this->right_side_expression_.at(row,column)));
     }
 
 
@@ -82,6 +74,14 @@ struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBin
     const MatrixType2& get_right_side_expression()
     {
         return right_side_expression_;
+    }
+    
+    
+
+    decltype(auto) at_(int row, int column)const
+    {
+        return static_cast<value_type>(operation_function_(this->left_side_expression_.at(row,column),
+                                                           this->right_side_expression_.at(row,column)));
     }
 
 

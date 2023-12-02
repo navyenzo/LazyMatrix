@@ -34,19 +34,19 @@ struct ReverseView : public BaseMatrix< ReverseView<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return this->expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->expression_.columns();
     }
 
 
 
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
+    decltype(auto) at_(int64_t row, int64_t column)const
     {
         int64_t actual_row = row;
         int64_t actual_column = column;
@@ -60,7 +60,7 @@ struct ReverseView : public BaseMatrix< ReverseView<MatrixType> >
         return expression_(actual_row, actual_column);
     }
 
-    decltype(auto) at(const int64_t& row,const int64_t& column)
+    decltype(auto) at_(int64_t row,int64_t column)
     {
         int64_t actual_row = row;
         int64_t actual_column = column;

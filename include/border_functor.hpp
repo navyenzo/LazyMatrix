@@ -35,27 +35,14 @@ struct RepeatedBorder : public BaseMatrix< RepeatedBorder<MatrixType> >
 
 
 
-    int64_t rows()const
+    uintptr_t rows()const
     {
         return expression_.rows();
     }
 
-    int64_t columns()const
+    uintptr_t columns()const
     {
         return expression_.columns();
-    }
-
-
-
-    decltype(auto) at(int64_t row, int64_t column)const
-    {
-        row = std::max(int64_t(0), row);
-        row = std::min(this->rows() - 1, row);
-
-        column = std::max(int64_t(0), column);
-        column = std::min(this->columns() - 1, column);
-
-        return expression_.at(row, column);
     }
 
 
@@ -63,6 +50,19 @@ struct RepeatedBorder : public BaseMatrix< RepeatedBorder<MatrixType> >
     const MatrixType& get_expression_()const
     {
         return expression_;
+    }
+
+
+    
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        row = std::max(int64_t(0), row);
+        row = std::min(this->rows() - 1, row);
+
+        column = std::max(int64_t(0), column);
+        column = std::min(this->columns() - 1, column);
+
+        return expression_(row, column);
     }
 
 
@@ -108,24 +108,14 @@ struct ConstantBorder : public BaseMatrix< ConstantBorder<MatrixType> >
 
 
 
-    int64_t rows()const
+    uintptr_t rows()const
     {
         return expression_.rows();
     }
 
-    int64_t columns()const
+    uintptr_t columns()const
     {
         return expression_.columns();
-    }
-
-
-
-    const value_type& at(int64_t row, int64_t column)const
-    {
-        if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
-            return constant_value_;
-
-        return expression_.at(row, column);
     }
 
 
@@ -143,6 +133,16 @@ struct ConstantBorder : public BaseMatrix< ConstantBorder<MatrixType> >
     void set_constant_value(const value_type& constant_value)
     {
         constant_value_ = constant_value;
+    }
+    
+
+
+    const value_type& at_(int64_t row, int64_t column)const
+    {
+        if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
+            return constant_value_;
+
+        return expression_(row, column);
     }
 
 

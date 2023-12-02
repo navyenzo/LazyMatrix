@@ -38,71 +38,75 @@ class BaseMatrix3D
 {
 public:  
 
-    int pages()const
-    {
-        return underlying().pages();
-    }  
+    uintptr_t pages()const { return underlying().pages(); }  
+    uintptr_t rows()const { return underlying().rows(); }
+    uintptr_t columns()const { return underlying().columns(); }
+    uintptr_t size()const { return this->pages() * this->rows() * this->columns(); }
     
-    int rows()const
+    decltype(auto) at(int64_t page, int64_t row, int64_t column)const { return this->at_(page, row, column); }
+    decltype(auto) at(int64_t page, int64_t row, int64_t column) { return this->at_(page, row, column); }
+    decltype(auto) at(int64_t index) const { return (*this)(index); }
+    decltype(auto) at(int64_t index) { return (*this)(index); }
+
+    decltype(auto) operator()(int64_t page, int64_t row, int64_t column)const { return this->at_(page, row, column); }
+    decltype(auto) operator()(int64_t page, int64_t row, int64_t column) { return this->at_(page, row, column); }
+
+    decltype(auto) operator()(int64_t index)const
     {
-        return underlying().rows();
+        int64_t page = index / (this->rows() * this->columns());
+
+        int64_t remainder = index % (this->rows() * this->columns());
+
+        return this->at_(page, remainder / this->columns(), remainder % this->columns());
     }
 
-    int columns()const
+    decltype(auto) operator()(int64_t index)
     {
-        return underlying().columns();
+        int64_t page = index / (this->rows() * this->columns());
+
+        int64_t remainder = index % (this->rows() * this->columns());
+
+        return this->at_(page, remainder / this->columns(), remainder % this->columns());
     }
 
-    int size()const
+    decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)const
     {
-        return this->rows() * this->columns() * this->pages();
+        int64_t circ_page = (this->pages() + page % this->pages) % this->pages();
+        int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
+        int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
+        return this->at_(circ_page, circ_row, circ_column);
     }
-
     
-    
-    decltype(auto) at(int page, int row, int column)const
+    decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)
     {
-        return underlying()(page, row, column);
+        int64_t circ_page = (this->pages() + page % this->pages) % this->pages();
+        int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
+        int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
+        return this->at_(circ_page, circ_row, circ_column);
     }
 
-    decltype(auto) at(int page, int row, int column)
-    {
-        return underlying()(page, row, column);
-    }
-    
-    decltype(auto) operator()(int page, int row, int column)const
-    {
-        return this->at(page, row, column);
-    }
-    
-    decltype(auto) operator()(int page, int row, int column)
-    {
-        return this->at(page, row, column);
-    }
-
-    decltype(auto) operator()(int index)const
-    {
-        int page = index / (this->rows() * this->columns());
-
-        int remainder = index % (this->rows() * this->columns());
-
-        return this->at(page, remainder / this->columns(), remainder % this->columns());
-    }
-
-
-
-    decltype(auto) circ_at(int page, int row, int column)const
-    {
-        int circ_page = (this->pages() + page % this->pages) % this->pages();
-        int circ_row = (this->rows() + row % this->rows()) % this->rows();
-        int circ_column = (this->columns() + column % this->columns()) % this->columns();
-        return (*this)(circ_page, circ_row, circ_column);
-    }
-
-    decltype(auto) circ_at(int index)const
+    decltype(auto) circ_at(int64_t index)const
     {
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
-        return (*this)(circ_index);
+        return this->at_(circ_index);
+    }
+
+    decltype(auto) circ_at(int64_t index)
+    {
+        int64_t circ_index = (this->size() + index % this->size()) % this->size();
+        return this->at_(circ_index);
+    }
+    
+    
+
+    decltype(auto) at_(int64_t page, int64_t row, int64_t column)const
+    {
+        return underlying().at_(page, row, column);
+    }
+
+    decltype(auto) at_(int64_t page, int64_t row, int64_t column)
+    {
+        return underlying().at_(page, row, column);
     }
 
 

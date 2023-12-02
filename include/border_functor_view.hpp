@@ -35,38 +35,14 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<MatrixType> >
 
 
 
-    int64_t rows()const
+    uintptr_t rows()const
     {
         return expression_.rows();
     }
 
-    int64_t columns()const
+    uintptr_t columns()const
     {
         return expression_.columns();
-    }
-
-
-
-    decltype(auto) at(int64_t row, int64_t column)const
-    {
-        row = std::max(int64_t(0), row);
-        row = std::min(this->rows() - 1, row);
-
-        column = std::max(int64_t(0), column);
-        column = std::min(this->columns() - 1, column);
-
-        return expression_.at(row, column);
-    }
-
-    decltype(auto) at(int64_t row, int64_t column)
-    {
-        row = std::max(int64_t(0), row);
-        row = std::min(this->rows() - 1, row);
-
-        column = std::max(int64_t(0), column);
-        column = std::min(this->columns() - 1, column);
-
-        return expression_.at(row, column);
     }
 
 
@@ -74,6 +50,30 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<MatrixType> >
     const MatrixType& get_expression_()const
     {
         return expression_;
+    }
+
+
+
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        row = std::max(row, int64_t(0));
+        row = std::min(this->rows() - 1, row);
+
+        column = std::max(column, int64_t(0));
+        column = std::min(this->columns() - 1, column);
+
+        return expression_(row, column);
+    }
+
+    decltype(auto) at_(int64_t row, int64_t column)
+    {
+        row = std::max(row, int64_t(0));
+        row = std::min(this->rows() - 1, row);
+        
+        column = std::max(column, int64_t(0));
+        column = std::min(this->columns() - 1, column);
+
+        return expression_(row, column);
     }
 
 
@@ -119,32 +119,14 @@ struct ConstantBorderView : public BaseMatrix< ConstantBorderView<MatrixType> >
 
 
 
-    int64_t rows()const
+    uintptr_t rows()const
     {
         return expression_.rows();
     }
 
-    int64_t columns()const
+    uintptr_t columns()const
     {
         return expression_.columns();
-    }
-
-
-
-    const value_type& at(int64_t row, int64_t column)const
-    {
-        if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
-            return constant_value_;
-
-        return expression_.at(row, column);
-    }
-
-    value_type& at(int64_t row, int64_t column)
-    {
-        if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
-            return constant_value_;
-
-        return expression_.at(row, column);
     }
 
 
@@ -162,6 +144,24 @@ struct ConstantBorderView : public BaseMatrix< ConstantBorderView<MatrixType> >
     void set_constant_value(const value_type& constant_value)
     {
         constant_value_ = constant_value;
+    }
+    
+    
+
+    const value_type& at_(int64_t row, int64_t column)const
+    {
+        if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
+            return constant_value_;
+
+        return expression_(row, column);
+    }
+
+    value_type& at_(int64_t row, int64_t column)
+    {
+        if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
+            return constant_value_;
+
+        return expression_(row, column);
     }
 
 

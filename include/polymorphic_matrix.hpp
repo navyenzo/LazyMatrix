@@ -5,14 +5,27 @@
 
 //-------------------------------------------------------------------
 #include <memory>
-
+#include <type_traits>
 #include "base_matrix.hpp"
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Define every thing within the namespace LazyMatrix
+/**
+ * @file polymorphic_matrix.hpp
+ * @brief Defines polymorphic wrappers for matrix-like data structures in the LazyMatrix library.
+ * @namespace LazyMatrix
+ *
+ * This file contains classes and functions that provide a polymorphic interface
+ * for working with various matrix-like data structures, allowing them to be 
+ * stored and manipulated in a generic manner. It's particularly useful for 
+ * applications requiring polymorphic behavior with matrices.
+ */
+//-------------------------------------------------------------------
+
+
+
 //-------------------------------------------------------------------
 namespace LazyMatrix
 {
@@ -21,89 +34,46 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// These classes allow a programmer to store complex combinations of
-// lazymatrix components in a polymorphic container for applications
-// that require it
-//-------------------------------------------------------------------
-
-
-
+/**
+ * @class PolymorphicMatrix
+ * @brief Base class providing a polymorphic interface for matrix-like data.
+ *
+ * This class defines a generic interface for matrices, allowing for 
+ * operations like accessing elements and querying dimensions. It's
+ * templated to handle different data types within the matrix.
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class PolymorphicMatrix
+class PolymorphicMatrix : public BaseMatrix< PolymorphicMatrix<DataType> >
 {
 public:
 
-    virtual int64_t rows()const = 0;
-    virtual int64_t columns()const = 0;
-    virtual int64_t size()const = 0;
+    PolymorphicMatrix() = default;
+    virtual ~PolymorphicMatrix() = default;
 
-    virtual DataType at(int64_t row, int64_t column)const = 0;
-    virtual DataType& at(int64_t row, int64_t column) = 0;
-
-    DataType at(int64_t index)const
-    {
-        return this->at(index / this->columns(), index % this->columns());
-    }
-
-    DataType& at(int64_t index)
-    {
-        return this->at(index / this->columns(), index % this->columns());
-    }
-
-    DataType operator()(int64_t row, int64_t column)const
-    {
-        return this->at(row, column);
-    }
-
-    DataType& operator()(int64_t row, int64_t column)
-    {
-        return this->at(row, column);
-    }
-
-    DataType operator()(int64_t index)const
-    {
-        return this->at(index / this->columns(), index % this->columns());
-    }
-
-    DataType& operator()(int64_t index)
-    {
-        return this->at(index / this->columns(), index % this->columns());
-    }
+    virtual uintptr_t rows() const = 0;
+    virtual uintptr_t columns() const = 0;
+    virtual uintptr_t size() const = 0;
+    
 
 
-
-    DataType circ_at(int64_t row, int64_t column)const
-    {
-        int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
-        int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
-        return this->at(circ_row, circ_column);
-    }
-
-    DataType& circ_at(int64_t row, int64_t column)
-    {
-        int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
-        int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
-        return this->at(circ_row, circ_column);
-    }
-
-    DataType circ_at(int64_t index)const
-    {
-        int64_t circ_index = (this->size() + index % this->size()) % this->size();
-        return this->at(circ_index);
-    }
-
-    DataType& circ_at(int64_t index)
-    {
-        int64_t circ_index = (this->size() + index % this->size()) % this->size();
-        return this->at(circ_index);
-    }
+    virtual DataType at_(int64_t row, int64_t column) const = 0;
+    virtual DataType& at_(int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
 
 
 
+//-------------------------------------------------------------------
+/**
+ * @class PolymorphicMatrixWrapper
+ * @brief Wrapper class that provides a polymorphic interface to a given matrix type.
+ *
+ * This class wraps around a specific matrix type and exposes it through
+ * the PolymorphicMatrix interface. It handles both const and non-const
+ * matrix types, allowing for uniform treatment in a polymorphic context.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -111,93 +81,28 @@ class PolymorphicMatrixWrapper : public PolymorphicMatrix<typename std::remove_r
 {
 public:
 
-    // Type of value that is returned by the matrix
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
 
-    PolymorphicMatrixWrapper<MatrixType>(const MatrixType& matrix)
-    : matrix_(matrix)
-    {
-    }
+    explicit PolymorphicMatrixWrapper(MatrixType& matrix) : matrix_(matrix) {}
 
-
-
-    int64_t rows()const override
-    {
-        return matrix_.rows();
-    }
-
-    int64_t columns()const override
-    {
-        return matrix_.columns();
-    }
-
-    int64_t size()const override
-    {
-        return matrix_.size();
-    }
-
-    value_type at(int64_t row, int64_t column)const override
-    {
-        return matrix_.at(row, column);
-    }
-
-    value_type& at(int64_t row, int64_t column) override
-    {
-        return zero_;
-    }
-
-
-
-private:
-
-    const MatrixType& matrix_;
-    value_type zero_ = value_type(0);
+    uintptr_t rows() const override { return matrix_.rows(); }
+    uintptr_t columns() const override { return matrix_.columns(); }
+    uintptr_t size() const override { return matrix_.size(); }
     
-};
-//-------------------------------------------------------------------
 
 
-
-//-------------------------------------------------------------------
-template<typename MatrixType>
-
-class PolymorphicMatrixWrapperView : public PolymorphicMatrix<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>
-{
-public:
-
-    // Type of value that is returned by the matrix
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
-
-    PolymorphicMatrixWrapperView<MatrixType>(MatrixType& matrix)
-    : matrix_(matrix)
+    value_type at_(int64_t row, int64_t column) const override { return matrix_(row, column); }
+    
+    value_type& at_(int64_t row, int64_t column) override 
     {
-    }
-
-
-
-    int64_t rows()const override
-    {
-        return matrix_.rows();
-    }
-
-    int64_t columns()const override
-    {
-        return matrix_.columns();
-    }
-
-    int64_t size()const override
-    {
-        return matrix_.size();
-    }
-
-    value_type at(int64_t row, int64_t column)const override
-    {
-        return matrix_.at(row, column);
-    }
-
-    value_type& at(int64_t row, int64_t column) override
-    {
-        return matrix_.at(row, column);
+        if constexpr (std::is_const_v<MatrixType>)
+        {
+            return zero; // Return default value for const matrix types
+        }
+        else
+        {
+            return matrix_(row, column); // Non-const matrices allow modification
+        }
     }
 
 
@@ -205,75 +110,45 @@ public:
 private:
 
     MatrixType& matrix_;
-    
+
+    // Inline static member for zero value for wrapping
+    // matrix objects that don't allow changing entries
+    inline static value_type zero{};
 };
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Compile time functions to check if the type is an expression type
+/**
+ * @brief Compile time function to check if the type is a matrix expression type.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
-struct is_type_a_matrix< PolymorphicMatrixWrapper<MatrixType> > : std::true_type
-{
-};
-
-
-
-template<typename MatrixType>
-
-struct is_type_a_matrix< PolymorphicMatrixWrapperView<MatrixType> > : std::true_type
-{
-};
+struct is_type_a_matrix< PolymorphicMatrixWrapper<MatrixType> > : std::true_type {};
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Functions used to wrap a matrix expression in a matrix wrapper
+/**
+ * @brief Wraps a matrix in a PolymorphicMatrixWrapper and returns a shared pointer to PolymorphicMatrix.
+ * 
+ * @tparam MatrixType Type of the matrix to wrap.
+ * @param matrix The matrix to be wrapped.
+ * @return std::shared_ptr<PolymorphicMatrix<value_type>> Shared pointer to the base polymorphic type of the wrapped matrix.
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType>
-
-inline auto wrap_matrix(const MatrixType& matrix)
-{
-    return PolymorphicMatrixWrapper<MatrixType>(matrix);
-}
-
-
-
-template<typename MatrixType>
-
-inline auto wrap_matrix_ptr(const MatrixType& matrix)
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+inline auto wrap_matrix(MatrixType& matrix)
 {
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
 
-    PolymorphicMatrix<value_type>* ptr = new PolymorphicMatrixWrapper<MatrixType>(matrix);
+    std::shared_ptr<PolymorphicMatrix<value_type>> wrapped_matrix = std::make_shared<PolymorphicMatrixWrapper<MatrixType>>(matrix);
 
-    return ptr;
-}
-
-
-
-template<typename MatrixType>
-
-inline auto wrap_matrix_view(MatrixType& matrix)
-{
-    return PolymorphicMatrixWrapperView<MatrixType>(matrix);
-}
-
-
-
-template<typename MatrixType>
-
-inline auto wrap_matrix_view_ptr(MatrixType& matrix)
-{
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
-
-    PolymorphicMatrix<value_type>* ptr = new PolymorphicMatrixWrapperView<MatrixType>(matrix);
-
-    return ptr;
+    return wrapped_matrix;
 }
 //-------------------------------------------------------------------
 

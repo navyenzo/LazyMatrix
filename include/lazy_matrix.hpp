@@ -65,6 +65,8 @@
 #include "element_by_element_unary_expression.hpp"
 
 #include "output_operators.hpp"
+
+#include "strassen_matrix_multiplication.hpp"
 //-------------------------------------------------------------------
 
 

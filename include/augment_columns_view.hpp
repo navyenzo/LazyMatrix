@@ -40,52 +40,14 @@ struct AugmentColumnsView : public BaseMatrix< AugmentColumnsView<MatrixType1, M
 
 
 
-    int64_t rows()const
+    uintptr_t rows()const
     {
         return std::max(this->left_side_expression_.rows(), this->right_side_expression_.rows());
     }
 
-    int64_t columns()const
+    uintptr_t columns()const
     {
         return this->left_side_expression_.columns() + this->right_side_expression_.columns();
-    }
-
-
-
-    const value_type& at(int64_t row, int64_t column)const
-    {
-        if(column < this->left_side_expression_.columns())
-        {
-            if(row < this->left_side_expression_.rows())
-                return this->left_side_expression_.at(row, column);
-            else
-                return zero_;
-        }
-        else
-        {
-            if(row < this->right_side_expression_.rows())
-                return this->right_side_expression_.at(row, column - this->left_side_expression_.columns());
-            else
-                return zero_;
-        }
-    }
-
-    value_type& at(int64_t row, int64_t column)
-    {
-        if(column < this->left_side_expression_.columns())
-        {
-            if(row < this->left_side_expression_.rows())
-                return this->left_side_expression_.at(row, column);
-            else
-                return zero_;
-        }
-        else
-        {
-            if(row < this->right_side_expression_.rows())
-                return this->right_side_expression_.at(row, column - this->left_side_expression_.columns());
-            else
-                return zero_;
-        }
     }
 
 
@@ -98,6 +60,44 @@ struct AugmentColumnsView : public BaseMatrix< AugmentColumnsView<MatrixType1, M
     const MatrixType2& get_right_side_expression()const
     {
         return right_side_expression_;
+    }
+
+    
+
+    const value_type& at_(int64_t row, int64_t column)const
+    {
+        if(column < this->left_side_expression_.columns())
+        {
+            if(row < this->left_side_expression_.rows())
+                return this->left_side_expression_.at(row, column);
+            else
+                return zero_;
+        }
+        else
+        {
+            if(row < this->right_side_expression_.rows())
+                return this->right_side_expression_.at(row, column - this->left_side_expression_.columns());
+            else
+                return zero_;
+        }
+    }
+
+    value_type& at_(int64_t row, int64_t column)
+    {
+        if(column < this->left_side_expression_.columns())
+        {
+            if(row < this->left_side_expression_.rows())
+                return this->left_side_expression_.at(row, column);
+            else
+                return zero_;
+        }
+        else
+        {
+            if(row < this->right_side_expression_.rows())
+                return this->right_side_expression_.at(row, column - this->left_side_expression_.columns());
+            else
+                return zero_;
+        }
     }
 
 

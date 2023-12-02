@@ -40,32 +40,26 @@ struct Difference : public BaseMatrix< Difference<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         if(difference_direction_ == 1)
             return expression_.rows();
         
-        return std::max(0, expression_.rows() - 1);
+        if(expression_.rows() > 0)
+            return expression_.rows() - 1;
+        
+        return 0;
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         if(difference_direction_ == 2)
             return expression_.columns();
-            
-        return std::max(0, expression_.columns() - 1);
-    }
-
-
-
-    decltype(auto) at(int row, int column)const
-    {
-        if(difference_direction_ == 1)
-        {
-            return expression_.at(row, column + 1) - expression_.at(row, column);
-        }
-
-        return expression_.at(row + 1, column) - expression_.at(row, column);
+        
+        if(expression_.columns() > 0)
+            return expression_.columns() - 1;
+        
+        return 0;
     }
 
 
@@ -73,6 +67,18 @@ struct Difference : public BaseMatrix< Difference<MatrixType> >
     const MatrixType& get_expression()const
     {
         return expression_;
+    }
+    
+    
+
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        if(difference_direction_ == 1)
+        {
+            return expression_.at(row, column + 1) - expression_.at(row, column);
+        }
+
+        return expression_.at(row + 1, column) - expression_.at(row, column);
     }
 
 

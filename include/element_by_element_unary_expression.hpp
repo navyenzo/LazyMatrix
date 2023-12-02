@@ -51,21 +51,14 @@ struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnar
 
     // This operation assumes both expressions are the
     // same size
-    int rows()const
+    uintptr_t rows()const
     {
         return this->expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->expression_.columns();
-    }
-
-
-
-    decltype(auto) at(int row, int column)const
-    {
-        return static_cast<value_type>(operation_function_(this->expression_.at(row,column)));
     }
 
 
@@ -73,6 +66,13 @@ struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnar
     const MatrixType& get_expression()
     {
         return expression_;
+    }
+    
+    
+
+    decltype(auto) at_(int row, int column)const
+    {
+        return static_cast<value_type>(operation_function_(this->expression_.at(row,column)));
     }
 
 
