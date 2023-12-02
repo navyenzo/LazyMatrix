@@ -77,10 +77,8 @@ public:
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return this->at_(circ_index);
     }
-
-
-
-protected:
+    
+    
 
     decltype(auto) at_(int64_t row, int64_t column)const { return underlying().at_(row, column); }
     decltype(auto) at_(int64_t row, int64_t column) { return underlying().at_(row, column); }
