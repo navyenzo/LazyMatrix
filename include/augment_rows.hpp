@@ -64,7 +64,7 @@ struct AugmentRows : public BaseMatrix< AugmentRows<MatrixType1, MatrixType2> >
 
 
 
-    const value_type& at(int64_t row, int64_t column)const
+    const value_type& at_(int64_t row, int64_t column)const
     {
         if(row < this->left_side_expression_.rows())
         {
