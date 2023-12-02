@@ -53,21 +53,14 @@ struct Shuffle : public BaseMatrix< Shuffle<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return this->expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->expression_.columns();
-    }
-
-
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
-    {
-        return expression_.circ_at(row_indeces_[row], column_indeces_[column]);
     }
 
 
@@ -75,6 +68,13 @@ struct Shuffle : public BaseMatrix< Shuffle<MatrixType> >
     const MatrixType& get_expression()
     {
         return expression_;
+    }
+
+
+
+    decltype(auto) at_(int64_t row, int64_t column)const
+    {
+        return expression_.circ_at(row_indeces_[row], column_indeces_[column]);
     }
 
 

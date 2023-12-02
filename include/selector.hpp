@@ -58,10 +58,6 @@ struct RowSelector : public BaseMatrix< RowSelector<MatrixType> >
         return expression_;
     }
 
-
-
-protected:
-
     decltype(auto) at_(int64_t row, int64_t column)const
     {
         return expression_.circ_at(selected_rows_[row], column);
@@ -125,10 +121,8 @@ struct ColumnSelector : public BaseMatrix< ColumnSelector<MatrixType> >
     {
         return expression_;
     }
+    
 
-
-
-protected:
 
     decltype(auto) at_(int64_t row, int64_t column)const
     {
@@ -198,10 +192,8 @@ struct RowAndColumnSelector : public BaseMatrix< RowAndColumnSelector<MatrixType
     {
         return expression_;
     }
-
-
-
-protected:
+    
+    
 
     decltype(auto) at_(int64_t row, int64_t column)const
     {

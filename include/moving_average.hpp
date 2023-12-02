@@ -63,11 +63,11 @@ struct SimpleMovingAverageOfRows : public BaseMatrix< SimpleMovingAverageOfRows<
     {
         int64_t first_column = std::max(int64_t(0), column - number_of_data_points_to_average_ + 1);
 
-        auto avg = expression_.at(row, first_column);
+        auto avg = expression_(row, first_column);
 
         for(int64_t i = first_column + 1; i <= column; ++ i)
         {
-            avg += expression_.at(row, i);
+            avg += expression_(row, i);
         }
 
         avg /= static_cast<value_type>(column + 1 - first_column);
@@ -144,11 +144,11 @@ struct SimpleMovingAverageOfColumns : public BaseMatrix< SimpleMovingAverageOfCo
     {
         int64_t first_row = std::max(int64_t(0), row - number_of_data_points_to_average_ + 1);
 
-        auto avg = expression_.at(first_row, column);
+        auto avg = expression_(first_row, column);
 
         for(int64_t i = first_row + 1; i <= row; ++ i)
         {
-            avg += expression_.at(i, column);
+            avg += expression_(i, column);
         }
 
         avg /= static_cast<value_type>(row + 1 - first_row);

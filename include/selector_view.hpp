@@ -57,10 +57,8 @@ struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
     {
         return expression_;
     }
+    
 
-
-
-protected:
 
     decltype(auto) at_(int64_t row, int64_t column)const
     {
@@ -130,10 +128,8 @@ struct ColumnSelectorView : public BaseMatrix< ColumnSelectorView<MatrixType> >
     {
         return expression_;
     }
+    
 
-
-
-protected:
 
     decltype(auto) at_(int64_t row, int64_t column)const
     {
@@ -208,17 +204,15 @@ struct RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<Ma
     {
         return expression_;
     }
+    
 
 
-
-protected:
-
-    decltype(auto) at_(int64_t row,int64_t column)const
+    decltype(auto) at_(int64_t row, int64_t column)const
     {
         return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
     }
 
-    decltype(auto) at_(int64_t row,int64_t column)
+    decltype(auto) at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
     }

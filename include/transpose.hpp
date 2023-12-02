@@ -34,21 +34,14 @@ public:
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return this->expression_.columns();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->expression_.rows();
-    }
-
-
-
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
-    {
-        return expression_.at(column, row);
     }
 
 
@@ -56,6 +49,13 @@ public:
     const MatrixType& get_expression()
     {
         return expression_;
+    }
+
+
+
+    decltype(auto) at_(const int64_t& row,const int64_t& column)const
+    {
+        return expression_(column, row);
     }
 
 

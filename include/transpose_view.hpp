@@ -35,26 +35,26 @@ public:
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return this->expression_.columns();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->expression_.rows();
     }
 
 
 
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
+    decltype(auto) at_(int64_t row, int64_t column)const
     {
-        return expression_.at(column, row);
+        return expression_(column, row);
     }
 
-    decltype(auto) at(const int64_t& row,const int64_t& column)
+    decltype(auto) at_(int64_t row, int64_t column)
     {
-        return expression_.at(column, row);
+        return expression_(column, row);
     }
 
 

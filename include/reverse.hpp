@@ -34,19 +34,19 @@ struct Reverse : public BaseMatrix< Reverse<MatrixType> >
     
 
 
-    int rows()const
+    uintptr_t rows()const
     {
         return this->expression_.rows();
     }
 
-    int columns()const
+    uintptr_t columns()const
     {
         return this->expression_.columns();
     }
 
 
 
-    decltype(auto) at(const int64_t& row,const int64_t& column)const
+    decltype(auto) at(int64_t row, int64_t column)const
     {
         int64_t actual_row = row;
         int64_t actual_column = column;

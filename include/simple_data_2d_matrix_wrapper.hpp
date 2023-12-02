@@ -58,11 +58,9 @@ public:
     {
         return 1;
     }
-
-
-
-protected:
-
+    
+    
+    
     /**
      * @brief Const access of the wrapped value, ignoring row and column indices.
      * 

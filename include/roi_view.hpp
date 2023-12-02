@@ -53,10 +53,8 @@ struct ROIView : public BaseMatrix< ROIView<MatrixType> >
     {
         return expression_;
     }
-
-
-
-protected:
+    
+    
 
     decltype(auto) at_(int64_t row, int64_t column)const
     {
