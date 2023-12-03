@@ -1,3 +1,19 @@
+//-------------------------------------------------------------------
+/**
+ * @file circular_iterator.hpp
+ * @brief Defines a circular iterator for containers in LazyMatrix library.
+ *
+ * This file contains the CircularIterator template class, which provides an iterator 
+ * that can iterate over a container in a circular manner for a specified number of rotations.
+ *
+ * @author Vincenzo Barbato
+ * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
+ *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_CIRCULAR_ITERATOR_HPP_
 #define INCLUDE_CIRCULAR_ITERATOR_HPP_
 
@@ -20,8 +36,11 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// A circular iterator that stops circulating after a specified
-// amount of times
+/**
+ * @brief A circular iterator for iterating over containers.
+ * 
+ * @tparam ContainerType The type of container over which to iterate.
+ */
 //-------------------------------------------------------------------
 template<typename ContainerType>
 
@@ -38,6 +57,12 @@ public:
 
 
 
+    /**
+     * @brief Constructs a circular iterator for a given container.
+     * 
+     * @param container Reference to the container to iterate over.
+     * @param maximum_number_of_rotations The maximum number of complete rotations to make over the container.
+     */
     CircularIterator(ContainerType& container, std::ptrdiff_t maximum_number_of_rotations)
     : container_(container),
       current_pointer_(std::begin(container)),
@@ -46,6 +71,10 @@ public:
       maximum_number_of_rotations_(std::abs(maximum_number_of_rotations))
     {
     }
+
+
+
+    // Comparison operators
 
     bool operator==(const CircularIterator& circular_iterator)
     {
@@ -57,15 +86,24 @@ public:
         return current_pointer_ != circular_iterator.get_current_pointer();
     }
 
+
+
+    // Conversion to boolean
     explicit operator bool()const
     {
         return current_pointer_;
     }
 
+
+
+    // Dereference operators
     reference operator*(){return (*current_pointer_);}
     const reference operator*()const{return (*current_pointer_);}
     pointer operator->(){return current_pointer_;}
 
+
+
+    // Accessor methods
     pointer get_current_pointer()const { return current_pointer_; }
     pointer get_begin_pointer()const { return begin_pointer_; }
     pointer get_end_pointer()const { return end_pointer_; }
@@ -75,6 +113,7 @@ public:
 
 
 
+    // Set the iterator to the beginning or the end of its cycle
     void set_to_begin()
     {
         current_pointer_ = begin_pointer_;
@@ -89,6 +128,7 @@ public:
 
 
 
+    // Methods to get iterators to the beginning or end
     CircularIterator<ContainerType> begin()const
     {
         CircularIterator<ContainerType> copied_iterator = (*this);
@@ -105,13 +145,15 @@ public:
 
 
 
+    // Returns the size of the underlying container
     std::ptrdiff_t size()const
     {
         return container_.size();
     }
 
 
-
+    
+    // Increment and decrement operators
     CircularIterator<ContainerType>& operator++()
     {
         if(current_pointer_ == end_pointer_)
@@ -163,6 +205,9 @@ public:
         return (*this);
     }
 
+
+
+    // Compound assignment operators
     CircularIterator<ContainerType>& operator+=(std::ptrdiff_t movement)
     {
         return this->advance(movement);
@@ -177,6 +222,7 @@ public:
 
 private: // Private functions
 
+    // Advances the iterator by a specified number of steps
     CircularIterator<ContainerType>& advance(std::ptrdiff_t movement)
     {
         if(current_pointer_ == end_pointer_)
@@ -234,7 +280,7 @@ private: // Private variables
 
 
 //-------------------------------------------------------------------
-// Functions used to facilitate creating a circular iterator
+// Utility functions to facilitate creating a circular iterator
 //-------------------------------------------------------------------
 template<typename ContainerType>
 

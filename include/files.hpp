@@ -1,3 +1,21 @@
+//-------------------------------------------------------------------
+/**
+ * @file files.hpp
+ * @brief File and directory utilities for the LazyMatrix library.
+ *
+ * Provides functions for handling files and directories, including
+ * obtaining the executable's path, creating uniquely named files,
+ * and managing file sizes. These utilities are essential for
+ * operations involving file I/O in the LazyMatrix library.
+ *
+ * @author Vincenzo Barbato
+ * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
+ *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_FILES_HPP_
 #define INCLUDE_FILES_HPP_
 

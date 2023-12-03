@@ -1,3 +1,22 @@
+//-------------------------------------------------------------------
+/**
+ * @file interval.hpp
+ * @brief Defines the Interval class for representing and manipulating intervals.
+ *
+ * This file contains the Interval class template which is used to represent a numerical interval
+ * defined by a minimum and maximum value. It includes functionality for interval arithmetic
+ * operations such as addition, subtraction, multiplication, and division. This class is useful
+ * in contexts where interval calculations are needed, such as in numerical analysis or
+ * optimization problems.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ * @namespace LazyMatrix
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_INTERVAL_HPP_
 #define INCLUDE_INTERVAL_HPP_
 
@@ -21,8 +40,16 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Defines an interval: [min,max] together with the arithmetic
-// operators
+/**
+ * @class Interval
+ * @brief Represents a numerical interval and provides arithmetic operations.
+ *
+ * The Interval class template is designed to handle intervals defined by a minimum
+ * and maximum value. It provides basic arithmetic operations for intervals and can
+ * be used in various mathematical contexts.
+ *
+ * @tparam DataType The type of data the interval holds (e.g., int, float, double).
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 class Interval

@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file simple_data_2d_matrix_wrapper.hpp
+ * @brief Provides a wrapper to treat simple data types as 2D matrix-like objects.
+ *
+ * This file contains the SimpleData2DMatrixWrapper template class, which wraps simple data types
+ * (like int, float, etc.) to be treated as 1x1 matrices. This is particularly useful in polymorphic
+ * contexts where both simple types and matrices need to be handled uniformly. The file also includes
+ * utility functions to facilitate the use of this wrapper.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_SIMPLE_DATA_2D_MATRIX_WRAPPER_HPP_
 #define INCLUDE_SIMPLE_DATA_2D_MATRIX_WRAPPER_HPP_
 
@@ -20,14 +37,13 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
- * @brief A wrapper class to provide a 2d-matrix-like interface for simple data types.
+ * @brief A wrapper class for simple data types to provide a 2D matrix-like interface.
  *
- * This class is designed to wrap simple data types such as bool, float, int, etc.,
- * giving them a matrix-like interface. It presents these types as 1x1 matrices,
- * allowing them to be used interchangeably with more complex matrix types in
- * operations and functions expecting matrix-like objects.
+ * This class allows simple data types (like int, float, etc.) to be treated as 1x1 matrices.
+ * It's particularly useful in a polymorphic context where different data types including
+ * matrices and simple data types are handled uniformly.
  *
- * @tparam SimpleDataType The type of the simple data to be wrapped.
+ * @tparam SimpleDataType The data type of the value to be wrapped.
  */
 //-------------------------------------------------------------------
 template<typename SimpleDataType>
@@ -35,7 +51,12 @@ class SimpleData2DMatrixWrapper : public BaseMatrix<SimpleData2DMatrixWrapper<Si
 {
 public:
 
-    SimpleData2DMatrixWrapper(const SimpleDataType& value) : value_(value)
+    /**
+     * @brief Construct a new Simple Data 2D Matrix Wrapper object.
+     * 
+     * @param value The value to be wrapped in the matrix.
+     */
+    explicit SimpleData2DMatrixWrapper(const SimpleDataType& value) : value_(value)
     {
     }
 

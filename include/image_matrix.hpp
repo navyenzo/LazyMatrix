@@ -1,3 +1,22 @@
+//-------------------------------------------------------------------
+/**
+ * @file image_matrix.hpp
+ * @brief Provides the ImageMatrix class to handle images with pixel-level manipulation.
+ *
+ * This file contains the ImageMatrix class which is a wrapper around dlib's image processing
+ * capabilities. It allows for the loading, manipulation, and querying of images in a matrix
+ * format. The class is designed to be flexible with various pixel types including standard
+ * color formats and grayscale. It relies on dlib's image processing tools and thus requires
+ * pixel types that are compatible with dlib.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ * @namespace LazyMatrix
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_IMAGE_MATRIX_HPP_
 #define INCLUDE_IMAGE_MATRIX_HPP_
 
@@ -25,14 +44,17 @@ namespace LazyMatrix
 /**
  * @brief Trait to check if a type is a valid pixel type for use with dlib.
  *
- * This trait is used to ensure that only supported pixel types are used with
- * the ImageMatrix class. It is specialized for each valid pixel type provided by dlib,
- * as well as common types used for grayscale images.
+ * This trait ensures that only pixel types supported by dlib are used with ImageMatrix.
+ * It includes specializations for dlib's pixel types and common grayscale formats.
  */
 //-------------------------------------------------------------------
 template<typename T>
 struct is_valid_dlib_pixel_type : std::false_type {};
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
 // Specialize for dlib's provided pixel types
 template<> struct is_valid_dlib_pixel_type<dlib::rgb_pixel> : std::true_type {};
 template<> struct is_valid_dlib_pixel_type<dlib::bgr_pixel> : std::true_type {};

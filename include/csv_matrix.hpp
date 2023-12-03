@@ -1,3 +1,25 @@
+//-------------------------------------------------------------------
+/**
+ * @file csv_matrix.hpp
+ * @brief Memory maps CSV files and provides matrix-like access to numeric data within.
+ *
+ * The CSVMatrix class in the LazyMatrix library is designed to handle large CSV files 
+ * efficiently by memory-mapping them and allowing numeric data extraction with a matrix-like interface. 
+ * It accounts for complexities in CSV formatting, such as data enclosed in double quotes. 
+ * The class is templated on the DataType and extends the BaseMatrix class. Key features include 
+ * customizable delimiters for strings, rows, columns, and decimal points, and methods to extract 
+ * both raw string and numeric data from the CSV. It can also handle optional row and column headers. 
+ * The class emphasizes efficient data access in large CSV files, making it suitable for applications 
+ * that require processing and analyzing large datasets stored in CSV format. 
+ * The integration with the mio library ensures cross-platform compatibility for memory-mapping operations.
+ * 
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_CSV_MATRIX_HPP_
 #define INCLUDE_CSV_MATRIX_HPP_
 
@@ -29,12 +51,25 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// This class memory maps a csv file and provides functions to grab
-// numeric data from the csv file assuming that the data in the csv
-// file represents a matrix of size NxM
-//
-// -- The functions take into account double-quotes so that if data in the csv
-//    is saved within double-quotes, it is read as one thing
+/**
+ * @class CSVMatrix
+ * @brief Memory-mapped CSV file reader providing matrix-like access to data.
+ *
+ * This class represents a memory-mapped CSV file as a matrix, allowing for efficient access 
+ * to its contents. It is particularly useful for large CSV files where loading the entire file 
+ * into memory would be impractical. The class allows accessing individual data points with 
+ * matrix-like row and column indices. It supports customizable delimiters for parsing 
+ * the CSV file and can handle complex cases where data fields are enclosed in quotes. 
+ * Additionally, it provides functionality to handle optional row and column headers, 
+ * making it versatile for various CSV file formats. The CSVMatrix class extends 
+ * the BaseMatrix interface, enabling it to integrate seamlessly into systems that 
+ * operate on matrix-like data structures. This makes it suitable for applications 
+ * in data analysis, scientific computing, and any domain where large CSV datasets 
+ * are prevalent.
+ *
+ * @tparam DataType The data type of the elements in the CSV file. It dictates how the 
+ *                  string contents of the CSV are converted into numerical values.
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 

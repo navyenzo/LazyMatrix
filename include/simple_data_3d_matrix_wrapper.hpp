@@ -1,3 +1,21 @@
+//-------------------------------------------------------------------
+/**
+ * @file simple_data_3d_matrix_wrapper.hpp
+ * @brief Provides a wrapper to treat simple data types as 3D matrix-like objects.
+ *
+ * This file contains the SimpleData3DMatrixWrapper template class, which extends the concept of
+ * wrapping simple data types (like int, float, etc.) to provide a 3D matrix-like interface. It
+ * treats these types as 1x1 matrices, allowing them to be integrated into operations and functions
+ * that expect 3D matrix-like objects. The file also includes utility functions for easy use of this
+ * wrapper in polymorphic environments.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_SIMPLE_DATA_3D_MATRIX_WRAPPER_HPP_
 #define INCLUDE_SIMPLE_DATA_3D_MATRIX_WRAPPER_HPP_
 

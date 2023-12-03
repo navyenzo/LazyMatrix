@@ -1,3 +1,22 @@
+//-------------------------------------------------------------------
+/**
+ * @file polymorphic_matrix.hpp
+ * @brief Provides polymorphic wrappers for various matrix-like data structures in LazyMatrix.
+ *
+ * The polymorphic_matrix.hpp file defines classes and functions crucial for creating a polymorphic
+ * interface for matrix-like data structures. It allows for uniform handling of different matrix
+ * types in a polymorphic context. This file includes the definition of the `PolymorphicMatrix` base
+ * class, which offers a generic matrix interface, and the `PolymorphicMatrixWrapper` class, which
+ * wraps around specific matrix types and exposes them through the `PolymorphicMatrix` interface.
+ * These tools are essential for applications where polymorphic behavior with matrices is required.
+ * 
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_POLYMORPHIC_MATRIX_HPP_
 #define INCLUDE_POLYMORPHIC_MATRIX_HPP_
 

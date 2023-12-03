@@ -1,3 +1,21 @@
+//-------------------------------------------------------------------
+/**
+ * @file reverse_view.hpp
+ * @brief Provides the ReverseView class for creating a reversed view of matrix expressions in LazyMatrix.
+ *
+ * This file defines the ReverseView class, which creates a view of a matrix expression
+ * with reversed rows and/or columns. It allows modification of the original data through this reversed view.
+ * This class is useful for operations that require a reversed perspective of the matrix, while still
+ * allowing changes to be reflected in the original data.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ * @namespace LazyMatrix
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_REVERSE_VIEW_HPP_
 #define INCLUDE_REVERSE_VIEW_HPP_
 
@@ -19,7 +37,17 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Reverse rows and columns of an input matrix
+/**
+ * @class ReverseView
+ * @brief A class that provides a reversed view of a matrix.
+ *
+ * ReverseView presents a reversed interface to the underlying matrix expression. It allows
+ * for reversing the order of rows and/or columns, providing a flexible view for accessing
+ * and modifying the data. This class does not create a copy of the data but rather provides
+ * a different view of the same data with the ability to modify the original matrix.
+ *
+ * @tparam MatrixType The type of the underlying matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -106,7 +134,19 @@ struct is_type_a_matrix< ReverseView<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// reverse function
+/**
+ * @brief Helper function to create a ReverseView from a matrix expression.
+ *
+ * This function provides an easy way to create a ReverseView of a given matrix.
+ * It checks at compile time if the provided object is a matrix expression and returns
+ * a ReverseView object that offers access with reversed rows and/or columns.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ * @param m Reference to the matrix expression.
+ * @param should_rows_be_reversed Flag indicating if rows should be reversed.
+ * @param should_columns_be_reversed Flag indicating if columns should be reversed.
+ * @return ReverseView<MatrixType> A view of the matrix with reversed rows and/or columns.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>

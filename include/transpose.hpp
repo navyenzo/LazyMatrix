@@ -1,3 +1,21 @@
+//-------------------------------------------------------------------
+/**
+ * @file transpose.hpp
+ * @brief Provides the Transpose class for creating a transposed view of matrix expressions in LazyMatrix.
+ *
+ * This file defines the Transpose class, which creates a read-only view of a matrix expression
+ * where the rows and columns are swapped (transposed). Unlike TransposeView, Transpose does not allow
+ * modifications to the original matrix through the view, ensuring that the original data remains unchanged.
+ * This class is useful for operations that require a transpose view without the need for data modification.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ * @namespace LazyMatrix
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_TRANSPOSE_HPP_
 #define INCLUDE_TRANSPOSE_HPP_
 
@@ -19,7 +37,17 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Take the transpose of the input matrix expression
+/**
+ * @class Transpose
+ * @brief A class that provides a read-only transposed view of a matrix.
+ *
+ * Transpose presents a transposed interface to the underlying matrix expression. It swaps
+ * rows and columns for read-only access, allowing for operations as if the matrix were transposed.
+ * This class does not create a copy of the data, but rather provides a different view of the same data
+ * without allowing modifications to the original matrix.
+ *
+ * @tparam MatrixType The type of the underlying matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -81,7 +109,17 @@ struct is_type_a_matrix< Transpose<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// transpose
+/**
+ * @brief Helper function to create a Transpose from a matrix expression.
+ *
+ * This function provides an easy way to create a Transpose of a given matrix.
+ * It checks at compile time if the provided object is a matrix expression and returns
+ * a Transpose object that offers read-only access.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ * @param m Reference to the matrix expression.
+ * @return Transpose<MatrixType> A read-only transposed view of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>

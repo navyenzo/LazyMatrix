@@ -1,3 +1,25 @@
+//-------------------------------------------------------------------
+/**
+ * @file matrix.hpp
+ * @brief Defines the Matrix class, a key component of the LazyMatrix library for memory-mapped matrix operations.
+ *
+ * This file introduces the Matrix class, representing a memory-mapped matrix for efficient storage and
+ * manipulation of large datasets. A notable feature of this class is the inclusion of a mutex in the matrix header,
+ * facilitating its use for inter-process communication (IPC). This mutex allows for synchronized access to the matrix
+ * across different processes, ensuring safe and consistent data handling. The Matrix class supports various operations 
+ * such as resizing, initialization, loading from and saving to files. It integrates with external libraries like Eigen 
+ * and dlib for advanced mathematical computations. By leveraging memory-mapped files and IPC mechanisms, the Matrix class 
+ * provides robust functionality for high-performance matrix operations in a multi-process environment. It inherits from the 
+ * BaseMatrix class, utilizing the Curiously Recurring Template Pattern (CRTP) for polymorphic behavior.
+ * 
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
+
 #ifndef INCLUDE_MATRIX_HPP_
 #define INCLUDE_MATRIX_HPP_
 

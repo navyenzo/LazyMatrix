@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file convert_numbers.hpp
+ * @brief Provides functionality to convert strings to numbers and evaluate mathematical expressions.
+ *
+ * This header file contains templates and classes for converting strings to numeric types and for 
+ * evaluating mathematical expressions represented as strings. It is a part of the LazyMatrix library 
+ * which focuses on matrix operations and related utilities.
+ *
+ * @author Vincenzo Barbato
+ * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
+ *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_CONVERT_NUMBERS_HPP_
 #define INCLUDE_CONVERT_NUMBERS_HPP_
 
@@ -24,15 +41,18 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
- * @brief Function to convert a string to a number.
+ * @brief Converts a substring of a string to a number.
  *
- * @tparam T The numeric type to convert to.
- * @param result The resulting numeric value.
- * @param string_begin A pointer to the beginning of the string.
- * @param position_where_to_begin_converting The position where conversion should start.
- * @param position_where_to_end_converting The position where conversion should end.
- * @param decimal_point_delimiter The character used as the decimal point.
- * @return The position in the string where the conversion ended.
+ * @tparam NumberType The numeric type to which the string will be converted.
+ * @param resulting_converted_number The converted numeric result.
+ * @param string_begin Pointer to the beginning of the string to be converted.
+ * @param position_where_to_begin_converting Index in the string to start conversion.
+ * @param position_where_to_end_converting Index in the string to end conversion.
+ * @param decimal_point_delimiter Character used to denote the decimal point.
+ * @return int Position in the string where the conversion ended.
+ *
+ * Converts a portion of a string into a numeric value of type NumberType, starting and ending 
+ * at specified positions. Handles negative numbers and scientific notation.
  */
 //-------------------------------------------------------------------
 template<typename NumberType>

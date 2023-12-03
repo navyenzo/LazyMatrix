@@ -1,3 +1,27 @@
+//-------------------------------------------------------------------
+/**
+ * @file matrix3d.hpp
+ * @brief Defines the Matrix3D class, an integral part of the LazyMatrix library for 3D memory-mapped matrix operations.
+ *
+ * This file introduces the Matrix3D class, which represents a 3D memory-mapped matrix, 
+ * extending the capabilities of the LazyMatrix library to three dimensions. A key feature 
+ * of this class is the inclusion of a mutex in the matrix header, enabling its use in 
+ * inter-process communication (IPC). This mutex allows multiple processes to safely access 
+ * and manipulate the matrix data, ensuring data integrity in concurrent environments. 
+ * The Matrix3D class supports various operations such as resizing, initializing, and loading 
+ * matrices from files, and is compatible with external libraries like Eigen and dlib for 
+ * complex mathematical computations. By utilizing memory-mapped files and IPC mechanisms, 
+ * the Matrix3D class offers a robust solution for handling large 3D matrices efficiently 
+ * in multi-process applications. It builds upon the BaseMatrix3D class, using the Curiously 
+ * Recurring Template Pattern (CRTP) to achieve polymorphism without virtual functions.
+ * 
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_MATRIX3D_HPP_
 #define INCLUDE_MATRIX3D_HPP_
 

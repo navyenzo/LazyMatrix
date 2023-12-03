@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file base_matrix3d.hpp
+ * @brief Defines the BaseMatrix3D class as a foundation for 3D matrix operations in the LazyMatrix library.
+ *
+ * The BaseMatrix3D class serves as a base class for various 3D matrix types, providing common operations 
+ * and properties used across different 3D matrix implementations. It employs the Curiously Recurring 
+ * Template Pattern (CRTP) for type-safe operations.
+ *
+ * @author Vincenzo Barbato
+ * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
+ *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_BASE_MATRIX3D_HPP_
 #define INCLUDE_BASE_MATRIX3D_HPP_
 
@@ -19,7 +36,7 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Compile time functions to check if the type is an expression type
+// Trait to determine if a type is a 3D matrix expression.
 //-------------------------------------------------------------------
 template<typename MatrixType>
 struct is_type_a_matrix3d : std::false_type
@@ -30,24 +47,31 @@ struct is_type_a_matrix3d : std::false_type
 
 
 //-------------------------------------------------------------------
-// Used as the base expression class from which to derive from
+/**
+ * @brief Base class for 3D matrix expressions.
+ *
+ * @tparam MatrixType The derived matrix type following the CRTP pattern.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
 class BaseMatrix3D
 {
-public:  
+public:
 
+    // Accessors for matrix dimensions.
     uintptr_t pages()const { return underlying().pages(); }  
     uintptr_t rows()const { return underlying().rows(); }
     uintptr_t columns()const { return underlying().columns(); }
     uintptr_t size()const { return this->pages() * this->rows() * this->columns(); }
-    
+
+    // Accessors for matrix elements.
     decltype(auto) at(int64_t page, int64_t row, int64_t column)const { return this->at_(page, row, column); }
     decltype(auto) at(int64_t page, int64_t row, int64_t column) { return this->at_(page, row, column); }
     decltype(auto) at(int64_t index) const { return (*this)(index); }
     decltype(auto) at(int64_t index) { return (*this)(index); }
 
+    // Operator overloads for element access.
     decltype(auto) operator()(int64_t page, int64_t row, int64_t column)const { return this->at_(page, row, column); }
     decltype(auto) operator()(int64_t page, int64_t row, int64_t column) { return this->at_(page, row, column); }
 
@@ -69,6 +93,7 @@ public:
         return this->at_(page, remainder / this->columns(), remainder % this->columns());
     }
 
+    // Circular accessors for matrix elements.
     decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)const
     {
         int64_t circ_page = (this->pages() + page % this->pages) % this->pages();
@@ -96,9 +121,10 @@ public:
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return this->at_(circ_index);
     }
-    
-    
 
+
+
+    // Implementation for element access, to be provided by derived classes.
     decltype(auto) at_(int64_t page, int64_t row, int64_t column)const
     {
         return underlying().at_(page, row, column);
@@ -113,9 +139,11 @@ public:
 
 private:
 
+    // Private constructor to prevent direct instantiation.
     BaseMatrix3D<MatrixType>(){}
     friend MatrixType;
 
+    // Access to the derived class instance.
     MatrixType& underlying()
     {
         return static_cast<MatrixType&>(*this);

@@ -53,11 +53,7 @@ Finally, in your c++:
 LazyMatrix is available under the MIT License. This permissive license allows for wide use and modification as long as the original license and copyright notice are included.
 
 ## Contributing
-We welcome contributions from the community! Whether it's adding new features, fixing bugs, or improving documentation, your help is valuable. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for more details on how to get involved.
+We welcome contributions from the community! Whether it's adding new features, fixing bugs, or improving documentation, your help is valuable. Please see our contributing guidelines for more information on how to contribute.
 
 ## Stay Updated
 For the latest updates, enhancements, and features, keep an eye on our Githut repository
-
-## About the Author
-
-LazyMatrix is developed and maintained by Vincenzo Barbato. For more information about my professional background and other projects, please visit my [LinkedIn profile](https://www.linkedin.com/in/vincenzobarbato/).
