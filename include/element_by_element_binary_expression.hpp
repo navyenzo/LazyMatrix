@@ -1,3 +1,19 @@
+//-------------------------------------------------------------------
+/**
+ * @file element_by_element_binary_expression.hpp
+ * @brief Provides element-by-element binary operations for matrices.
+ *
+ * This file is part of the LazyMatrix library. It includes a template structure and functions to perform 
+ * element-by-element binary operations such as addition, subtraction, multiplication, etc., on matrices. 
+ * These operations are fundamental for matrix-based calculations and analyses.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_ELEMENT_BY_ELEMENT_BINARY_EXPRESSION_HPP_
 #define INCLUDE_ELEMENT_BY_ELEMENT_BINARY_EXPRESSION_HPP_
 
@@ -23,8 +39,16 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given two matrices, carry out element by element operation
-// - i.e. Addition, Multiplication and more...
+/**
+ * @brief A structure to represent element-by-element binary operations between two matrices.
+ *
+ * This structure allows for operations like addition, subtraction, multiplication, etc., 
+ * to be applied element-wise between two matrices. It uses a functional approach to define 
+ * the operation that should be applied to corresponding elements of the matrices.
+ *
+ * @tparam MatrixType1 Type of the first matrix (left operand).
+ * @tparam MatrixType2 Type of the second matrix (right operand).
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2>

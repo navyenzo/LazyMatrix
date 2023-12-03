@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file matrix_multiplication.hpp
+ * @brief Provides functionality for matrix multiplication in the LazyMatrix library.
+ *
+ * This file defines a function for performing matrix multiplication between two matrices,
+ * supporting matrices of different types. The multiplication follows the standard matrix
+ * multiplication algorithm with a time complexity of O(n^3). If dimensions are not compatible
+ * for multiplication, an empty matrix is returned.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_MATRIX_MULTIPLICATION_HPP_
 #define INCLUDE_MATRIX_MULTIPLICATION_HPP_
 

@@ -1,3 +1,19 @@
+//-------------------------------------------------------------------
+/**
+ * @brief Output stream operators for various pixel and matrix types.
+ *
+ * This file contains a series of overloaded operator<< functions that enable
+ * the output of different pixel types and matrix expressions to standard
+ * output streams. It supports various pixel types from the dlib library and
+ * custom matrix types defined in the application.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_OUTPUT_OPERATORS_HPP_
 #define INCLUDE_OUTPUT_OPERATORS_HPP_
 

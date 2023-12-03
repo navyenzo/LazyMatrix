@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file filters.hpp
+ * @brief Provides filtering functionality for matrices.
+ *
+ * This file is part of the LazyMatrix library and includes functions to create 
+ * various filter kernels (like Gaussian and Laplacian) and to apply these filters
+ * to matrices. It is particularly useful in image processing and computer vision 
+ * applications.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_FILTERS_HPP_
 #define INCLUDE_FILTERS_HPP_
 
@@ -24,7 +41,16 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Creates a Gaussian Kernel of a user specified size
+/**
+ * @brief Creates a Gaussian kernel of a specified size.
+ * 
+ * This function generates a Gaussian kernel, which is useful for smoothing images. 
+ * The Gaussian kernel is a square matrix with dimensions based on the specified kernel size.
+ * 
+ * @param kernel_size The size of the kernel (should be odd).
+ * @param sigma The standard deviation of the Gaussian distribution.
+ * @return Matrix<double> A Gaussian kernel matrix.
+ */
 //-------------------------------------------------------------------
 inline auto create_gaussian_kernel(uintptr_t kernel_size, double sigma)
 {
@@ -64,7 +90,16 @@ inline auto create_gaussian_kernel(uintptr_t kernel_size, double sigma)
 
 
 //-------------------------------------------------------------------
-// The Laplacian kernel
+/**
+ * @brief Creates a Laplacian kernel.
+ * 
+ * This function generates a Laplacian kernel, used for edge detection in images. 
+ * The Laplacian kernel is a 3x3 matrix with specific values to highlight areas of 
+ * rapid intensity change.
+ * 
+ * @tparam DataType The data type of the matrix elements.
+ * @return Matrix<DataType> A Laplacian kernel matrix.
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 
@@ -85,7 +120,18 @@ inline auto create_laplacian_kernel()
 
 
 //-------------------------------------------------------------------
-// Function used to filter an image using a provided filter
+/**
+ * @brief Applies a filter kernel to a source matrix.
+ * 
+ * This function convolves the source matrix with a filter kernel. 
+ * It is commonly used for image filtering operations such as blurring, sharpening, and edge detection.
+ * 
+ * @tparam MatrixType1 The type of the source matrix.
+ * @tparam MatrixType2 The type of the filter kernel.
+ * @param source_matrix The matrix to be filtered.
+ * @param filter_kernel The filter kernel to be applied.
+ * @return Matrix<value_type> The filtered matrix.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2,

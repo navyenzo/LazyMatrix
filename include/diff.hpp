@@ -1,3 +1,22 @@
+//-------------------------------------------------------------------
+/**
+ * @file diff.hpp
+ * @brief Functionality for first-order difference calculation in matrices.
+ *
+ * This file is part of the LazyMatrix library. It provides the Difference class
+ * which is used for computing first-order differences in matrices. This functionality
+ * mimics Matlab's diff function, offering the ability to compute differences along
+ * specified dimensions (rows or columns). It's useful in various fields such as signal
+ * processing, numerical analysis, and data analysis where differences between consecutive
+ * elements are of interest.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_DIFF_HPP_
 #define INCLUDE_DIFF_HPP_
 
@@ -20,12 +39,17 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 // Given a matrix return the first-order differences matrix
-// Equivalent of Matlab's diff function Y = diff(X,1,dim)
-// where 'dim' indicates the direction
-//
-// - dim -- direction of difference
-//       - 1 -- rows differences -- Y(i,j) = X(i,j+1) - X(i,j)
-//       - 2 -- column differences -- Y(i,j) = X(i+1,j) - X(i,j)
+/**
+ * @class Difference
+ * @brief Computes first-order differences of a matrix.
+ *
+ * The Difference class is designed to calculate the first-order differences of a given matrix.
+ * It supports computing differences either row-wise or column-wise. The class takes in a matrix
+ * and the desired direction (rows or columns) for calculating differences. This class extends
+ * the functionality of the BaseMatrix class and is templated to work with various matrix types.
+ *
+ * @tparam MatrixType The type of the input matrix for which differences are to be calculated.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 

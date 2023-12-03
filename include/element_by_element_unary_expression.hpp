@@ -1,3 +1,19 @@
+//-------------------------------------------------------------------
+/**
+ * @file element_by_element_unary_expression.hpp
+ * @brief Provides element-by-element unary operations for matrices.
+ *
+ * This file is part of the LazyMatrix library. It includes a template structure and functions to perform 
+ * element-by-element unary operations such as negation, sign, absolute value, square root, and exponential functions on matrices. 
+ * These operations are essential for various matrix-based calculations and transformations.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_ELEMENT_BY_ELEMENT_UNARY_EXPRESSION_HPP_
 #define INCLUDE_ELEMENT_BY_ELEMENT_UNARY_EXPRESSION_HPP_
 
@@ -23,8 +39,15 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given a matrix expression, carry out an operation on each element
-// - i.e. Absolute value, sign, negate and more...
+/**
+ * @brief A structure to represent element-by-element unary operations on a matrix.
+ *
+ * This structure allows for operations like negation, absolute value, square root, etc., 
+ * to be applied element-wise on a matrix. It uses a functional approach to define 
+ * the operation that should be applied to each element of the matrix.
+ *
+ * @tparam MatrixType Type of the matrix.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 

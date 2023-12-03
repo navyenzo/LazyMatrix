@@ -1,3 +1,21 @@
+//-------------------------------------------------------------------
+/**
+ * @file strassen_matrix_multiplication.hpp
+ * @brief Strassen's algorithm for efficient matrix multiplication.
+ *
+ * This file contains the implementation of Strassen's algorithm for matrix multiplication.
+ * It includes various utility functions for matrix manipulation, such as padding, trimming,
+ * splitting, and combining matrices, as well as the core Strassen multiplication logic.
+ * This implementation optimizes matrix multiplication for large matrices by reducing the
+ * number of recursive multiplications.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_STRASSEN_MATRIX_MULTIPLICATION_HPP_
 #define INCLUDE_STRASSEN_MATRIX_MULTIPLICATION_HPP_
 

@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file fft.hpp
+ * @brief Provides Fast Fourier Transform (FFT) functionalities for matrices.
+ *
+ * This file is part of the LazyMatrix library. It includes functions to perform 
+ * FFT and related transformations on matrices. The implementation leverages 
+ * Eigen library's FFT capabilities to provide efficient and accurate 
+ * frequency domain transformations.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_FFT_HPP_
 #define INCLUDE_FFT_HPP_
 
@@ -22,7 +39,21 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Function to compute the moving FFT of a matrix
+/**
+ * @brief Computes the moving FFT of a matrix.
+ * 
+ * This function applies a moving window FFT to a matrix of data, typically used 
+ * for analyzing time series or signal data. The FFT is computed for each window, 
+ * and the results are stored in a matrix. Overlapping windows can be specified 
+ * for more continuous analysis.
+ * 
+ * @tparam Scalar The data type of the matrix elements (typically double or float).
+ * @param data The input matrix of data.
+ * @param result The output matrix where FFT results will be stored.
+ * @param window_duration_sec The duration of the time window in seconds.
+ * @param sampling_period_sec The sampling period or frequency of the data in seconds.
+ * @param num_overlap_steps The number of overlap steps between successive windows.
+ */
 //-------------------------------------------------------------------
 template<typename Scalar>
 
