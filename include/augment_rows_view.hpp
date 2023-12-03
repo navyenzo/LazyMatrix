@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file augment_rows_view.hpp
+ * @brief Provides functionality to augment two matrices row-wise as a view.
+ *
+ * This file contains the AugmentRowsView template class, which is used to 
+ * create a view combining two matrices by augmenting their rows. This view 
+ * essentially places the rows of the second matrix below the first matrix, 
+ * creating a new matrix view without copying the data.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_AUGMENT_ROWS_VIEW_HPP_
 #define INCLUDE_AUGMENT_ROWS_VIEW_HPP_
 
@@ -19,7 +36,13 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given two matrices, augment rows
+/**
+ * @class AugmentRowsView
+ * @brief Augments two matrices by rows to create a new matrix view.
+ *
+ * @tparam MatrixType1 Type of the upper matrix in the augmentation.
+ * @tparam MatrixType2 Type of the lower matrix in the augmentation.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2>
@@ -29,8 +52,12 @@ struct AugmentRowsView : public BaseMatrix< AugmentRowsView<MatrixType1, MatrixT
     // Type of value that is stored in left side expression
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
 
-
-
+    /**
+     * @brief Constructs a new matrix view by augmenting the rows of two matrices.
+     *
+     * @param left_side_expression Reference to the upper matrix.
+     * @param right_side_expression Reference to the lower matrix.
+     */
     AugmentRowsView<MatrixType1, MatrixType2>(MatrixType1& left_side_expression,
                                               MatrixType2& right_side_expression)
     : left_side_expression_(left_side_expression),
@@ -127,7 +154,18 @@ struct is_type_a_matrix< AugmentRowsView<MatrixType1, MatrixType2> > : std::true
 
 
 //-------------------------------------------------------------------
-// Augment two matrices by rows
+/**
+ * @brief Function to augment two matrices by rows as a view.
+ *
+ * This function takes two matrix expressions and creates a new matrix view that represents
+ * the augmentation of these matrices by rows without copying the data.
+ *
+ * @tparam MatrixType1 Type of the upper matrix.
+ * @tparam MatrixType2 Type of the lower matrix.
+ * @param m1 Reference to the upper matrix.
+ * @param m2 Reference to the lower matrix.
+ * @return An AugmentRowsView object representing the augmented matrix view.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2,

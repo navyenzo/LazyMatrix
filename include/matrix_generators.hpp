@@ -1,3 +1,19 @@
+//-------------------------------------------------------------------
+/**
+ * @file matrix_generators.hpp
+ * @brief Provides matrix generation functionality for the LazyMatrix library.
+ *
+ * This file includes templates for generating various types of matrices like Iota, RandomMatrix,
+ * and SineWaveMatrix. These generators are useful for creating specific patterns or random matrices
+ * for testing, simulation, and other purposes in computational mathematics.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_MATRIX_GENERATORS_HPP_
 #define INCLUDE_MATRIX_GENERATORS_HPP_
 
@@ -29,7 +45,12 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Iota matrix generator
+/**
+ * @class Iota
+ * @brief Class to generate matrices with incrementally increasing values.
+ *
+ * @tparam DataType The data type of the matrix elements.
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 
@@ -90,7 +111,12 @@ struct is_type_a_matrix< Iota<DataType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Random matrix generator for integer matrices
+/**
+ * @class RandomMatrix
+ * @brief Class to generate matrices with random values.
+ *
+ * @tparam DataType The data type of the matrix elements.
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 
@@ -155,7 +181,12 @@ struct is_type_a_matrix< RandomMatrix<DataType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Sine wave matrix generator
+/**
+ * @class SineWaveMatrix
+ * @brief Class to generate matrices representing a sine wave.
+ *
+ * @tparam DataType The data type of the matrix elements.
+ */
 //-------------------------------------------------------------------
 template<typename DataType>
 

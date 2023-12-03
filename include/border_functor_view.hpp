@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file border_functor_view.hpp
+ * @brief Provides views for matrix border handling.
+ *
+ * This file contains the RepeatedBorderView and ConstantBorderView template classes,
+ * offering views to handle border cases when accessing matrix elements outside the
+ * bounds. RepeatedBorderView returns the value at the matrix's border, while
+ * ConstantBorderView returns a user-specified constant value.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_BORDER_FUNCTOR_VIEW_HPP_
 #define INCLUDE_BORDER_FUNCTOR_VIEW_HPP_
 
@@ -21,8 +38,12 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given a matrix, when trying to access the matrix outside of its
-// bounds, it just returns the value at the matrix's border
+/**
+ * @class RepeatedBorderView
+ * @brief View that handles border cases by repeating border values.
+ *
+ * @tparam MatrixType Type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -99,8 +120,12 @@ struct is_type_a_matrix< RepeatedBorderView<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Given a matrix, when trying to access the matrix outside of its
-// bounds, it just returns a user specified constant (defaulted to 0)
+/**
+ * @class ConstantBorderView
+ * @brief View that handles border cases by returning a constant value.
+ *
+ * @tparam MatrixType Type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 

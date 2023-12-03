@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file roi_view.hpp
+ * @brief Provides functionality to create a view representing a Region Of Interest (ROI) in matrices.
+ *
+ * This file contains the ROIView template class, which enables the creation of a modifiable view
+ * focusing on a specific sub-region within a matrix. This class is particularly useful for
+ * operations that require modifying or analyzing a particular area of a matrix without affecting
+ * the rest of the matrix.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_ROI_VIEW_HPP_
 #define INCLUDE_ROI_VIEW_HPP_
 
@@ -19,12 +36,26 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given a matrix, select a Region Of Interest (ROI)
+/**
+ * @class ROIView
+ * @brief Class to create a view representing a modifiable Region Of Interest within a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
 struct ROIView : public BaseMatrix< ROIView<MatrixType> >
 {
+    /**
+     * @brief Constructs a ROIView object from a matrix expression and coordinates.
+     *
+     * @param expression The matrix expression from which to create the ROI view.
+     * @param row1 The starting row index of the ROI.
+     * @param column1 The starting column index of the ROI.
+     * @param row2 The ending row index of the ROI.
+     * @param column2 The ending column index of the ROI.
+     */
     ROIView<MatrixType>(MatrixType& expression,
                         int64_t row1, int64_t column1, int64_t row2, int64_t column2)
     : expression_(expression),

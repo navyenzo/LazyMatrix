@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file moving_average.hpp
+ * @brief Provides functionality for computing simple moving averages of matrix rows or columns.
+ *
+ * This file contains templates for SimpleMovingAverageOfRows and SimpleMovingAverageOfColumns,
+ * which enable users to compute the simple moving average across rows or columns of a given
+ * matrix expression. These functionalities are useful in statistical analysis and signal processing,
+ * where moving averages are commonly used to smooth data or identify trends.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_MOVING_AVERAGE_HPP_
 #define INCLUDE_MOVING_AVERAGE_HPP_
 
@@ -19,8 +36,12 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given a matrix return a matrix whose rows are averaged using a
-// simple moving average
+/**
+ * @class SimpleMovingAverageOfRows
+ * @brief Class to compute the simple moving average of rows in a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -100,8 +121,12 @@ struct is_type_a_matrix< SimpleMovingAverageOfRows<MatrixType> > : std::true_typ
 
 
 //-------------------------------------------------------------------
-// Given a matrix return a matrix whose columns are averaged using a
-// simple moving average
+/**
+ * @class SimpleMovingAverageOfColumns
+ * @brief Class to compute the simple moving average of columns in a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 

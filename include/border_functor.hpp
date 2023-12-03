@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file border_functor.hpp
+ * @brief Provides functionality to handle matrix border cases.
+ *
+ * This file contains the RepeatedBorder and ConstantBorder template classes,
+ * which are used to handle border cases when accessing elements outside the
+ * bounds of a matrix. RepeatedBorder returns the value at the matrix's border,
+ * while ConstantBorder returns a user-specified constant value.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_BORDER_FUNCTOR_HPP_
 #define INCLUDE_BORDER_FUNCTOR_HPP_
 
@@ -21,8 +38,12 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given a matrix, when trying to access the matrix outside of its
-// bounds, it just returns the value at the matrix's border
+/**
+ * @class RepeatedBorder
+ * @brief Handles border cases by repeating border values.
+ *
+ * @tparam MatrixType Type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -88,8 +109,12 @@ struct is_type_a_matrix< RepeatedBorder<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Given a matrix, when trying to access the matrix outside of its
-// bounds, it just returns a user specified constant (defaulted to 0)
+/**
+ * @class ConstantBorder
+ * @brief Handles border cases by returning a constant value.
+ *
+ * @tparam MatrixType Type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 

@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file shuffle.hpp
+ * @brief Provides functionality to shuffle rows and/or columns of matrices.
+ *
+ * This file contains the template for Shuffle, which allows users to shuffle rows, columns, or both
+ * of a given matrix expression. The shuffling is done in a random manner using the Xoshiro256PlusPlus
+ * random number generator from the xoshiro-cpp library. This is particularly useful in data processing
+ * and machine learning applications where random sampling or permutation is required.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_SHUFFLE_HPP_
 #define INCLUDE_SHUFFLE_HPP_
 
@@ -26,7 +43,12 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Shuffle rows and/or columns of an input matrix
+/**
+ * @class Shuffle
+ * @brief Class for shuffling rows and/or columns of a matrix expression.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 

@@ -50,7 +50,9 @@ Finally, in your c++:
 ```
 
 ## Example Usage
-Using LazyMatrix library is very simple, you just need to include one header file and that's it: ```#include <lazy_matrix.hpp>```
+Using LazyMatrix library is very simple, you just need to include one header file and that's it:
+
+ ```#include <lazy_matrix.hpp>```
 
 Here is a simple main.cpp file showing some examples on how to use some of the library's features, showcasing how we can do some advanced matrix manipulations/operations while keeiping code legible and easy to understand:
 ```cpp

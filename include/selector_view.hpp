@@ -1,3 +1,19 @@
+//-------------------------------------------------------------------
+/**
+ * @file selector_view.hpp
+ * @brief Provides functionality for creating views that select specific rows and/or columns from matrices.
+ *
+ * This file contains templates for RowSelectorView, ColumnSelectorView, and RowAndColumnSelectorView,
+ * which enable users to create views focusing on specific rows, columns, or both from a given matrix.
+ * Unlike the non-view selectors, these classes allow modification of the original matrix through the view.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_SELECTOR_VIEW_HPP_
 #define INCLUDE_SELECTOR_VIEW_HPP_
 
@@ -23,7 +39,12 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given an input matrix, select rows from it
+/**
+ * @class RowSelectorView
+ * @brief Class for creating a view that selects specific rows from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -94,7 +115,12 @@ struct is_type_a_matrix< RowSelectorView<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Given an input matrix, select columns from it
+/**
+ * @class ColumnSelectorView
+ * @brief Class for creating a view that selects specific columns from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -165,7 +191,12 @@ struct is_type_a_matrix< ColumnSelectorView<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Given an input matrix, select columns from it
+/**
+ * @class RowAndColumnSelectorView
+ * @brief Class for creating a view that selects specific rows and columns from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 

@@ -1,3 +1,19 @@
+//-------------------------------------------------------------------
+/**
+ * @file roi.hpp
+ * @brief Provides functionality to select a Region Of Interest (ROI) in matrices.
+ *
+ * This file contains the ROI template class, allowing the selection of a specific
+ * sub-region within a matrix. The ROI class is useful for focusing on a particular
+ * area of a matrix for further processing or analysis.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_ROI_HPP_
 #define INCLUDE_ROI_HPP_
 
@@ -19,12 +35,26 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given a matrix, select a Region Of Interest (ROI)
+/**
+ * @class ROI
+ * @brief Class to create a view representing a Region Of Interest within a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
 struct ROI : public BaseMatrix< ROI<MatrixType> >
 {
+    /**
+     * @brief Constructs a ROI object from a matrix expression and coordinates.
+     *
+     * @param expression The matrix expression from which to create the ROI.
+     * @param row1 The starting row index of the ROI.
+     * @param column1 The starting column index of the ROI.
+     * @param row2 The ending row index of the ROI.
+     * @param column2 The ending column index of the ROI.
+     */
     ROI<MatrixType>(const MatrixType& expression,
                     int64_t row1, int64_t column1, int64_t row2, int64_t column2)
     : expression_(expression),

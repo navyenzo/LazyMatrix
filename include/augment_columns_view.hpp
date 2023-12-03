@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file augment_columns_view.hpp
+ * @brief Provides functionality to augment two matrices column-wise.
+ *
+ * This file contains the AugmentColumnsView template class, which is used to 
+ * create a view combining two matrices by augmenting their columns. It essentially
+ * places the columns of the second matrix to the right of the first matrix.
+ *
+ * @author Vincenzo Barbato
+ * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
+ *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_AUGMENT_COLUMNS_VIEW_HPP_
 #define INCLUDE_AUGMENT_COLUMNS_VIEW_HPP_
 
@@ -19,7 +36,13 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given two matrices, augment columns
+/**
+ * @class AugmentColumnsView
+ * @brief Augments two matrices by columns to create a new matrix view.
+ *
+ * @tparam MatrixType1 Type of the left side matrix in the augmentation.
+ * @tparam MatrixType2 Type of the right side matrix in the augmentation.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2>
@@ -29,8 +52,12 @@ struct AugmentColumnsView : public BaseMatrix< AugmentColumnsView<MatrixType1, M
     // Type of value that is stored in left side expression
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
 
-
-
+    /**
+     * @brief Constructs a view which augments the columns of two matrices.
+     *
+     * @param left_side_expression Reference to the left side matrix.
+     * @param right_side_expression Reference to the right side matrix.
+     */
     AugmentColumnsView<MatrixType1, MatrixType2>(MatrixType1& left_side_expression,
                                                  MatrixType2& right_side_expression)
     : left_side_expression_(left_side_expression),
@@ -127,7 +154,18 @@ struct is_type_a_matrix< AugmentColumnsView<MatrixType1, MatrixType2> > : std::t
 
 
 //-------------------------------------------------------------------
-// Augment two matrices by columns
+/**
+ * @brief Function to augment two matrices by columns.
+ *
+ * This function takes two matrix expressions and creates a view that represents
+ * the augmentation of these matrices by columns.
+ *
+ * @tparam MatrixType1 Type of the left side matrix.
+ * @tparam MatrixType2 Type of the right side matrix.
+ * @param m1 Reference to the left side matrix.
+ * @param m2 Reference to the right side matrix.
+ * @return An AugmentColumnsView object representing the augmented matrix.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2,

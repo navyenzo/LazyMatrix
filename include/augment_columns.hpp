@@ -1,3 +1,21 @@
+//-------------------------------------------------------------------
+/**
+ * @file augment_columns.hpp
+ * @brief Provides functionality to augment two matrices column-wise.
+ *
+ * This file contains the AugmentColumns template class, which is used to 
+ * create a new matrix combining two matrices by augmenting their columns. It essentially
+ * places the columns of the second matrix to the right of the first matrix, creating
+ * a new matrix object.
+ *
+ * @author Vincenzo Barbato
+ * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
+ *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_AUGMENT_COLUMNS_HPP_
 #define INCLUDE_AUGMENT_COLUMNS_HPP_
 
@@ -19,7 +37,13 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given two matrices, augment columns
+/**
+ * @class AugmentColumns
+ * @brief Augments two matrices by columns to create a new matrix.
+ *
+ * @tparam MatrixType1 Type of the left side matrix in the augmentation.
+ * @tparam MatrixType2 Type of the right side matrix in the augmentation.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2>
@@ -29,8 +53,12 @@ struct AugmentColumns : public BaseMatrix< AugmentColumns<MatrixType1, MatrixTyp
     // Type of value that is stored in left side expression
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
 
-
-
+    /**
+     * @brief Constructs a new matrix by augmenting the columns of two matrices.
+     *
+     * @param left_side_expression Reference to the left side matrix.
+     * @param right_side_expression Reference to the right side matrix.
+     */
     AugmentColumns<MatrixType1, MatrixType2>(const MatrixType1& left_side_expression,
                                              const MatrixType2& right_side_expression)
     : left_side_expression_(left_side_expression),
@@ -109,7 +137,18 @@ struct is_type_a_matrix< AugmentColumns<MatrixType1, MatrixType2> > : std::true_
 
 
 //-------------------------------------------------------------------
-// Augment two matrices by rows
+/**
+ * @brief Function to augment two matrices by columns.
+ *
+ * This function takes two matrix expressions and creates a new matrix that represents
+ * the augmentation of these matrices by columns.
+ *
+ * @tparam MatrixType1 Type of the left side matrix.
+ * @tparam MatrixType2 Type of the right side matrix.
+ * @param m1 Reference to the left side matrix.
+ * @param m2 Reference to the right side matrix.
+ * @return An AugmentColumns object representing the augmented matrix.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2,

@@ -1,3 +1,20 @@
+//-------------------------------------------------------------------
+/**
+ * @file selector.hpp
+ * @brief Provides functionality for selecting specific rows and/or columns from matrices.
+ *
+ * This file contains templates for RowSelector, ColumnSelector, and RowAndColumnSelector,
+ * enabling users to create views that focus on specific rows, columns, or both from a given
+ * matrix. These classes are essential for operations that require manipulation or analysis
+ * of selected portions of a matrix.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_SELECTOR_HPP_
 #define INCLUDE_SELECTOR_HPP_
 
@@ -23,7 +40,12 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Given an input matrix, select rows from it
+/**
+ * @class RowSelector
+ * @brief Class for selecting specific rows from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -87,7 +109,12 @@ struct is_type_a_matrix< RowSelector<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Given an input matrix, select columns from it
+/**
+ * @class ColumnSelector
+ * @brief Class for selecting specific columns from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
@@ -153,7 +180,12 @@ struct is_type_a_matrix< ColumnSelector<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Given an input matrix, select columns from it
+/**
+ * @class RowAndColumnSelector
+ * @brief Class for selecting specific rows and columns from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
