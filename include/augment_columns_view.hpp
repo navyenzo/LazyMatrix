@@ -127,7 +127,7 @@ struct is_type_a_matrix< AugmentColumnsView<MatrixType1, MatrixType2> > : std::t
 
 
 //-------------------------------------------------------------------
-// Augment two matrices by rows
+// Augment two matrices by columns
 //-------------------------------------------------------------------
 template<typename MatrixType1,
          typename MatrixType2,

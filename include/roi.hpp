@@ -108,7 +108,7 @@ struct is_type_a_matrix< ROI<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Augment two matrices by rows
+// Create a Region Of Interest (ROI) of a given matrix expression
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
