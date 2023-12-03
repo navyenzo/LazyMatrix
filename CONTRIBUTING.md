@@ -1,59 +1,55 @@
-# LazyMatrix
+# Contributing to LazyMatrix
 
-## Overview
-**LazyMatrix** is a sophisticated, header-only C++ library designed for intuitive and efficient handling of 2D and 3D matrix data. It leverages lazy evaluation for performance optimization and integrates seamlessly with the Eigen and dlib libraries for advanced matrix operations and neural network functionalities.
+We welcome and appreciate contributions from the community! Whether it's improving code, fixing bugs, or enhancing documentation, your help is valuable. This document provides guidelines for contributing to LazyMatrix.
 
-## Key Features
-- **Header-Only**: Easy integration with just a single include.
-- **Lazy Evaluation**: Optimized for performance, carrying out computations only when needed.
-- **2D and 3D Matrix Support**: Unified interface for both 2D and 3D matrices.
-- **Memory-Mapped File Storage**: `Matrix<Type>` and `Matrix3D<Type>` use memory-mapped files for efficient data sharing across threads and processes.
-- **Eigen and dlib Integration**: For efficient matrix math and neural network support.
-- **User-Friendly Syntax**: Designed for clarity and ease of use.
+## Code Contributions
 
-## Active Development
-LazyMatrix is under active development. We regularly add new features and enhancements to make the library more powerful and easy to use.
+Before you contribute, please note that LazyMatrix follows the [Google C++ Style Guidelines](https://google.github.io/styleguide/cppguide.html). Familiarize yourself with these guidelines as your contributions should adhere to them.
 
-## Getting Started
-Clone the repository and include `lazy_matrix.hpp` in your project:
+### Getting Started
+
+1. **Fork the repository**: Make a copy of the project on GitHub by forking it.
+
+2. **Clone your fork**: Download your fork to your local machine.
 ```bash
-git clone https://github.com/navyenzo/LazyMatrix.git
+   git clone https://github.com/your-username/LazyMatrix.git
 ```
 
-Then update your cmake file adding LazyMatrix's include directory:
-```cmake
-# Add the LazyMatrix include directory
-include_directories(path_to_LazyMatrix/include)
+Create a branch: Create a new branch for your feature or fix.Create a branch: Create a new branch for your feature or fix.
+```bash
+git checkout -b feature/my-new-feature
 ```
 
-Alternatively, you can use FetchContent in CMake to include LazyMatrix (this in my opinion is a better choice):
-```cmake
-###############################################################
-# LazyMatrix library
-###############################################################
+### Making Changes
+Follow the coding style: Use lower case with underscores for function and variable names, and place everything inside the LazyMatrix namespace.
+Comment your code: Provide clear and concise comments where necessary.
+Write tests: If possible, add tests for the new functionality or the bug you are fixing.
+Document changes: Update the README or documentation if your changes require it.
 
-# Declare LazyMatrix dependency with a specific commit hash
-FetchContent_Declare(
-    LazyMatrix
-    GIT_REPOSITORY https://github.com/navyenzo/LazyMatrix.git
-    GIT_TAG main
-)
-
-# Make LazyMatrix content available for use
-FetchContent_MakeAvailable(LazyMatrix)
-###############################################################
+### Submitting Changes
+1. Commit your changes:
+```bash
+git commit -am 'Add some feature'
 ```
-
-Finally, in your c++:
-```cpp
-#include <lazy_matrix.hpp>
+2. Push your branch:
+```bash
+git push origin feature/my-new-feature
 ```
+3. Create a pull request: Go to the LazyMatrix repository on GitHub and create a pull request from your branch.
 
-## License
-LazyMatrix is available under the MIT License. This permissive license allows for wide use and modification as long as the original license and copyright notice are included.
+### Review Process
+After you submit a pull request, the project maintainers will review your changes. They may suggest modifications or improvements to your submission.
 
-## Contributing
-We welcome contributions from the community! Whether it's adding new features, fixing bugs, or improving documentation, your help is valuable. Please see our contributing guidelines for more information on how to contribute.
+### Reporting Issues
+If you find bugs or have feature requests, feel free to open an issue. Please provide as much detail as possible, including steps to reproduce the issue, the LazyMatrix version, and your environment details.
 
-## Stay Updated
-For the latest updates, enhancements, and features, keep an eye on our Githut repository
+### Documentation Contributions
+Improvements or additions to documentation are always welcome. Whether it's correcting typos, clarifying sections, or adding examples, your help in making our documentation better is appreciated.
+
+### Community and Conduct
+LazyMatrix is committed to providing a welcoming and inclusive environment for contributors. We expect all participants to adhere to our Code of Conduct, which is based on respect, professionalism, and collaboration.
+
+### Questions
+If you have questions or need help with setting up or understanding our codebase, feel free to open an issue with your question.
+
+Thank you for contributing to LazyMatrix!
