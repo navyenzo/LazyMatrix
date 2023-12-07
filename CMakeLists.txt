@@ -11,8 +11,9 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3")
 # Set the output directory for binaries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# External libraries
+# These modules are needed for external libraries
 include(FetchContent)
+include(ExternalProject)
 ###############################################################
 
 
