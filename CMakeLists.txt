@@ -84,7 +84,7 @@ FetchContent_MakeAvailable(dlib)
 # Option to build or not build the provided tests
 option(LazyMatrix_BUILD_TESTS "Build the tests." ON)
 
-message("LazyMatrix_BUILD_TESTS option: " ${BUILD_TESTS})
+message("LazyMatrix_BUILD_TESTS option: " ${LazyMatrix_BUILD_TESTS})
 
 if(${LazyMatrix_BUILD_TESTS})
     enable_testing()
@@ -125,10 +125,10 @@ target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
 
 
 # Find the required libraries for non-vcpkg (particularly on Linux)
-find_package(ZLIB REQUIRED)
-find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
-find_package(GIF REQUIRED)
+find_package(ZLIB REQUIRED MODULE)
+find_package(PNG REQUIRED MODULE)
+find_package(JPEG REQUIRED MODULE)
+find_package(GIF REQUIRED MODULE)
 
 # Link the required libraries to dlib (if necessary)
 target_link_libraries(${PROJECT_NAME} INTERFACE PNG::PNG JPEG::JPEG GIF::GIF)
