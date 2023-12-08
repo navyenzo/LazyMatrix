@@ -60,17 +60,20 @@ FetchContent_MakeAvailable(xoshiro)
 ###############################################################
 # dlib library
 ###############################################################
+
+# Fetch dlib library
 FetchContent_Declare(
   dlib
   GIT_REPOSITORY https://github.com/davisking/dlib.git
   GIT_TAG master
 )
-FetchContent_MakeAvailable(dlib)
 
-# Define Dlib image support
-add_definitions(-DDLIB_PNG_SUPPORT)
-add_definitions(-DDLIB_JPEG_SUPPORT)
-add_definitions(-DDLIB_GIF_SUPPORT)
+# Set required definitions for dlib image support
+set(DLIB_PNG_SUPPORT ON CACHE BOOL "Enable PNG support in dlib" FORCE)
+set(DLIB_JPEG_SUPPORT ON CACHE BOOL "Enable JPEG support in dlib" FORCE)
+set(DLIB_GIF_SUPPORT ON CACHE BOOL "Enable GIF support in dlib" FORCE)
+
+FetchContent_MakeAvailable(dlib)
 ###############################################################
 
 
@@ -120,26 +123,15 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 # Link dlib to LazyMatrix
 target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
 
-# Find PNG library
+
+# Find the required libraries for non-vcpkg (particularly on Linux)
+find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
-if(PNG_FOUND)
-  target_link_libraries(${PROJECT_NAME} INTERFACE ${PNG_LIBRARIES})
-  target_include_directories(${PROJECT_NAME} INTERFACE ${PNG_INCLUDE_DIRS})
-endif()
-
-# Find JPEG library
 find_package(JPEG REQUIRED)
-if(JPEG_FOUND)
-  target_link_libraries(${PROJECT_NAME} INTERFACE ${JPEG_LIBRARIES})
-  target_include_directories(${PROJECT_NAME} INTERFACE ${JPEG_INCLUDE_DIR})
-endif()
-
-# Find GIF library
 find_package(GIF REQUIRED)
-if(GIF_FOUND)
-  target_link_libraries(${PROJECT_NAME} INTERFACE ${GIF_LIBRARIES})
-  target_include_directories(${PROJECT_NAME} INTERFACE ${GIF_INCLUDE_DIR})
-endif()
+
+# Link the required libraries to dlib (if necessary)
+target_link_libraries(${PROJECT_NAME} INTERFACE PNG::PNG JPEG::JPEG GIF::GIF)
 ###############################################################
 
 
