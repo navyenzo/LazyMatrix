@@ -1,11 +1,12 @@
 //-------------------------------------------------------------------
 /**
  * @file robust_mutex.hpp
- * @brief Defines a robust mutex class for inter-process synchronization in the LazyMatrix library.
+ * @brief Defines a robust mutex class for inter-process synchronization.
  *
- * This header file defines the RobustMutex class which implements a mutex suitable for 
+ * This header file defines the RobustMutex class, which implements a mutex suitable for 
  * use across multiple processes. This mutex is robust against process crashes and can 
- * handle ownership issues effectively.
+ * handle ownership issues effectively. It provides a cross-platform implementation, supporting
+ * both Windows and POSIX (Linux) environments.
  *
  * @author Vincenzo Barbato
  * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
@@ -21,14 +22,21 @@
 
 
 //-------------------------------------------------------------------
-#include <pthread.h>
 #include <atomic>
+
+// Check if we are compiling on Windows
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    // POSIX headers
+    #include <pthread.h>
+#endif
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-namespace LazyMatrix
+namespace LazyMatrix 
 {
 //-------------------------------------------------------------------
 
@@ -39,15 +47,14 @@ namespace LazyMatrix
  * @class RobustMutex
  * @brief A mutex class that is robust and suitable for inter-process synchronization.
  *
- * RobustMutex uses pthread mutex attributes to create a mutex that is robust and 
- * suitable for use across multiple processes. This mutex is particularly useful in 
- * scenarios where mutexes might be orphaned due to abrupt termination of a process.
+ * RobustMutex uses platform-specific implementations to create a mutex that is robust and 
+ * suitable for use across multiple processes. It ensures that mutexes are not orphaned due
+ * to abrupt termination of a process, providing consistent locking behavior.
  */
 //-------------------------------------------------------------------
-class RobustMutex
+class RobustMutex 
 {
 public:
-
     /**
      * @brief Constructor for RobustMutex.
      * 
@@ -57,10 +64,18 @@ public:
     RobustMutex();
 
     /**
+     * @brief Destructor for RobustMutex.
+     * 
+     * Destroys the mutex if it was previously initialized, ensuring proper cleanup.
+     */
+    ~RobustMutex();
+
+    /**
      * @brief Locks the mutex.
      * 
-     * Attempts to lock the mutex. If the mutex was previously locked by a process 
-     * that has terminated, it marks the state as consistent and returns EOWNERDEAD.
+     * Attempts to lock the mutex. In Windows, it waits indefinitely for the lock.
+     * In POSIX, if the mutex was previously locked by a process that has terminated, 
+     * it marks the state as consistent.
      * 
      * @return int Returns 0 on success or an error code on failure.
      */
@@ -72,13 +87,6 @@ public:
      * Releases the mutex, allowing other processes or threads to acquire it.
      */
     void unlock();
-
-    /**
-     * @brief Destructor for RobustMutex.
-     * 
-     * Destroys the mutex if it was previously initialized, ensuring proper cleanup.
-     */
-    ~RobustMutex();
 
 private:
     /**
@@ -95,8 +103,13 @@ private:
      */
     void ensure_initialized();
 
+#ifdef _WIN32
+    HANDLE mtx_handle_; ///< Windows HANDLE for the mutex.
+#else
     pthread_mutex_t mtx; ///< POSIX thread mutex used for synchronization.
-    std::atomic<int> initialization_status; ///< Status flag for mutex initialization.
+#endif
+
+    std::atomic<int> initialization_status_; ///< Status flag for mutex initialization.
 
     static const int UNINITIALIZED = 0; ///< Flag indicating mutex is not initialized.
     static const int INITIALIZED = 1;   ///< Flag indicating mutex has been initialized.
@@ -113,7 +126,7 @@ private:
 
 //-------------------------------------------------------------------
 inline RobustMutex::RobustMutex()
-    : initialization_status(UNINITIALIZED)
+    : initialization_status_(UNINITIALIZED)
 {
     ensure_initialized();
 }
@@ -122,15 +135,45 @@ inline RobustMutex::RobustMutex()
 
 
 //-------------------------------------------------------------------
+inline RobustMutex::~RobustMutex()
+{
+    #ifdef _WIN32
+        if (mtx_handle_ != NULL)
+        {
+            CloseHandle(mtx_handle_);
+        }
+    #else
+        if (initialization_status_.load() == INITIALIZED)
+        {
+            pthread_mutex_destroy(&mtx);
+        }
+    #endif
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 inline int RobustMutex::lock()
 {
-    int ret = pthread_mutex_lock(&mtx);
-    if (ret == EOWNERDEAD)
-    {
-        pthread_mutex_consistent(&mtx);
-        return EOWNERDEAD;
-    }
-    return ret;
+    #ifdef _WIN32
+        DWORD wait_result = WaitForSingleObject(mtx_handle_, INFINITE);
+        switch (wait_result)
+        {
+            case WAIT_OBJECT_0:
+                return 0; // Success
+            default:
+                return -1; // Error
+        }
+    #else
+        int ret = pthread_mutex_lock(&mtx);
+        if (ret == EOWNERDEAD)
+        {
+            pthread_mutex_consistent(&mtx);
+            return EOWNERDEAD;
+        }
+        return ret;
+    #endif
 }
 //-------------------------------------------------------------------
 
@@ -139,19 +182,11 @@ inline int RobustMutex::lock()
 //-------------------------------------------------------------------
 inline void RobustMutex::unlock()
 {
-    pthread_mutex_unlock(&mtx);
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-inline RobustMutex::~RobustMutex()
-{
-    if (initialization_status.load() == INITIALIZED)
-    {
-        pthread_mutex_destroy(&mtx);
-    }
+    #ifdef _WIN32
+        ReleaseMutex(mtx_handle_);
+    #else
+        pthread_mutex_unlock(&mtx);
+    #endif
 }
 //-------------------------------------------------------------------
 
@@ -160,12 +195,16 @@ inline RobustMutex::~RobustMutex()
 //-------------------------------------------------------------------
 inline void RobustMutex::initialize_mutex()
 {
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_setrobust(&attr, PTHREAD_MUTEX_ROBUST);         
-    pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);      
-    pthread_mutex_init(&mtx, &attr);
-    pthread_mutexattr_destroy(&attr);
+    #ifdef _WIN32
+        mtx_handle_ = CreateMutex(NULL, FALSE, NULL);
+    #else
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_setrobust(&attr, PTHREAD_MUTEX_ROBUST);
+        pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+        pthread_mutex_init(&mtx, &attr);
+        pthread_mutexattr_destroy(&attr);
+    #endif
 }
 //-------------------------------------------------------------------
 
@@ -174,10 +213,10 @@ inline void RobustMutex::initialize_mutex()
 //-------------------------------------------------------------------
 inline void RobustMutex::ensure_initialized()
 {
-    if (initialization_status.load() == UNINITIALIZED)
+    if (initialization_status_.load() == UNINITIALIZED)
     {
         int expected = UNINITIALIZED;
-        if (initialization_status.compare_exchange_strong(expected, INITIALIZED))
+        if (initialization_status_.compare_exchange_strong(expected, INITIALIZED))
         {
             initialize_mutex();
         }
