@@ -130,8 +130,19 @@ find_package(PNG REQUIRED MODULE)
 find_package(JPEG REQUIRED MODULE)
 find_package(GIF REQUIRED MODULE)
 
-# Link the required libraries to dlib (if necessary)
-target_link_libraries(${PROJECT_NAME} INTERFACE PNG::PNG JPEG::JPEG GIF::GIF)
+# Create alias targets for each dependency
+add_library(LazyMatrix_ZLIB ALIAS ZLIB::ZLIB)
+add_library(LazyMatrix_PNG ALIAS PNG::PNG)
+add_library(LazyMatrix_JPEG ALIAS JPEG::JPEG)
+add_library(LazyMatrix_GIF ALIAS GIF::GIF)
+
+# Link the alias libraries to LazyMatrix
+target_link_libraries(${PROJECT_NAME} INTERFACE 
+    LazyMatrix_ZLIB 
+    LazyMatrix_PNG 
+    LazyMatrix_JPEG 
+    LazyMatrix_GIF
+)
 ###############################################################
 
 
