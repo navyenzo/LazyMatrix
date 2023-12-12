@@ -117,8 +117,8 @@ inline fs::path create_file_with_specified_size_and_unique_name(
     std::size_t desired_file_size,
     std::error_code& file_creation_error,
     std::string filename_template = "XXXXXX",
-    const fs::path& directory_where_file_will_reside = fs::temp_directory_path())
-{
+    const fs::path& directory_where_file_will_reside = fs::temp_directory_path()) {
+
     // Ensure the filename template ends with exactly "XXXXXX"
     const size_t x_count = 6;
     size_t found_x = filename_template.find_last_not_of('X');
@@ -135,6 +135,14 @@ inline fs::path create_file_with_specified_size_and_unique_name(
         // Generate a unique filename
         _mktemp_s(unique_filename_string.data(), unique_filename_string.size() + 1);
         filename = unique_filename_string; // Update filename with the generated unique filename
+
+        // Create and open the file to ensure it exists
+        std::ofstream file_stream(filename, std::ios::binary | std::ios::out);
+        if (!file_stream) {
+            file_creation_error.assign(errno, std::generic_category());
+            return fs::path(); // Return an empty path on failure
+        }
+        file_stream.close();
     #else
         // Construct the full template path for unique filename in Linux
         std::string full_template = (directory_where_file_will_reside / filename_template).string();
@@ -153,6 +161,11 @@ inline fs::path create_file_with_specified_size_and_unique_name(
 
     // Resize the file to the desired size
     fs::resize_file(filename, desired_file_size, file_creation_error);
+
+    // Additional check to confirm the file size is as expected
+    if (!file_creation_error && fs::file_size(filename) != desired_file_size) {
+        file_creation_error.assign(std::make_error_code(std::errc::io_error).value(), std::generic_category());
+    }
 
     return filename; // Return the path of the created file
 }
