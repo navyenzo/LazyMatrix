@@ -142,6 +142,9 @@
 // Unary expression templates for element-wise operations
 #include "element_by_element_unary_expression.hpp"
 
+// Data sampling algorithms
+#include "data_sampling.hpp"
+
 // Output operators for matrix serialization
 #include "output_operators.hpp"
 
