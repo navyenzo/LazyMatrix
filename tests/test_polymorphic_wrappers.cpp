@@ -1,9 +1,12 @@
+//-------------------------------------------------------------------
 #include <iostream>
 #include <catch2/catch_all.hpp>
 #include "lazy_matrix.hpp"
+//-------------------------------------------------------------------
 
 
 
+//-------------------------------------------------------------------
 TEST_CASE("Wrapping a matrix with polymorphic wrapper with non-const access", "[PolymorphicWrapper]")
 {
     // Create a matrix
@@ -27,3 +30,4 @@ TEST_CASE("Wrapping a matrix with polymorphic wrapper with non-const access", "[
     REQUIRE(wrapper->at(1,0) == mat(1,0));
     REQUIRE(wrapper->at(1,1) == mat(1,1));
 }
+//-------------------------------------------------------------------

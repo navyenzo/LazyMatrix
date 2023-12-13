@@ -49,6 +49,9 @@ template<typename MatrixType>
 
 struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<MatrixType> >
 {
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+    
     RepeatedBorderView<MatrixType>(MatrixType& expression)
     : expression_(expression)
     {
@@ -75,7 +78,7 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<MatrixType> >
 
 
 
-    decltype(auto) at_(int64_t row, int64_t column)const
+    const value_type& at_(int64_t row, int64_t column)const
     {
         row = std::max(row, int64_t(0));
         row = std::min(this->rows() - 1, row);
@@ -86,7 +89,7 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<MatrixType> >
         return expression_(row, column);
     }
 
-    decltype(auto) at_(int64_t row, int64_t column)
+    value_type& at_(int64_t row, int64_t column)
     {
         row = std::max(row, int64_t(0));
         row = std::min(this->rows() - 1, row);

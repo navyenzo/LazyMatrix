@@ -100,6 +100,12 @@
 // View applying border conditions allowing modification
 #include "border_functor_view.hpp"
 
+// Functor for padding a matrix expression
+#include "padding.hpp"
+
+// View for padding a matrix expression
+#include "padding_view.hpp"
+
 // Region of Interest (ROI) in matrices
 #include "roi.hpp"
 
@@ -142,8 +148,8 @@
 // Unary expression templates for element-wise operations
 #include "element_by_element_unary_expression.hpp"
 
-// Data sampling algorithms
-#include "data_sampling.hpp"
+// Downsampling algorithms
+#include "downsampling.hpp"
 
 // Output operators for matrix serialization
 #include "output_operators.hpp"

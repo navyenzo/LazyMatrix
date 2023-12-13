@@ -1,9 +1,12 @@
+//-------------------------------------------------------------------
 #include <iostream>
 #include <catch2/catch_all.hpp>
 #include "lazy_matrix.hpp"
+//-------------------------------------------------------------------
 
 
 
+//-------------------------------------------------------------------
 TEST_CASE("ImageMatrix Loading and Pixel Access", "[ImageMatrix]")
 {
     // Generate a 2x2 test image
@@ -29,3 +32,4 @@ TEST_CASE("ImageMatrix Loading and Pixel Access", "[ImageMatrix]")
     // Clean up: Delete the temporary file
     std::remove(temp_filename.c_str());
 }
+//-------------------------------------------------------------------

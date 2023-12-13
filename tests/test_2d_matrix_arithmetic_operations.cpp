@@ -4,6 +4,7 @@
 
 
 #include <catch2/catch_all.hpp>
+#include <chrono>
 #include "lazy_matrix.hpp"
 
 
@@ -105,11 +106,21 @@ TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
     LazyMatrix::Matrix<int> mat1(random_mat1);
     LazyMatrix::Matrix<int> mat2(random_mat2);
 
-    // Perform multiplication using naive method
-    auto result_naive = mat1 * mat2;
+     using clock = std::chrono::high_resolution_clock;
 
-    // Perform multiplication using Strassen algorithm
+    // Time naive multiplication
+    auto start_naive = clock::now();
+    auto result_naive = mat1 * mat2;
+    auto end_naive = clock::now();
+    std::chrono::duration<double> elapsed_naive = end_naive - start_naive;
+    std::cout << "Time taken for naive multiplication: " << elapsed_naive.count() << " seconds\n";
+
+    // Time Strassen multiplication
+    auto start_strassen = clock::now();
     auto result_strassen = LazyMatrix::strassen_matrix_multiply(mat1, mat2);
+    auto end_strassen = clock::now();
+    std::chrono::duration<double> elapsed_strassen = end_strassen - start_strassen;
+    std::cout << "Time taken for Strassen multiplication: " << elapsed_strassen.count() << " seconds\n";
 
     // Check dimensions
     REQUIRE(result_naive.rows() == 10);
