@@ -94,13 +94,13 @@ public:
     decltype(auto) circ_at(int64_t index)const
     {
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
-        return this->at_(circ_index);
+        return this->at(circ_index);
     }
 
     decltype(auto) circ_at(int64_t index)
     {
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
-        return this->at_(circ_index);
+        return this->at(circ_index);
     }
 
 

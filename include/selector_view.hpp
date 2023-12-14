@@ -35,6 +35,152 @@
 namespace LazyMatrix
 {
 //-------------------------------------------------------------------
+/**
+ * @class SingleRowSelectorView
+ * @brief Class for creating a view that selects a single row from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
+//-------------------------------------------------------------------
+template<typename MatrixType>
+
+struct SingleRowSelectorView : public BaseMatrix< SingleRowSelectorView<MatrixType> >
+{
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+
+    SingleRowSelectorView<MatrixType>(MatrixType& expression, int64_t selected_row)
+    : expression_(expression),
+      selected_row_(selected_row_)
+    {
+    }
+    
+
+
+    uintptr_t rows()const
+    {
+        return uintptr_t(1);
+    }
+
+    uintptr_t columns()const
+    {
+        return expression_.columns();
+    }
+
+
+
+    const MatrixType& get_expression()const
+    {
+        return expression_;
+    }
+
+
+
+    const value_type& at_(int64_t row, int64_t column)const
+    {
+        return expression_.circ_at(selected_row_, column);
+    }
+
+    value_type& at_(int64_t row, int64_t column)
+    {
+        return expression_.circ_at(selected_row_, column);
+    }
+
+
+
+private:
+
+    MatrixType& expression_;
+    int64_t selected_row_;
+};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Compile time functions to check if the type is an expression type
+//-------------------------------------------------------------------
+template<typename MatrixType>
+
+struct is_type_a_matrix< SingleRowSelectorView<MatrixType> > : std::true_type
+{
+};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @class SingleColumnSelector
+ * @brief Class for selecting a single column from a matrix.
+ *
+ * @tparam MatrixType The type of the matrix expression.
+ */
+//-------------------------------------------------------------------
+template<typename MatrixType>
+
+struct SingleColumnSelectorView : public BaseMatrix< SingleColumnSelectorView<MatrixType> >
+{
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+
+    SingleColumnSelectorView<MatrixType>(MatrixType& expression, int64_t selected_column)
+    : expression_(expression),
+      selected_column_(selected_column_)
+    {
+    }
+    
+
+
+    uintptr_t rows()const
+    {
+        return expression_.rows();
+    }
+
+    uintptr_t columns()const
+    {
+        return uintptr_t(1);
+    }
+
+
+
+    const MatrixType& get_expression()const
+    {
+        return expression_;
+    }
+
+
+
+    const value_type& at_(int64_t row, int64_t column)const
+    {
+        return expression_.circ_at(row, selected_column_);
+    }
+
+    value_type& at_(int64_t row, int64_t column)
+    {
+        return expression_.circ_at(row, selected_column_);
+    }
+
+
+
+private:
+
+    MatrixType& expression_;
+    int64_t selected_column_;
+};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Compile time functions to check if the type is an expression type
+//-------------------------------------------------------------------
+template<typename MatrixType>
+
+struct is_type_a_matrix< SingleColumnSelectorView<MatrixType> > : std::true_type
+{
+};
+//-------------------------------------------------------------------
 
 
 
@@ -50,6 +196,9 @@ template<typename MatrixType>
 
 struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
 {
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+
     RowSelectorView<MatrixType>(MatrixType& expression,
                                 const std::vector<int64_t>& selected_rows)
     : expression_(expression),
@@ -81,12 +230,12 @@ struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
     
 
 
-    decltype(auto) at_(int64_t row, int64_t column)const
+    const value_type& at_(int64_t row, int64_t column)const
     {
         return expression_.circ_at(selected_rows_[row], column);
     }
 
-    decltype(auto) at_(int64_t row, int64_t column)
+    value_type& at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(selected_rows_[row], column);
     }
@@ -126,6 +275,9 @@ template<typename MatrixType>
 
 struct ColumnSelectorView : public BaseMatrix< ColumnSelectorView<MatrixType> >
 {
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+
     ColumnSelectorView<MatrixType>(MatrixType& expression,
                                    const std::vector<int64_t>& selected_columns)
     : expression_(expression),
@@ -157,12 +309,12 @@ struct ColumnSelectorView : public BaseMatrix< ColumnSelectorView<MatrixType> >
     
 
 
-    decltype(auto) at_(int64_t row, int64_t column)const
+    const value_type& at_(int64_t row, int64_t column)const
     {
         return expression_.circ_at(row, selected_columns_[column]);
     }
 
-    decltype(auto) at_(int64_t row, int64_t column)
+    value_type& at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(row, selected_columns_[column]);
     }
@@ -202,6 +354,9 @@ template<typename MatrixType>
 
 struct RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<MatrixType> >
 {
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+
     RowAndColumnSelectorView<MatrixType>(MatrixType& expression,
                                          const std::vector<int64_t>& selected_rows,
                                          const std::vector<int64_t>& selected_columns)
@@ -238,12 +393,12 @@ struct RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<Ma
     
 
 
-    decltype(auto) at_(int64_t row, int64_t column)const
+    const value_type& at_(int64_t row, int64_t column)const
     {
         return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
     }
 
-    decltype(auto) at_(int64_t row, int64_t column)
+    value_type& at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
     }
@@ -275,6 +430,26 @@ struct is_type_a_matrix< RowAndColumnSelectorView<MatrixType> > : std::true_type
 //-------------------------------------------------------------------
 // Helper functions
 //-------------------------------------------------------------------
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+
+inline auto select_a_single_row_view(MatrixType& m, int64_t selected_row)
+{
+    return SingleRowSelectorView<MatrixType>(m, selected_row);
+}
+
+
+
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+
+inline auto select_a_single_column_view(MatrixType& m, int64_t selected_column)
+{
+    return SingleColumnSelectorView<MatrixType>(m, selected_column);
+}
+
+
+
 template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
