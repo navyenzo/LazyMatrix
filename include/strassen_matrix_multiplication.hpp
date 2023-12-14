@@ -23,7 +23,7 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix.hpp"
-#include "matrix.hpp"
+#include "simple_matrix.hpp"
 //-------------------------------------------------------------------
 
 
@@ -44,35 +44,6 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
- * @brief Pads a matrix to the next power of two dimensions.
- *
- * @tparam MatrixType Type of the matrix.
- * @param matrix The matrix to be padded.
- * @return Padded matrix.
- */
-//-------------------------------------------------------------------
-template<typename MatrixType>
-MatrixType pad_matrix(const MatrixType& matrix)
-{
-    int max_dim = std::max(matrix.rows(), matrix.columns());
-    int new_size = std::pow(2, std::ceil(std::log2(max_dim)));
-    MatrixType padded(new_size, new_size);
-    // Copy original matrix into the top-left corner
-    for (int i = 0; i < matrix.rows(); ++i)
-    {
-        for (int j = 0; j < matrix.columns(); ++j)
-        {
-            padded(i, j) = matrix(i, j);
-        }
-    }
-    return padded;
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-/**
  * @brief Trims a matrix to the specified size.
  *
  * @tparam MatrixType Type of the matrix.
@@ -83,7 +54,8 @@ MatrixType pad_matrix(const MatrixType& matrix)
  */
 //-------------------------------------------------------------------
 template<typename MatrixType>
-MatrixType trim_matrix(const MatrixType& matrix, int rows, int cols)
+
+inline MatrixType trim_matrix(const MatrixType& matrix, int rows, int cols)
 {
     MatrixType trimmed(rows, cols);
     for (int i = 0; i < rows; ++i)
@@ -103,7 +75,12 @@ MatrixType trim_matrix(const MatrixType& matrix, int rows, int cols)
 /**
  * @brief Splits a matrix into four equal submatrices.
  *
- * @tparam MatrixType Type of the matrix.
+ * This function divides a given matrix into four submatrices. The split
+ * occurs at the midpoint of the rows and columns of the matrix. It's used
+ * as a part of the Strassen algorithm for matrix multiplication.
+ *
+ * @tparam MatrixType1 Type of the source matrix.
+ * @tparam MatrixType2 Type of the submatrices.
  * @param matrix The matrix to be split.
  * @param a11 Upper left submatrix.
  * @param a12 Upper right submatrix.
@@ -111,9 +88,12 @@ MatrixType trim_matrix(const MatrixType& matrix, int rows, int cols)
  * @param a22 Lower right submatrix.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename MatrixType1,
+         typename MatrixType2,
+         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
-void strassen_split(const MatrixType& matrix, MatrixType& a11, MatrixType& a12, MatrixType& a21, MatrixType& a22)
+inline void strassen_split(const MatrixType1& matrix, MatrixType2& a11, MatrixType2& a12, MatrixType2& a21, MatrixType2& a22)
 {
     int mid_row = matrix.rows() / 2;
     int mid_col = matrix.columns() / 2;
@@ -134,7 +114,7 @@ void strassen_split(const MatrixType& matrix, MatrixType& a11, MatrixType& a12, 
             {
                 a21(i - mid_row, j) = matrix(i, j);
             }
-            else
+            else // i >= mid_row && j >= mid_col
             {
                 a22(i - mid_row, j - mid_col) = matrix(i, j);
             }
@@ -157,9 +137,10 @@ void strassen_split(const MatrixType& matrix, MatrixType& a11, MatrixType& a12, 
  * @return Combined matrix.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
-MatrixType strassen_combine(const MatrixType& a11, const MatrixType& a12, const MatrixType& a21, const MatrixType& a22)
+inline MatrixType strassen_combine(const MatrixType& a11, const MatrixType& a12, const MatrixType& a21, const MatrixType& a22)
 {
     MatrixType result(a11.rows() * 2, a11.columns() * 2);
     int mid_row = result.rows() / 2;
@@ -204,9 +185,10 @@ MatrixType strassen_combine(const MatrixType& a11, const MatrixType& a12, const 
  * @return Sum of the two matrices.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
-MatrixType strassen_add(const MatrixType& a, const MatrixType& b)
+inline MatrixType strassen_add(const MatrixType& a, const MatrixType& b)
 {
     MatrixType result(a.rows(), a.columns());
 
@@ -234,9 +216,10 @@ MatrixType strassen_add(const MatrixType& a, const MatrixType& b)
  * @return Result of the subtraction.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
-MatrixType strassen_subtract(const MatrixType& a, const MatrixType& b)
+inline MatrixType strassen_subtract(const MatrixType& a, const MatrixType& b)
 {
     MatrixType result(a.rows(), a.columns());
 
@@ -258,19 +241,33 @@ MatrixType strassen_subtract(const MatrixType& a, const MatrixType& b)
 /**
  * @brief Recursively multiplies two matrices using the Strassen algorithm.
  *
+ * Implements the Strassen algorithm to efficiently multiply two matrices.
+ * The algorithm recursively divides the matrices into smaller submatrices,
+ * computes seven intermediate products, and combines these products to
+ * form the final result. This implementation optimizes for generic matrix
+ * expressions, using a concrete matrix type for internal computations.
+ *
  * @tparam MatrixType Type of the matrices.
- * @param a First matrix.
- * @param b Second matrix.
+ * @param a First matrix operand.
+ * @param b Second matrix operand.
  * @return The result of multiplying matrices a and b.
+ *
+ * @note For matrices smaller than or equal to 2x2, the function falls
+ *       back to conventional matrix multiplication.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
-MatrixType strassen_multiply_recursive(const MatrixType& a, const MatrixType& b)
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+
+auto strassen_multiply_recursive(const MatrixType& a, const MatrixType& b)
 {
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(a(0,0))>::type>::type;
+    using ConcreteMatrix = SimpleMatrix<value_type>; // Concrete matrix type for internal computations
+
     // Base case for recursion
     if (a.rows() <= 2 || a.columns() <= 2 || b.rows() <= 2 || b.columns() <= 2)
     {
-        MatrixType result(a.rows(), b.columns());
+        ConcreteMatrix result(a.rows(), b.columns());
         for (int i = 0; i < result.rows(); ++i)
         {
             for (int j = 0; j < result.columns(); ++j)
@@ -288,10 +285,10 @@ MatrixType strassen_multiply_recursive(const MatrixType& a, const MatrixType& b)
     int mid_row = a.rows() / 2;
     int mid_col = a.columns() / 2;
     
-    MatrixType a11(mid_row, mid_col), a12(mid_row, mid_col), 
-               a21(mid_row, mid_col), a22(mid_row, mid_col);
-    MatrixType b11(mid_row, mid_col), b12(mid_row, mid_col), 
-               b21(mid_row, mid_col), b22(mid_row, mid_col);
+    ConcreteMatrix a11(mid_row, mid_col), a12(mid_row, mid_col), 
+                   a21(mid_row, mid_col), a22(mid_row, mid_col);
+    ConcreteMatrix b11(mid_row, mid_col), b12(mid_row, mid_col), 
+                   b21(mid_row, mid_col), b22(mid_row, mid_col);
 
     strassen_split(a, a11, a12, a21, a22);
     strassen_split(b, b11, b12, b21, b22);
@@ -306,10 +303,10 @@ MatrixType strassen_multiply_recursive(const MatrixType& a, const MatrixType& b)
     auto p7 = strassen_multiply_recursive(strassen_subtract(a11, a21), strassen_add(b11, b12));
 
     // Combine the products to form the final result
-    auto c11 = strassen_add(strassen_subtract(strassen_add(p5, p4), p2), p6);
-    auto c12 = strassen_add(p1, p2);
-    auto c21 = strassen_add(p3, p4);
-    auto c22 = strassen_subtract(strassen_subtract(strassen_add(p1, p5), p3), p7);
+    ConcreteMatrix c11 = strassen_add(strassen_subtract(strassen_add(p5, p4), p2), p6);
+    ConcreteMatrix c12 = strassen_add(p1, p2);
+    ConcreteMatrix c21 = strassen_add(p3, p4);
+    ConcreteMatrix c22 = strassen_subtract(strassen_subtract(strassen_add(p1, p5), p3), p7);
 
     return strassen_combine(c11, c12, c21, c22);
 }
@@ -322,35 +319,45 @@ MatrixType strassen_multiply_recursive(const MatrixType& a, const MatrixType& b)
  * @brief Performs matrix multiplication using the Strassen algorithm.
  *
  * This function implements the Strassen algorithm for efficient matrix multiplication.
- * It pads matrices to the next power of two, performs the Strassen multiplication, and then
- * trims the result back to the original size.
+ * It first pads the input matrices to dimensions that are powers of two, 
+ * which optimizes the recursive division process in the Strassen algorithm.
+ * After the multiplication, it trims the result back to the original size.
+ * This approach is particularly efficient for large matrices where the
+ * conventional multiplication becomes computationally expensive.
  *
  * @tparam MatrixType1 Type of the first matrix operand.
  * @tparam MatrixType2 Type of the second matrix operand.
- * @param a The first matrix operand.
- * @param b The second matrix operand.
+ * @param a The first matrix operand, not modified by padding.
+ * @param b The second matrix operand, not modified by padding.
  * @return Matrix containing the result of the multiplication.
- *
+ * 
  * @note For matrices smaller or equal to 2x2, this function falls back to
- *       conventional matrix multiplication.
+ *       conventional matrix multiplication. Padding is applied internally
+ *       and does not modify the input matrices.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1, typename MatrixType2,
-            std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-            std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename MatrixType1,
+         typename MatrixType2,
+         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+
 auto strassen_matrix_multiply(const MatrixType1& a, const MatrixType2& b)
 {
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
-    using result_type = Matrix<value_type>;
+    using result_type = SimpleMatrix<value_type>;
 
-    // Pad matrices to the next power of two
-    auto padded_a = pad_matrix(a);
-    auto padded_b = pad_matrix(b);
+    // Calculate the size for padding
+    int max_dim = std::max({a.rows(), a.columns(), b.rows(), b.columns()});
+    int new_size = std::pow(2, std::ceil(std::log2(max_dim)));
+
+    // Apply padding
+    auto padded_a = pad_matrix(a, new_size, new_size, static_cast<value_type>(0));
+    auto padded_b = pad_matrix(b, new_size, new_size, static_cast<value_type>(0));
 
     // Perform Strassen multiplication on the padded matrices
     result_type result = strassen_multiply_recursive(padded_a, padded_b);
 
-    // Trim the result to the original size
+    // Trim the result back to the size of the original matrix
     return trim_matrix(result, a.rows(), b.columns());
 }
 //-------------------------------------------------------------------

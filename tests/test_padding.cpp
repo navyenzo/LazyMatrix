@@ -43,40 +43,40 @@ TEST_CASE("Matrix Padding Test", "[MatrixPadding]")
     const uintptr_t padded_rows = 4;
     const uintptr_t padded_columns = 4;
 
-    SECTION("PaddedMatrix Test")
+    SECTION("padded_matrix Test")
     {
         // Apply padding
-        auto paddedMatrix = LazyMatrix::pad_matrix(small_matrix, padded_rows, padded_columns, 0);
+        auto padded_matrix = pad_matrix(small_matrix, padded_rows, padded_columns, 0);
 
         // Check dimensions
-        REQUIRE(paddedMatrix.rows() == padded_rows);
-        REQUIRE(paddedMatrix.columns() == padded_columns);
+        REQUIRE(padded_matrix.rows() == padded_rows);
+        REQUIRE(padded_matrix.columns() == padded_columns);
 
         // Check original values
-        REQUIRE(paddedMatrix(0, 0) == 1);
-        REQUIRE(paddedMatrix(1, 1) == 4);
+        REQUIRE(padded_matrix(0, 0) == 1);
+        REQUIRE(padded_matrix(1, 1) == 4);
 
         // Check padding values
-        REQUIRE(paddedMatrix(2, 2) == 0);
-        REQUIRE(paddedMatrix(3, 3) == 0);
+        REQUIRE(padded_matrix(2, 2) == 0);
+        REQUIRE(padded_matrix(3, 3) == 0);
     }
 
-    SECTION("PaddedMatrixView Test")
+    SECTION("padded_matrix_view Test")
     {
         // Apply padding view
-        auto paddedMatrixView = LazyMatrix::pad_matrix_view(small_matrix, padded_rows, padded_columns, 0);
+        auto padded_matrix_view = pad_matrix(small_matrix, padded_rows, padded_columns, 0);
 
         // Check dimensions
-        REQUIRE(paddedMatrixView.rows() == padded_rows);
-        REQUIRE(paddedMatrixView.columns() == padded_columns);
+        REQUIRE(padded_matrix_view.rows() == padded_rows);
+        REQUIRE(padded_matrix_view.columns() == padded_columns);
 
         // Check original values
-        REQUIRE(paddedMatrixView(0, 0) == 1);
-        REQUIRE(paddedMatrixView(1, 1) == 4);
+        REQUIRE(padded_matrix_view(0, 0) == 1);
+        REQUIRE(padded_matrix_view(1, 1) == 4);
 
         // Check padding values
-        REQUIRE(paddedMatrixView(2, 2) == 0);
-        REQUIRE(paddedMatrixView(3, 3) == 0);
+        REQUIRE(padded_matrix_view(2, 2) == 0);
+        REQUIRE(padded_matrix_view(3, 3) == 0);
     }
 }
 //-------------------------------------------------------------------

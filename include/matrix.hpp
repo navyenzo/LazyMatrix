@@ -284,7 +284,7 @@ public:
 
 
 
-   /**
+    /**
      * @brief Shallow copy of another mapped matrix into this matrix.
      * 
      * It copies the filename and re-maps the file into memory. This results in 

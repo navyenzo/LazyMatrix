@@ -95,7 +95,7 @@ struct PaddedMatrix : public BaseMatrix< PaddedMatrix<MatrixType> >
 
     const value_type& at_(int64_t row, int64_t column)const
     {
-        if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
+        if(row < 0 || row >= expression_.rows() || column < 0 || column >= expression_.columns())
             return constant_value_for_padding_;
 
         return expression_(row, column);

@@ -21,7 +21,7 @@
 
 
 //-------------------------------------------------------------------
-#include "matrix.hpp"
+#include "simple_matrix.hpp"
 //-------------------------------------------------------------------
 
 
@@ -52,7 +52,7 @@ namespace LazyMatrix
  * @param m1 The first matrix (left operand).
  * @param m2 The second matrix (right operand).
  *
- * @return A new matrix of type Matrix<value_type> containing the result 
+ * @return A new matrix of type SimpleMatrix<value_type> containing the result 
  *         of the multiplication. If the matrices are empty or their dimensions 
  *         do not conform to the requirements of matrix multiplication 
  *         (i.e., the number of columns in m1 is different from the number of rows in m2), 
@@ -73,7 +73,7 @@ operator*(const MatrixType1& m1,
     
     if(m1.size() > 0 && m2.size() > 0 && (m1.columns() == m2.rows()))
     {
-        auto result = Matrix<value_type>(m1.rows(), m2.columns());
+        auto result = SimpleMatrix<value_type>(m1.rows(), m2.columns());
 
         for(int i = 0; i < result.rows(); ++i)
         {
@@ -90,7 +90,7 @@ operator*(const MatrixType1& m1,
     }
     else
     {
-        return Matrix<value_type>(0, 0);
+        return SimpleMatrix<value_type>(0, 0);
     }
 }
 //-------------------------------------------------------------------
