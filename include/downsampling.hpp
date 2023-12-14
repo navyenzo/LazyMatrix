@@ -68,7 +68,8 @@ namespace LazyMatrix
  * @param sample_rows A boolean flag indicating whether to sample rows (true) or columns (false).
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1, typename MatrixType2,
+template<typename MatrixType1,
+         typename MatrixType2,
          std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
          std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
          
@@ -132,7 +133,8 @@ inline void simple_downsampling(const MatrixType1& source,
  *   where mid_point is some index in the middle of the source data.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1, typename MatrixType2,
+template<typename MatrixType1,
+         typename MatrixType2,
          std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
          std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
@@ -236,7 +238,10 @@ inline void downsample_lttb(const MatrixType1& source,
  * @param source_end_index The ending index in the source data for downsampling.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1, typename MatrixType2, typename MatrixType3, typename MatrixType4,
+template<typename MatrixType1,
+         typename MatrixType2,
+         typename MatrixType3,
+         typename MatrixType4,
          std::enable_if_t<is_type_a_matrix<MatrixType1>{} &&
                           is_type_a_matrix<MatrixType2>{} &&
                           is_type_a_matrix<MatrixType3>{} &&
@@ -342,7 +347,8 @@ inline void downsample_lttb_xy(const MatrixType1& x_source,
  *   downsample_lttb_matrix(source_matrix, destination_matrix, 0, source_matrix.rows() - 1, true);
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1, typename MatrixType2,
+template<typename MatrixType1,
+         typename MatrixType2,
          std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
          std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
@@ -393,8 +399,10 @@ inline void downsample_lttb_matrix(const MatrixType1& source_matrix,
  * Note: The function returns immediately if the size of either source or destination matrix is zero.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1, typename MatrixType2,
+template<typename MatrixType1,
+         typename MatrixType2,
          std::enable_if_t<is_type_a_matrix<MatrixType1>{} && is_type_a_matrix<MatrixType2>{}>* = nullptr>
+         
 inline void downsample_lttb_matrix_xy(const MatrixType1& source_matrix,
                                       MatrixType2& destination_matrix,
                                       int64_t x_index,
