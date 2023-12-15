@@ -49,8 +49,10 @@ template<typename MatrixType1,
 
 struct AugmentColumnsView : public BaseMatrix< AugmentColumnsView<MatrixType1, MatrixType2> >
 {
-    // Type of value that is stored in left side expression
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
+
+
 
     /**
      * @brief Constructs a view which augments the columns of two matrices.
@@ -83,7 +85,7 @@ struct AugmentColumnsView : public BaseMatrix< AugmentColumnsView<MatrixType1, M
     {
         return left_side_expression_;
     }
-
+    
     const MatrixType2& get_right_side_expression()const
     {
         return right_side_expression_;

@@ -184,7 +184,7 @@ template<typename MatrixType>
 struct is_type_a_matrix< SortedView<MatrixType> > : std::true_type
 {
 };
-//-------------------------------------------------------------------
+//--------------------------------------------------------->----------
 
 
 

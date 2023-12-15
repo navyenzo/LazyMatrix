@@ -49,8 +49,10 @@ template<typename MatrixType1,
 
 struct AugmentRows : public BaseMatrix< AugmentRows<MatrixType1, MatrixType2> >
 {
-    // Type of value that is stored in left side expression
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
+
+
 
     /**
      * @brief Constructs a new matrix by augmenting the rows of two matrices.

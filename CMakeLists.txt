@@ -79,6 +79,22 @@ FetchContent_MakeAvailable(dlib)
 
 
 ###############################################################
+# pybind11 (For creating python interfaces to LazyMatrix objects)
+###############################################################
+include(FetchContent)
+
+FetchContent_Declare(
+  pybind11
+  GIT_REPOSITORY https://github.com/pybind/pybind11.git
+  GIT_TAG        master
+)
+
+FetchContent_MakeAvailable(pybind11)
+###############################################################
+
+
+
+###############################################################
 # Build unit tests or not
 ###############################################################
 # Option to build or not build the provided tests
@@ -112,6 +128,8 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     ${CMAKE_BINARY_DIR}/_deps/eigen-src
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
+    ${pybind11_SOURCE_DIR}/include
+    include_directories(${Python3_INCLUDE_DIRS})
 )
 ###############################################################
 
@@ -122,7 +140,6 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 ###############################################################
 # Link dlib to LazyMatrix
 target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
-
 
 # Find the required libraries for non-vcpkg (particularly on Linux)
 find_package(ZLIB REQUIRED MODULE)
@@ -143,12 +160,19 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
     LazyMatrix_JPEG 
     LazyMatrix_GIF
 )
+
+# Find the required libraries for non-vcpkg (particularly on Linux)
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+
+# Link python libraries to LazyMatrix
+target_link_libraries(${PROJECT_NAME} INTERFACE Python3::Python Python3::Module)
 ###############################################################
 
 
 
 ###############################################################
 # Linker options for Windows or other platforms
+###############################################################
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} INTERFACE stdc++fs)
 else()
