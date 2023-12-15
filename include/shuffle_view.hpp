@@ -135,7 +135,7 @@ struct is_type_a_matrix< ShuffleView<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// reverse function
+// helper function
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>

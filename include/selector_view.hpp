@@ -197,7 +197,9 @@ template<typename MatrixType>
 struct RowSelectorView : public BaseMatrix< RowSelectorView<MatrixType> >
 {
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+
+    
 
     RowSelectorView<MatrixType>(MatrixType& expression,
                                 const std::vector<int64_t>& selected_rows)

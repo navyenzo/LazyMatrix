@@ -50,7 +50,7 @@ template<typename MatrixType>
 struct PaddedMatrix : public BaseMatrix< PaddedMatrix<MatrixType> >
 {
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
 
 
 

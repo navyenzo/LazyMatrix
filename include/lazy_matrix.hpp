@@ -124,6 +124,11 @@
 // View for selector operation allowing modification
 #include "selector_view.hpp"
 
+// Sorting operations for matrix elements with some of
+// them allowing modification of the original matrix
+// expression
+#include "sorting.hpp"
+
 // Shuffle operation for matrix elements
 #include "shuffle.hpp"
 
