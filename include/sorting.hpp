@@ -147,17 +147,17 @@ public:
     value_type& at_(int64_t row, int64_t column)
     {
         if(sort_by_rows_)
-            return expression_.circ_at(sorted_indeces_[row], column);
-        else
             return expression_.circ_at(row, sorted_indeces_[column]);
+        else
+            return expression_.circ_at(sorted_indeces_[row], column);
     }
 
     const value_type& at_(int64_t row, int64_t column)const
     {
         if(sort_by_rows_)
-            return expression_.circ_at(sorted_indeces_[row], column);
-        else
             return expression_.circ_at(row, sorted_indeces_[column]);
+        else
+            return expression_.circ_at(sorted_indeces_[row], column);
     }
 
 
@@ -249,9 +249,9 @@ public:
     const value_type& at_(int64_t row, int64_t column)const
     {
         if(sort_by_rows_)
-            return expression_.circ_at(sorted_indeces_[row], column);
-        else
             return expression_.circ_at(row, sorted_indeces_[column]);
+        else
+            return expression_.circ_at(sorted_indeces_[row], column);
     }
 
 
@@ -291,7 +291,7 @@ template<typename MatrixType,
 inline auto
 
 sorted_matrix_view(MatrixType& m, int64_t index_of_row_or_column_to_use_to_sort, bool sort_by_rows)
-{
+{\
     return SortedView<MatrixType>(m, index_of_row_or_column_to_use_to_sort, sort_by_rows);
 }
 

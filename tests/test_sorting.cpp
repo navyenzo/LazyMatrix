@@ -89,17 +89,17 @@ TEST_CASE("Sorting test: Circular indices", "[Sorting]")
 {
     LazyMatrix::SimpleMatrix<double> matrix(3, 3, 0.0);
     // Fill matrix with test data
-    matrix.at_(0, 0) = 3.0; matrix.at_(0, 1) = 1.0; matrix.at_(0, 2) = 2.0;
-    matrix.at_(1, 0) = 2.0; matrix.at_(1, 1) = 3.0; matrix.at_(1, 2) = 1.0;
-    matrix.at_(2, 0) = 1.0; matrix.at_(2, 1) = 2.0; matrix.at_(2, 2) = 3.0;
+    matrix(0, 0) = 3.0; matrix(0, 1) = 1.0; matrix(0, 2) = 2.0;
+    matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
+    matrix(2, 0) = 1.0; matrix(2, 1) = 2.0; matrix(2, 2) = 3.0;
 
     std::vector<int64_t> sorted_indices;
-    LazyMatrix::get_sorted_indices(matrix, -1, true, sorted_indices); // Sort with circular indexing (last row)
+    LazyMatrix::get_sorted_indices(matrix, -3, true, sorted_indices); // Sort with circular indexing (middle row)
 
-    // Expected order after sorting the last row with circular indexing: 1, 0, 2
-    REQUIRE(sorted_indices[0] == 1);
+    // Expected order after sorting the last row with circular indexing: 2, 0, 1
+    REQUIRE(sorted_indices[0] == 2);
     REQUIRE(sorted_indices[1] == 0);
-    REQUIRE(sorted_indices[2] == 2);
+    REQUIRE(sorted_indices[2] == 1);
 }
 //-------------------------------------------------------------------
 
