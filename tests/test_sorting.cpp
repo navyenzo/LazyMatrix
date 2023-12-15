@@ -124,17 +124,19 @@ TEST_CASE("Mutable sorted matrix view test", "[Sorting View]")
     matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
     matrix(2, 0) = 1.0; matrix(2, 1) = 2.0; matrix(2, 2) = 3.0;
 
-    auto sorted_view = LazyMatrix::sorted_matrix_view(matrix, 1, true); // Create a mutable sorted view
+    int64_t index_of_row_to_sort = 1;
+
+    auto sorted_view = LazyMatrix::sorted_matrix_view(matrix, index_of_row_to_sort, true); // Create a mutable sorted view
 
     // Verify sorting correctness
-    REQUIRE(sorted_view(0, 0) <= sorted_view(0, 1));
-    REQUIRE(sorted_view(0, 1) <= sorted_view(0, 2));
+    REQUIRE(sorted_view(index_of_row_to_sort, 0) <= sorted_view(index_of_row_to_sort, 1));
+    REQUIRE(sorted_view(index_of_row_to_sort, 1) <= sorted_view(index_of_row_to_sort, 2));
 
     // Modify the sorted view
-    sorted_view(1, 0) = 10.0;
+    sorted_view(index_of_row_to_sort, 0) = 10.0;
 
     // Check if the modification is reflected in the original matrix
-    REQUIRE(matrix(1, 2) == 10.0);
+    REQUIRE(matrix(index_of_row_to_sort, 2) == 10.0);
 }
 //-------------------------------------------------------------------
 
@@ -159,16 +161,12 @@ TEST_CASE("Immutable sorted matrix view test", "[Sorting]")
     matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
     matrix(2, 0) = 1.0; matrix(2, 1) = 2.0; matrix(2, 2) = 3.0;
 
-    auto sorted_view = LazyMatrix::sorted_matrix(matrix, 1, true); // Create an immutable sorted view
+    int64_t index_of_column_to_sort = 1;
+
+    auto sorted_view = LazyMatrix::sorted_matrix(matrix, index_of_column_to_sort, false); // Create an immutable sorted view
 
     // Verify sorting correctness
-    REQUIRE(sorted_view(0, 0) <= sorted_view(1, 0));
-    REQUIRE(sorted_view(1, 0) <= sorted_view(2, 0));
-
-    // Attempt to modify the sorted view (this should be a compile-time error)
-    // sorted_view(1, 2) = 10.0;
-
-    // Check if the original matrix is unaffected
-    REQUIRE(matrix(1, 2) != 10.0); // Assuming that the modification above is commented out
+    REQUIRE(sorted_view(0, index_of_column_to_sort) <= sorted_view(1, index_of_column_to_sort));
+    REQUIRE(sorted_view(1, index_of_column_to_sort) <= sorted_view(2, index_of_column_to_sort));
 }
 //-------------------------------------------------------------------

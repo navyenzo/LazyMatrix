@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------
 /**
- * @file test_triangle_bucket_downsampling.cpp
+ * @file test_lttb_downsampling.cpp
  * @brief Tests for triangle bucket downsampling functionality in LazyMatrix.
  *
  * This file contains test cases to verify the correct implementation of the

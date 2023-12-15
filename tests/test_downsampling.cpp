@@ -42,7 +42,7 @@ TEST_CASE("Downsampling test: Downsampling a source matrix in forward direction"
     LazyMatrix::Matrix<int> destination(5, 1, 0); // 5x1 matrix
 
     // Perform forward sampling
-    LazyMatrix::simple_downsampling(source, destination, 0, 9, false);
+    LazyMatrix::simple_downsampling(source, destination, 0, 10, false);
 
     // Verify sampled data
     for (int i = 0; i < destination.rows(); ++i)

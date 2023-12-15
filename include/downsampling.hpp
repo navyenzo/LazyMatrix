@@ -79,30 +79,29 @@ inline void simple_downsampling(const MatrixType1& source,
                                 int64_t end_index,
                                 bool sample_rows)
 {
-    // Determine the interval and range for sampling based on the sampling mode (rows/columns)
-    int64_t interval = std::abs(end_index - start_index) / (sample_rows ? destination.columns() - 1 : destination.rows() - 1);
-    int64_t range = sample_rows ? destination.rows() : destination.columns();
+    // Determine the step, referring to how many source
+    // values we skip as we downsample
+    double step = double(end_index - start_index) / double(sample_rows ? destination.columns() : destination.rows());
 
-    // Iterate over the range of the destination matrix (rows or columns)
-    for (int64_t i = 0; i < range; ++i)
+    // Iterate over each row if downsampling rows or column otherwise
+    for(int64_t source_i = 0, dest_i = 0;
+        source_i < (sample_rows ? source.rows() : source.columns()) &&
+        dest_i < (sample_rows ? destination.rows() : destination.columns());
+        ++source_i, ++dest_i)
     {
-        // Iterate over the columns (for row sampling) or rows (for column sampling) of the destination matrix
-        for (int64_t j = 0; j < (sample_rows ? destination.columns() : destination.rows()); ++j)
-        {
-            // Calculate the index in the source matrix to sample from
-            int64_t sourceIndex = start_index + j * interval;
+        int64_t dest_index = 0;
+        double source_index = double(start_index);
 
-            // Use circular access to copy the sampled data from the source to the destination matrix
-            if (sample_rows)
-            {
-                // Sampling rows: circularly copy columns from source to destination
-                destination(j, i) = source.circ_at(j, sourceIndex);
-            }
+        // Now for each row (or column), we need to downsample the source
+        for(;
+            dest_index < (sample_rows ? destination.columns() : destination.rows()) &&
+            ((step > 0) ? (source_index < end_index) : (source_index > end_index));
+            ++dest_index, source_index += step)
+        {
+            if(sample_rows)
+                destination(dest_i, dest_index) = source.circ_at(source_i, int64_t(source_index));
             else
-            {
-                // Sampling columns: circularly copy rows from source to destination
-                destination(i, j) = source.circ_at(sourceIndex, j);
-            }
+                destination(dest_index, dest_i) = source.circ_at(int64_t(source_index), source_i);
         }
     }
 }
