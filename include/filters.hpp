@@ -57,7 +57,7 @@ inline auto create_gaussian_kernel(uintptr_t kernel_size, double sigma)
     uintptr_t actual_kernel_size = (kernel_size / 2) * 2 + 1;
     uintptr_t half_kernel_size = (kernel_size / 2);
 
-    auto kernel = LazyMatrix::Matrix<double>(actual_kernel_size, actual_kernel_size, 0);
+    auto kernel = SimpleMatrix<double>(actual_kernel_size, actual_kernel_size, 0);
 
     if(sigma <= 0)
         sigma = 0.3*((actual_kernel_size - 1)*0.5 - 1) + 0.8;
@@ -105,7 +105,7 @@ template<typename DataType>
 
 inline auto create_laplacian_kernel()
 {
-    auto laplacian_kernel = LazyMatrix::Matrix<DataType>(3,3);
+    auto laplacian_kernel = SimpleMatrix<DataType>(3,3);
 
     laplacian_kernel(0,1) = DataType(1);
     laplacian_kernel(1,0) = DataType(1);
@@ -149,7 +149,7 @@ inline auto filter(const MatrixType1& source_matrix, const MatrixType2& filter_k
     int64_t rows = source_matrix.rows();
     int64_t columns = source_matrix.columns();
 
-    LazyMatrix::Matrix<value_type> filtered_output(rows, columns, 0);
+    SimpleMatrix<value_type> filtered_output(rows, columns, 0);
 
     for(int i = 0; i < rows; ++i)
     {

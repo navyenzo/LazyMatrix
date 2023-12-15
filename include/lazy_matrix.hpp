@@ -55,6 +55,9 @@
 // Polymorphic matrix for dynamic type handling
 #include "polymorphic_matrix.hpp"
 
+// Polymorphic 3d matrix for dynamic type handling
+#include "polymorphic_matrix3d.hpp"
+
 // 2D matrix storage using std::vector for storage
 #include "simple_matrix.hpp"
 

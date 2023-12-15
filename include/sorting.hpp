@@ -291,7 +291,7 @@ template<typename MatrixType,
 inline auto
 
 sorted_matrix_view(MatrixType& m, int64_t index_of_row_or_column_to_use_to_sort, bool sort_by_rows)
-{\
+{
     return SortedView<MatrixType>(m, index_of_row_or_column_to_use_to_sort, sort_by_rows);
 }
 

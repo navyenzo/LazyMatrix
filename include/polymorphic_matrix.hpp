@@ -31,21 +31,6 @@
 
 
 //-------------------------------------------------------------------
-/**
- * @file polymorphic_matrix.hpp
- * @brief Defines polymorphic wrappers for matrix-like data structures in the LazyMatrix library.
- * @namespace LazyMatrix
- *
- * This file contains classes and functions that provide a polymorphic interface
- * for working with various matrix-like data structures, allowing them to be 
- * stored and manipulated in a generic manner. It's particularly useful for 
- * applications requiring polymorphic behavior with matrices.
- */
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 namespace LazyMatrix
 {
 //-------------------------------------------------------------------
@@ -77,7 +62,7 @@ public:
     
 
 
-    virtual DataType at_(int64_t row, int64_t column) const = 0;
+    virtual const DataType& at_(int64_t row, int64_t column) const = 0;
     virtual DataType& at_(int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
@@ -100,17 +85,25 @@ class PolymorphicMatrixWrapper : public PolymorphicMatrix<typename std::remove_r
 {
 public:
 
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    
+
 
     explicit PolymorphicMatrixWrapper(MatrixType& matrix) : matrix_(matrix) {}
 
+    
+    
     uintptr_t rows() const override { return matrix_.rows(); }
     uintptr_t columns() const override { return matrix_.columns(); }
     uintptr_t size() const override { return matrix_.size(); }
     
 
 
-    value_type at_(int64_t row, int64_t column) const override { return matrix_(row, column); }
+    const value_type& at_(int64_t row, int64_t column) const override
+    {
+        return matrix_(row, column);
+    }
     
     value_type& at_(int64_t row, int64_t column) override 
     {
@@ -161,6 +154,7 @@ struct is_type_a_matrix< PolymorphicMatrixWrapper<MatrixType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+         
 inline auto wrap_matrix(MatrixType& matrix)
 {
     using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
