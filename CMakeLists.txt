@@ -60,6 +60,8 @@ FetchContent_MakeAvailable(xoshiro)
 ###############################################################
 # dlib library
 ###############################################################
+# Before declaring dlib or any other library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Fetch dlib library
 FetchContent_Declare(
@@ -78,6 +80,7 @@ FetchContent_MakeAvailable(dlib)
 
 
 
+
 ###############################################################
 # pybind11 (For creating python interfaces to LazyMatrix objects)
 ###############################################################
@@ -90,22 +93,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(pybind11)
-###############################################################
-
-
-
-###############################################################
-# Build unit tests or not
-###############################################################
-# Option to build or not build the provided tests
-option(LazyMatrix_BUILD_TESTS "Build the tests." ON)
-
-message("LazyMatrix_BUILD_TESTS option: " ${LazyMatrix_BUILD_TESTS})
-
-if(${LazyMatrix_BUILD_TESTS})
-    enable_testing()
-    add_subdirectory(tests)
-endif()
 ###############################################################
 
 
@@ -188,4 +175,21 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
+###############################################################
+
+
+
+###############################################################
+# Build unit tests or not
+###############################################################
+# Option to build or not build the provided tests
+option(LazyMatrix_BUILD_TESTS "Build the tests." ON)
+
+message("LazyMatrix_BUILD_TESTS option: " ${LazyMatrix_BUILD_TESTS})
+
+if(${LazyMatrix_BUILD_TESTS})
+    enable_testing()
+    add_subdirectory(tests)
+    add_subdirectory(python_tests)
+endif()
 ###############################################################

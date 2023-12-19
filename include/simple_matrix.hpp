@@ -16,8 +16,8 @@
 
 
 
-#ifndef SIMPLE_MATRIX_HPP
-#define SIMPLE_MATRIX_HPP
+#ifndef INCLUDE_SIMPLE_MATRIX_HPP_
+#define INCLUDE_SIMPLE_MATRIX_HPP_
 
 
 
@@ -65,6 +65,25 @@ public:
     SimpleMatrix(uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
     {
         this->resize(rows, columns, initial_value);
+    }
+
+    /**
+     * @brief Constructor from a generic matrix expression
+     * @param matrix The input matrix we will copy
+     */
+    template<typename MatrixType,
+             std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+
+    SimpleMatrix(const MatrixType& matrix)
+    {
+        auto rows = matrix.rows();
+        auto columns = matrix.columns();
+
+        this->resize(matrix.rows(), matrix.columns());
+
+        for(int i = 0; i < rows; ++i)
+            for(int j = 0; j < columns; ++j)
+                (*this)(i,j) = matrix(i,j);
     }
 
     /**
@@ -147,11 +166,11 @@ private:
 
 
 //-------------------------------------------------------------------
-// Compile time functions to check if the type is a matrix expression type
+// Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename DataType>
+template<typename MatrixType>
 
-struct is_type_a_matrix< SimpleMatrix<DataType> > : std::true_type
+struct is_type_a_matrix< SimpleMatrix<MatrixType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -164,4 +183,4 @@ struct is_type_a_matrix< SimpleMatrix<DataType> > : std::true_type
 
 
 
-#endif // SIMPLE_MATRIX_HPP
+#endif // INCLUDE_SIMPLE_MATRIX_HPP_

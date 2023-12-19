@@ -56,8 +56,8 @@ namespace LazyMatrix
  * @param sorted_indices A reference to a vector where sorted indices will be stored.
  */
 //-------------------------------------------------------------------
- template<typename MatrixType,
-          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
 inline void get_sorted_indices(const MatrixType& matrix,
                                int64_t index, 
@@ -184,7 +184,7 @@ template<typename MatrixType>
 struct is_type_a_matrix< SortedView<MatrixType> > : std::true_type
 {
 };
-//--------------------------------------------------------->----------
+//-------------------------------------------------------------------
 
 
 

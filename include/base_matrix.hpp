@@ -105,6 +105,12 @@ public:
 
 
 
+    // Setter methods defined here to help define python/c++ interface
+    template<typename ValueType>
+    void set_circ_at(int64_t row, int64_t column, const ValueType& value) { this->circ_at(row, column) = value; }
+
+
+
     // Implementation for element access, to be provided by derived classes.
     decltype(auto) at_(int64_t row, int64_t column)const { return underlying().at_(row, column); }
     decltype(auto) at_(int64_t row, int64_t column) { return underlying().at_(row, column); }

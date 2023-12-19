@@ -177,9 +177,10 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
 //-------------------------------------------------------------------
 // Utility function used to print an expression to an output stream
 //-------------------------------------------------------------------
-template<typename MatrixType>
-
-inline std::ostream& operator<<(std::ostream& os, const LazyMatrix::BaseMatrix3D<MatrixType>& expression)
+template<typename MatrixType,
+         std::enable_if_t<LazyMatrix::is_type_a_matrix3d<MatrixType>{}>* = nullptr>
+         
+inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
 {
     os << "(" << expression.pages() << "x" << expression.rows() << "x" << expression.columns() << ")\n";
 

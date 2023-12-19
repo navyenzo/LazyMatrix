@@ -46,13 +46,10 @@
 // Base matrix class for 3D matrices
 #include "base_matrix3d.hpp"
 
-// Python bindings for matrices
-#include "python_bindings.hpp"
-
 // Wrapper for 2D matrices with simple data storage allowing modification
 #include "simple_data_2d_matrix_wrapper.hpp"
 
-// Wrapper for 3D matrices with simple//------------------------------------------------------------------- data storage allowing modification
+// Wrapper for 3D matrices with simple
 #include "simple_data_3d_matrix_wrapper.hpp"
 
 // Polymorphic matrix for dynamic type handling
@@ -173,6 +170,9 @@
 
 // Strassen algorithm for matrix multiplication
 #include "strassen_matrix_multiplication.hpp"
+
+// Python bindings for matrices
+#include "python_bindings.hpp"
 //-------------------------------------------------------------------
 
 
