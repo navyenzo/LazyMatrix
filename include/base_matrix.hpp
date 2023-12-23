@@ -79,27 +79,27 @@ public:
     // Circular accessors for matrix elements.
     decltype(auto) circ_at(int64_t row, int64_t column)const
     {
-        int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
-        int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
+        int64_t circ_row = ( int64_t(this->rows()) + row % int64_t(this->rows()) ) % int64_t(this->rows());
+        int64_t circ_column = ( int64_t(this->columns()) + column % int64_t(this->columns()) ) % int64_t(this->columns());
         return this->at_(circ_row, circ_column);
     }
 
     decltype(auto) circ_at(int64_t row, int64_t column)
     {
-        int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
-        int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
+        int64_t circ_row = ( int64_t(this->rows()) + row % int64_t(this->rows()) ) % int64_t(this->rows());
+        int64_t circ_column = ( int64_t(this->columns()) + column % int64_t(this->columns()) ) % int64_t(this->columns());
         return this->at_(circ_row, circ_column);
     }
 
     decltype(auto) circ_at(int64_t index)const
     {
-        int64_t circ_index = (this->size() + index % this->size()) % this->size();
+        int64_t circ_index = ( int64_t(this->size()) + index % int64_t(this->size()) ) % int64_t(this->size());
         return this->at(circ_index);
     }
 
     decltype(auto) circ_at(int64_t index)
     {
-        int64_t circ_index = (this->size() + index % this->size()) % this->size();
+        int64_t circ_index = ( int64_t(this->size()) + index % int64_t(this->size()) ) % int64_t(this->size());
         return this->at(circ_index);
     }
 

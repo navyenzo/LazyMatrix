@@ -97,7 +97,7 @@ public:
     uintptr_t rows()const { return rows_; }
     uintptr_t columns()const { return columns_; }
 
-    std::string_view string_at(uintptr_t row, uintptr_t column)const;
+    std::string_view string_at(int64_t row, int64_t column)const;
     decltype(auto) at_(int64_t row, int64_t column)const;
     
 
@@ -114,7 +114,7 @@ public:
 
 
 
-private: // Private functions
+//private: // Private functions
     
     uintptr_t find_end_of_current_row(uintptr_t current_position_in_csv_string)const;
     uintptr_t find_end_of_current_column(uintptr_t current_position_in_csv_string, uintptr_t end_of_row)const;
@@ -247,7 +247,7 @@ inline decltype(auto) CSVMatrix<std::string_view>::at_(int64_t row, int64_t colu
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::string_view CSVMatrix<DataType>::string_at(uintptr_t row, uintptr_t column)const
+inline std::string_view CSVMatrix<DataType>::string_at(int64_t row, int64_t column)const
 {
     auto [begin,end] = find_begin_end_indeces_of_csv_entry(row, column);
 
@@ -520,7 +520,7 @@ inline uintptr_t CSVMatrix<DataType>::find_nth_row(uintptr_t row_index)const
     uintptr_t nth_row_begin_position = 0;
     uintptr_t nth_row_end_position = 0;
 
-    uintptr_t current_row = -1;
+    int64_t current_row = -1;
 
     if(does_first_row_contain_column_header_names_)
     {
@@ -531,7 +531,7 @@ inline uintptr_t CSVMatrix<DataType>::find_nth_row(uintptr_t row_index)const
     }
 
     while(nth_row_begin_position < mapped_csv_.size() &&
-          current_row < row_index)
+          current_row < int64_t(row_index))
     {
         nth_row_end_position = find_end_of_current_row(nth_row_begin_position);
 
