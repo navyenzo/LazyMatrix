@@ -31,7 +31,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <experimental/string_view>
+#include <string_view>
 
 // mio library for cross-platform memory-mapping
 #include "single_include/mio/mio.hpp"
@@ -97,7 +97,7 @@ public:
     uintptr_t rows()const { return rows_; }
     uintptr_t columns()const { return columns_; }
 
-    decltype(auto) string_at(uintptr_t row, uintptr_t column)const;
+    std::string_view string_at(uintptr_t row, uintptr_t column)const;
     decltype(auto) at_(int64_t row, int64_t column)const;
     
 
@@ -223,6 +223,20 @@ inline decltype(auto) CSVMatrix<DataType>::at_(int64_t row, int64_t column)const
 
     return value;
 }
+
+// String specializations
+
+template<>
+inline decltype(auto) CSVMatrix<std::string>::at_(int64_t row, int64_t column)const
+{
+    return this->string_at(row, column);
+}
+
+template<>
+inline decltype(auto) CSVMatrix<std::string_view>::at_(int64_t row, int64_t column)const
+{
+    return this->string_at(row, column);
+}
 //-------------------------------------------------------------------
 
 
@@ -233,11 +247,11 @@ inline decltype(auto) CSVMatrix<DataType>::at_(int64_t row, int64_t column)const
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline decltype(auto) CSVMatrix<DataType>::string_at(uintptr_t row, uintptr_t column)const
+inline std::string_view CSVMatrix<DataType>::string_at(uintptr_t row, uintptr_t column)const
 {
     auto [begin,end] = find_begin_end_indeces_of_csv_entry(row, column);
 
-    std::experimental::string_view value(&mapped_csv_.data()[begin], end - begin);
+    std::string_view value(&mapped_csv_.data()[begin], end - begin);
 
     return value;
 }
