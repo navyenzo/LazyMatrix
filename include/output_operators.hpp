@@ -22,6 +22,8 @@
 //-------------------------------------------------------------------
 #include <iostream>
 
+#include <Poco/Dynamic/Var.h>
+
 #include "base_matrix.hpp"
 #include "base_matrix3d.hpp"
 #include "image_matrix.hpp"
@@ -148,24 +150,43 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::hsv_pixel& pixel)
 
 
 //-------------------------------------------------------------------
-// Utility function used to print an expression to an output stream
+// Utility function used to print a 2d matrix expression to an output stream
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<LazyMatrix::is_type_a_matrix<MatrixType>{}>* = nullptr>
 
 inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
 {
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+
     os << "(" << expression.rows() << "x" << expression.columns() << ")\n";
 
     for(int i = 0; i < expression.rows(); ++i)
     {
         for(int j = 0; j < expression.columns() - 1; ++j)
         {
-            os << expression(i,j) << ",";
+            if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+            {
+                os << expression(i,j).toString() << ",";
+            }
+            else
+            {
+                os << expression(i,j) << ",";
+            }
         }
 
         if(expression.columns() > 0)
-            os << expression(i,expression.columns() - 1) << "\n";
+        {
+            if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+            {
+                os << expression(i,expression.columns() - 1).toString() << "\n";
+            }
+            else
+            {
+                os << expression(i,expression.columns() - 1) << "\n";
+            }
+        }
     }
 
     return os;
@@ -175,13 +196,16 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
 
 
 //-------------------------------------------------------------------
-// Utility function used to print an expression to an output stream
+// Utility function used to print a 3d expression to an output stream
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<LazyMatrix::is_type_a_matrix3d<MatrixType>{}>* = nullptr>
          
 inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
 {
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type;
+
     os << "(" << expression.pages() << "x" << expression.rows() << "x" << expression.columns() << ")\n";
 
     for(int i = 0; i < expression.pages(); ++i)
@@ -192,11 +216,27 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
         {
             for(int k = 0; k < expression.columns() - 1; ++k)
             {
-                os << expression(i,j,k) << ",";
+                if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+                {
+                    os << expression(i,j,k).toString() << ",";
+                }
+                else
+                {
+                    os << expression(i,j,k) << ",";
+                }
             }
 
             if(expression.columns() > 0)
-                os << expression(i,j,expression.columns() - 1) << "\n";
+            {
+                if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+                {
+                    os << expression(i,j,expression.columns() - 1).toString() << "\n";
+                }
+                else
+                {
+                    os << expression(i,j,expression.columns() - 1) << "\n";
+                }
+            }
         }
     }
 

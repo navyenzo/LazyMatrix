@@ -6,6 +6,10 @@
  * This test suite is designed to validate the functionality of the DatabaseMatrix class,
  * particularly its ability to interact with a SQLite database and perform basic operations
  * such as fetching the number of rows and columns and reading data using operator()(i, j).
+ * 
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ * @see https://github.com/navyenzo/LazyMatrix.git
  */
 //-------------------------------------------------------------------
 
@@ -19,7 +23,7 @@
 #include <Poco/Data/SQLite/SQLiteException.h>
 #include <Poco/Data/Session.h>
 
-#include "database_matrix.hpp"
+#include "lazy_matrix.hpp"
 //-------------------------------------------------------------------
 
 

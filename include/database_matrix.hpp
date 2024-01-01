@@ -1,3 +1,22 @@
+//-------------------------------------------------------------------
+/**
+ * @file database_matrix.hpp
+ * @brief Defines the DatabaseMatrix class for accessing database data as a matrix.
+ *
+ * This header file provides the definition of the DatabaseMatrix class, which
+ * allows accessing and manipulating data in a SQL database table as if it were
+ * a 2D matrix. It utilizes Poco's Data library for database interaction and
+ * supports basic matrix operations.
+ *
+ * @author Vincenzo Barbato
+ * @link https://www.linkedin.com/in/vincenzobarbato/
+ * @see https://github.com/navyenzo/LazyMatrix.git
+ * @namespace LazyMatrix
+ */
+//-------------------------------------------------------------------
+
+
+
 #ifndef INCLUDE_DATABASE_MATRIX_HPP_
 #define INCLUDE_DATABASE_MATRIX_HPP_
 
@@ -26,11 +45,20 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
+/**
+ * @struct DatabaseWindow
+ * @brief Represents a window of cached data from the database.
+ *
+ * This structure manages a cache window for efficient data retrieval from
+ * the database. It stores a range of rows and columns and the corresponding
+ * cached data.
+ */
+//-------------------------------------------------------------------
 struct DatabaseWindow
 {
-    std::vector<Poco::Dynamic::Var> cache;
-    int row1, column1; // Upper left corner of the window
-    int row2, column2; // Lower right corner of the window
+    std::vector<Poco::Dynamic::Var> cache; ///< The cache holding data within the window.
+    int row1, column1;                     ///< Upper left corner of the window.
+    int row2, column2;                     ///< Lower right corner of the window.
 
     DatabaseWindow() : row1(0), column1(0), row2(0), column2(0) {}
 
@@ -52,6 +80,15 @@ struct DatabaseWindow
 
 
 
+//-------------------------------------------------------------------
+/**
+ * @class DatabaseMatrix
+ * @brief Allows representing and accessing a SQL database table as a 2D matrix.
+ *
+ * DatabaseMatrix provides an interface to treat SQL database tables as 2D matrices,
+ * enabling matrix-like data access. It uses a DatabaseWindow for caching and efficient
+ * data retrieval.
+ */
 //-------------------------------------------------------------------
 class DatabaseMatrix : public BaseMatrix<DatabaseMatrix>
 {
@@ -88,8 +125,23 @@ private:
 
 
 //-------------------------------------------------------------------
+// Compile time functions to check if the type is a matrix expression type
+//-------------------------------------------------------------------
+template<>
+
+struct is_type_a_matrix< DatabaseMatrix > : std::true_type
+{
+};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 inline DatabaseMatrix::DatabaseMatrix(Poco::Data::Session& session, const std::string& tableName, uintptr_t cache_window_size)
-    : session_(session), tableName_(tableName), cache_window_size_(cache_window_size)
+    : BaseMatrix<DatabaseMatrix>(),
+      session_(session),
+      tableName_(tableName),
+      cache_window_size_(cache_window_size)
 {
     initial_setup();
 }
