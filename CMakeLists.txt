@@ -80,12 +80,9 @@ FetchContent_MakeAvailable(dlib)
 
 
 
-
 ###############################################################
 # pybind11 (For creating python interfaces to LazyMatrix objects)
 ###############################################################
-include(FetchContent)
-
 FetchContent_Declare(
   pybind11
   GIT_REPOSITORY https://github.com/pybind/pybind11.git
@@ -123,7 +120,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 
 
 ###############################################################
-# dlib related linking
+# Linking
 ###############################################################
 # Link dlib to LazyMatrix
 target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
@@ -146,6 +143,18 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
     LazyMatrix_PNG 
     LazyMatrix_JPEG 
     LazyMatrix_GIF
+)
+
+# Find the Poco library
+find_package(Poco REQUIRED COMPONENTS Foundation Data DataSQLite DataMySQL DataODBC)
+
+# Linking to SOCI and its backends
+target_link_libraries(${PROJECT_NAME} INTERFACE 
+    Poco::Foundation 
+    Poco::Data 
+    Poco::DataSQLite 
+    Poco::DataMySQL 
+    Poco::DataODBC
 )
 
 # Find the required libraries for non-vcpkg (particularly on Linux)

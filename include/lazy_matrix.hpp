@@ -162,6 +162,9 @@
 // Unary expression templates for element-wise operations
 #include "element_by_element_unary_expression.hpp"
 
+// Database matrix views
+#include "database_matrix.hpp"
+
 // Downsampling algorithms
 #include "downsampling.hpp"
 
