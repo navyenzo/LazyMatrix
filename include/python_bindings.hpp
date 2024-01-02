@@ -369,59 +369,37 @@ std::vector<std::pair<std::string, MatrixType&>> create_named_matrix_vector(cons
 template<typename MatrixType,
          std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
-inline std::string execute_python_script(const std::vector<std::pair<std::string, MatrixType&>>& input_matrices,
-                                  std::vector<std::pair<std::string, MatrixType&>>& output_matrices,
+std::string execute_python_script(const std::vector<MatrixType>& input_matrices,
+                                  const std::vector<MatrixType>& output_matrices,
                                   const std::string& script,
                                   const std::string& module_name)
 {
     std::stringstream python_script_output;
 
-    std::cout << "checking input matrices:\n\n";
-
-    int i = 0;
-
-    for(const auto& m : input_matrices)
-    {
-        std::cout << "m" << i << ":\nname: " << m.first << "\nsize: (" << m.second.rows() << "," << m.second.columns() << ")\n\n\n" << std::endl;
-        ++i;
-    }
-
-    std::cout << "\n\n\nModule name = " << module_name << "\n\n" << std::endl;
-
-    try
-    {
-        LazyMatrix::PythonStdOutErrStreamRedirect python_output_redirect;
-        pybind11::scoped_interpreter guard{}; // Start the Python interpreter
-
-        // Import the Pybind11 module containing the bindings
-        pybind11::module py_module = pybind11::module::import(module_name.c_str());
+    try {
+        PythonStdOutErrStreamRedirect python_output_redirect;
 
         pybind11::dict locals;
+        pybind11::module py_module = pybind11::module::import(module_name.c_str());
 
-        // Expose input matrices to Python
-        for (const auto& [name, matrix] : input_matrices)
-        {
-            locals[name.c_str()] = pybind11::cast(&matrix);
+        // Automatically assign names to input matrices and expose them to Python
+        for (size_t i = 0; i < input_matrices.size(); ++i) {
+            locals[("in" + std::to_string(i)).c_str()] = pybind11::cast(input_matrices[i]);
         }
 
-        // Expose output matrices to Python
-        for (auto& [name, matrix] : output_matrices)
-        {
-            locals[name.c_str()] = pybind11::cast(&matrix);
+        // Automatically assign names to output matrices and expose them to Python
+        for (size_t i = 0; i < output_matrices.size(); ++i) {
+            locals[("out" + std::to_string(i)).c_str()] = pybind11::cast(output_matrices[i]);
         }
 
         // Execute the Python script
-        pybind11::exec(script, pybind11::globals(), locals);
+        pybind11::exec(script, py_module.attr("__dict__"), locals);
 
         // Capture the python script output
         python_script_output << python_output_redirect.get_captured_output();
-    }
-    catch (const std::exception& e)
-    {
+    } catch (const std::exception& e) {
         python_script_output << "C++ Exception: " << e.what() << std::endl;
-    }
-    catch (...)
-    {
+    } catch (...) {
         python_script_output << "Unexpected Exception" << std::endl;
     }
 
