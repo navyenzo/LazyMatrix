@@ -64,12 +64,15 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
     pybind11::scoped_interpreter guard{}; // Start the Python interpreter
 
     // Define the Python script to be executed
-    std::vector<std::string> python_script_lines = {
+    std::vector<std::string> python_script_lines =
+    {
         "from example import SimpleMatrixDouble, MatrixDouble, print_simple_matrix, print_matrix",
         "",
         "# Access the C++ matrices directly",
-        "print(\"Printing C++ matrices in Python:\")",
+        "print(\"Printing C++ matrices in Python:\\n\\n\")",
+        "print(\"matrix in0 =\\n\")",
         "print_matrix(in0)",
+        "print(\"\\n\\nmatrix in1 =\\n\")",
         "print_matrix(in1)",
         "",
         "# Modify an element of in0",
@@ -78,16 +81,17 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
         "# Modify an element of in1",
         "in1.set_circ_at(3, 3, -14)",
         "",
-        "# Resize in0",
-        "in0.resize(10,10,-11)",
+        "# Resize out0",
+        "out0.resize(10,10,-11)",
         "",
         "# Print the modified matrix",
-        "print(\"Modified in0:\")",
-        "print_matrix(in0)"
+        "print(\"Matrix out0 =\\n\")",
+        "print_matrix(out0)"
     };
 
     std::string python_script;
-    for (const auto& line : python_script_lines) {
+    for (const auto& line : python_script_lines)
+    {
         python_script += line + "\n";
     }
 
@@ -95,10 +99,11 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
     // Create matrices in C++
     LazyMatrix::Matrix<double> m1(3, 3, 5.0);
     LazyMatrix::Matrix<double> m2(3, 3, 10.0);
+    LazyMatrix::Matrix<double> m3;
 
     // Prepare input and output matrices
     std::vector<LazyMatrix::Matrix<double>> input_matrices = {m1, m2};
-    std::vector<LazyMatrix::Matrix<double>> output_matrices; // If needed
+    std::vector<LazyMatrix::Matrix<double>> output_matrices = {m3};
 
     // Execute the Python script using the LazyMatrix function
     std::string python_script_output = LazyMatrix::execute_python_script(input_matrices, output_matrices, python_script, "example");

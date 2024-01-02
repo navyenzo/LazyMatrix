@@ -377,6 +377,8 @@ std::string execute_python_script(const std::vector<MatrixType>& input_matrices,
     std::stringstream python_script_output;
 
     try {
+        // This captures the output of std::cout, std::cerr
+        // and python out/err
         PythonStdOutErrStreamRedirect python_output_redirect;
 
         pybind11::dict locals;
@@ -397,9 +399,13 @@ std::string execute_python_script(const std::vector<MatrixType>& input_matrices,
 
         // Capture the python script output
         python_script_output << python_output_redirect.get_captured_output();
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e)
+    {
         python_script_output << "C++ Exception: " << e.what() << std::endl;
-    } catch (...) {
+    }
+    catch (...)
+    {
         python_script_output << "Unexpected Exception" << std::endl;
     }
 
