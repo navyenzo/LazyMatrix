@@ -74,8 +74,6 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
     {
         // Redirect both Python and C++ output to a string
         LazyMatrix::PythonStdOutErrStreamRedirect python_output_redirect;
-
-        std::cout << "\n\nciao bello\n\n";
         
         // Import the Pybind11 module containing the bindings
         pybind11::module example = pybind11::module::import("example");
@@ -86,8 +84,6 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
         {
             locals[name.c_str()] = pybind11::cast(&matrix);
         }
-        // locals["simple_matrix_cpp"] = pybind11::cast(&simple_matrix_cpp);
-        // locals["matrix_cpp"] = pybind11::cast(&matrix_cpp);
 
         // Execute Python code
         pybind11::exec(R"(
@@ -113,7 +109,7 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
         )", pybind11::globals(), locals);
 
         // Get the captured output
-        python_script_output = python_output_redirect.std_out_string();
+        python_script_output += python_output_redirect.get_captured_output();
     }
     catch (const std::exception& e)
     {
