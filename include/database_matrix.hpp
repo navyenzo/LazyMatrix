@@ -31,6 +31,7 @@
 #include <Poco/Data/Session.h>
 #include <Poco/Data/RecordSet.h>
 #include <Poco/Dynamic/Var.h>
+#include <Poco/Data/Statement.h>
 
 #include "base_matrix.hpp"
 //-------------------------------------------------------------------
@@ -96,7 +97,7 @@ public:
 
     using value_type = Poco::Dynamic::Var;
 
-    DatabaseMatrix(Poco::Data::Session& session, const std::string& tableName, uintptr_t cache_window_size = 100);
+    DatabaseMatrix(Poco::Data::Session& session, const std::string& table_name, uintptr_t cache_window_size = 100);
 
     uintptr_t rows() const;
     uintptr_t columns() const;
@@ -107,7 +108,7 @@ public:
 private:
     
     Poco::Data::Session& session_;
-    std::string tableName_;
+    std::string table_name_;
     std::vector<std::string> column_names_;
 
     mutable DatabaseWindow cache_window_;
@@ -136,10 +137,10 @@ struct is_type_a_matrix< DatabaseMatrix > : std::true_type
 
 
 //-------------------------------------------------------------------
-inline DatabaseMatrix::DatabaseMatrix(Poco::Data::Session& session, const std::string& tableName, uintptr_t cache_window_size)
+inline DatabaseMatrix::DatabaseMatrix(Poco::Data::Session& session, const std::string& table_name, uintptr_t cache_window_size)
     : BaseMatrix<DatabaseMatrix>(),
       session_(session),
-      tableName_(tableName),
+      table_name_(table_name),
       cache_window_size_(cache_window_size)
 {
     initial_setup();
@@ -153,7 +154,7 @@ inline void DatabaseMatrix::initial_setup()
 {
     // Assuming SQLite for simplification
     Poco::Data::Statement pragmaStmt(session_);
-    pragmaStmt << "PRAGMA table_info(" << tableName_ << ")";
+    pragmaStmt << "PRAGMA table_info(" << table_name_ << ")";
     pragmaStmt.execute();
 
     Poco::Data::RecordSet recordSet(pragmaStmt);
@@ -166,7 +167,7 @@ inline void DatabaseMatrix::initial_setup()
     // Fetching the number of rows
     rows_ = 0;
     Poco::Data::Statement rowStmt(session_);
-    rowStmt << "SELECT COUNT(*) FROM " << tableName_, 
+    rowStmt << "SELECT COUNT(*) FROM " << table_name_, 
         Poco::Data::Keywords::into(rows_), 
         Poco::Data::Keywords::now;
     rowStmt.execute();
@@ -225,7 +226,7 @@ inline void DatabaseMatrix::preload_data(int64_t row, int64_t column) const
 
     // Construct and execute the SQL query
     Poco::Data::Statement select(session_);
-    select << "SELECT * FROM " << tableName_ << " LIMIT " << (end_row - start_row) 
+    select << "SELECT * FROM " << table_name_ << " LIMIT " << (end_row - start_row) 
            << " OFFSET " << start_row;
     select.execute();
 
