@@ -164,6 +164,7 @@
 
 // Database matrix views
 #include "database_matrix.hpp"
+#include "database_matrix2.hpp"
 
 // Downsampling algorithms
 #include "downsampling.hpp"

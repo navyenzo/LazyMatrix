@@ -118,7 +118,6 @@ private:
     void initial_setup();
 
     void preload_data(int64_t row, int64_t column) const;
-    value_type fetch_data(int64_t row, int64_t column) const;
 };
 //-------------------------------------------------------------------
 

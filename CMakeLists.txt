@@ -95,6 +95,37 @@ FetchContent_MakeAvailable(pybind11)
 
 
 ###############################################################
+# SOCI library (For Database Matrices)
+###############################################################
+ExternalProject_Add(
+    soci
+    GIT_REPOSITORY https://github.com/SOCI/soci.git
+    GIT_TAG        master
+    CMAKE_ARGS     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/_deps/soci
+                   -DSOCI_STATIC=ON
+                   -DSOCI_SHARED=OFF
+                   -DSOCI_TESTS=OFF
+                   -DSOCI_EMPTY=ON
+                   -DSOCI_SQLITE3=ON
+                   -DSOCI_MYSQL=ON
+                   -DSOCI_POSTGRESQL=ON
+                   -DSOCI_ODBC=ON
+                   -DSOCI_ORACLE=ON
+                   -DSOCI_DB2=ON
+                   -DSOCI_FIREBIRD=ON
+                   # Add other backends as needed
+)
+
+# Include directories for SOCI
+include_directories(${CMAKE_BINARY_DIR}/_deps/soci/include)
+
+# Link directories for SOCI
+link_directories(${CMAKE_BINARY_DIR}/_deps/soci/lib)
+###############################################################
+
+
+
+###############################################################
 # Define LazyMatrix as an interface library
 ###############################################################
 add_library(${PROJECT_NAME} INTERFACE)
@@ -148,6 +179,9 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 # Find the Poco library
 find_package(Poco REQUIRED COMPONENTS Foundation Data DataSQLite DataMySQL DataODBC)
 
+# Ensure LazyMatrix is built after SOCI is built
+add_dependencies(${PROJECT_NAME} soci)
+
 # Linking to SOCI and its backends
 target_link_libraries(${PROJECT_NAME} INTERFACE 
     Poco::Foundation 
@@ -156,6 +190,29 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
     Poco::DataMySQL 
     Poco::DataODBC
 )
+
+# Find the required database libraries
+find_package(SQLite3 REQUIRED)
+find_package(ODBC REQUIRED)
+find_package(PostgreSQL REQUIRED)
+#find_package(MySQL REQUIRED)
+
+# Link SOCI libraries to your target, including all specified backends and database libraries
+target_link_libraries(${PROJECT_NAME} INTERFACE
+    soci_core
+    soci_sqlite3
+    soci_mysql
+    soci_postgresql
+    soci_odbc
+    soci_empty
+    SQLite::SQLite3 # Link against SQLite3 library
+    ODBC::ODBC # Link against ODBC library
+    #MySQL::MySQL # Link against MySQL library
+    PostgreSQL::PostgreSQL # Link against PostgreSQL library
+)
+
+# Link against libdl
+target_link_libraries(${PROJECT_NAME} INTERFACE dl)
 
 # Find the required libraries for non-vcpkg (particularly on Linux)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
