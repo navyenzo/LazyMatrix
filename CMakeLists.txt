@@ -95,32 +95,49 @@ FetchContent_MakeAvailable(pybind11)
 
 
 ###############################################################
-# SOCI library (For Database Matrices)
+# Poco library
 ###############################################################
-ExternalProject_Add(
-    soci
-    GIT_REPOSITORY https://github.com/SOCI/soci.git
-    GIT_TAG        master
-    CMAKE_ARGS     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/_deps/soci
-                   -DSOCI_STATIC=ON
-                   -DSOCI_SHARED=OFF
-                   -DSOCI_TESTS=OFF
-                   -DSOCI_EMPTY=ON
-                   -DSOCI_SQLITE3=ON
-                   -DSOCI_MYSQL=ON
-                   -DSOCI_POSTGRESQL=ON
-                   -DSOCI_ODBC=ON
-                   -DSOCI_ORACLE=ON
-                   -DSOCI_DB2=ON
-                   -DSOCI_FIREBIRD=ON
-                   # Add other backends as needed
+ExternalProject_Add(Poco
+    GIT_REPOSITORY https://github.com/pocoproject/poco.git
+    GIT_TAG devel
+    CMAKE_ARGS 
+        -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/_deps/poco
+        -DBUILD_SHARED_LIBS=OFF
+        -DENABLE_MYSQL=ON
+        -DENABLE_SQLITE=ON
+        -DENABLE_DATA=ON
+        -DENABLE_ODBC=ON
+        -DENABLE_POSTGRESQL=ON
+        -DENABLE_DATA_ODBC=ON
+        -DENABLE_DATA_SQLITE=ON
+        -DENABLE_DATA_MYSQL=ON
+        -DENABLE_DATA_POSTGRESQL=ON
+        -DENABLE_ZIP=ON
+        -DENABLE_PAGECOMPILER=ON
+        -DENABLE_PAGECOMPILER_FILE2PAGE=ON
 )
 
-# Include directories for SOCI
-include_directories(${CMAKE_BINARY_DIR}/_deps/soci/include)
+link_directories(${CMAKE_BINARY_DIR}/_deps/poco/lib)
+###############################################################
 
-# Link directories for SOCI
-link_directories(${CMAKE_BINARY_DIR}/_deps/soci/lib)
+
+
+###############################################################
+# SQLParser library (needed for Poco library)
+###############################################################
+FetchContent_Declare(
+  sqlparser
+  GIT_REPOSITORY https://github.com/hyrise/sql-parser.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(sqlparser)
+
+include_directories(${CMAKE_BINARY_DIR}/_deps)
+
+# Copy the "sql-parser-src" to the "sql-parser" directory as
+# this is needed for the Poco library
+file(COPY ${CMAKE_BINARY_DIR}/_deps/sqlparser-src/src 
+     DESTINATION ${CMAKE_BINARY_DIR}/_deps/sql-parser)
 ###############################################################
 
 
@@ -129,6 +146,14 @@ link_directories(${CMAKE_BINARY_DIR}/_deps/soci/lib)
 # Define LazyMatrix as an interface library
 ###############################################################
 add_library(${PROJECT_NAME} INTERFACE)
+###############################################################
+
+
+
+###############################################################
+# Add external project dependencies
+###############################################################
+add_dependencies(${PROJECT_NAME} Poco)
 ###############################################################
 
 
@@ -144,6 +169,8 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
     ${pybind11_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/_deps/poco
+    ${CMAKE_BINARY_DIR}/_deps
     include_directories(${Python3_INCLUDE_DIRS})
 )
 ###############################################################
@@ -176,39 +203,20 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
     LazyMatrix_GIF
 )
 
-# Find the Poco library
-find_package(Poco REQUIRED COMPONENTS Foundation Data DataSQLite DataMySQL DataODBC)
+# Ensure LazyMatrix is built after Poco is built
+add_dependencies(${PROJECT_NAME} Poco)
 
 # Ensure LazyMatrix is built after SOCI is built
 add_dependencies(${PROJECT_NAME} soci)
 
-# Linking to SOCI and its backends
-target_link_libraries(${PROJECT_NAME} INTERFACE 
-    Poco::Foundation 
-    Poco::Data 
-    Poco::DataSQLite 
-    Poco::DataMySQL 
-    Poco::DataODBC
-)
-
-# Find the required database libraries
-find_package(SQLite3 REQUIRED)
-find_package(ODBC REQUIRED)
-find_package(PostgreSQL REQUIRED)
-#find_package(MySQL REQUIRED)
-
-# Link SOCI libraries to your target, including all specified backends and database libraries
+# Link to Poco libraries
 target_link_libraries(${PROJECT_NAME} INTERFACE
-    soci_core
-    soci_sqlite3
-    soci_mysql
-    soci_postgresql
-    soci_odbc
-    soci_empty
-    SQLite::SQLite3 # Link against SQLite3 library
-    ODBC::ODBC # Link against ODBC library
-    #MySQL::MySQL # Link against MySQL library
-    PostgreSQL::PostgreSQL # Link against PostgreSQL library
+    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataSQLite.a
+    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataODBC.a
+    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataMySQL.a
+    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataPostgreSQL.a
+    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoData.a
+    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoFoundation.a
 )
 
 # Link against libdl
