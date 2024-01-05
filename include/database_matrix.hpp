@@ -76,6 +76,11 @@ struct DatabaseWindow
         column2 = std::max(c1, c2);
         cache.resize((row2 - row1) * (column2 - column1));
     }
+
+    void clear()
+    {
+        this->resize_window(0, 0, 0, 0);
+    }
 };
 //-------------------------------------------------------------------
 
@@ -97,28 +102,45 @@ public:
 
     using value_type = Poco::Dynamic::Var;
 
-    DatabaseMatrix(Poco::Data::Session& session, const std::string& table_name, uintptr_t cache_window_size = 100);
+    DatabaseMatrix(Poco::Data::Session& session,
+                   const std::string& table_name,
+                   const std::string& condition = "",
+                   uintptr_t cache_window_size = 100,
+                   const std::string& row_sorting_method = "");
+
+    const std::string& get_last_error() const;
 
     uintptr_t rows() const;
     uintptr_t columns() const;
     value_type at_(int64_t row, int64_t column) const;
 
+    void set_row_sorting_method(const std::string& row_sorting_method);
+    void set_condition(const std::string& condition);
+
 
 
 private:
+
+    void initial_setup();
+    void count_rows();
+    void count_columns();
+    
+    void preload_data(int64_t row, int64_t column) const;
+
+
     
     Poco::Data::Session& session_;
     std::string table_name_;
-    std::vector<std::string> column_names_;
+    std::string row_sorting_method_;
+    std::string condition_;
 
     mutable DatabaseWindow cache_window_;
     uintptr_t cache_window_size_ = 100;
 
     uintptr_t rows_ = 0;
+    std::vector<std::string> column_names_;
 
-    void initial_setup();
-
-    void preload_data(int64_t row, int64_t column) const;
+    std::string last_error_;
 };
 //-------------------------------------------------------------------
 
@@ -137,40 +159,85 @@ struct is_type_a_matrix< DatabaseMatrix > : std::true_type
 
 
 //-------------------------------------------------------------------
-inline DatabaseMatrix::DatabaseMatrix(Poco::Data::Session& session, const std::string& table_name, uintptr_t cache_window_size)
+inline DatabaseMatrix::DatabaseMatrix(Poco::Data::Session& session,
+                                      const std::string& table_name,
+                                      const std::string& condition,
+                                      uintptr_t cache_window_size,
+                                      const std::string& row_sorting_method)
     : BaseMatrix<DatabaseMatrix>(),
       session_(session),
       table_name_(table_name),
-      cache_window_size_(cache_window_size)
+      cache_window_size_(cache_window_size),
+      row_sorting_method_(row_sorting_method)
 {
-    initial_setup();
+    count_rows();
+    count_columns();
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-inline void DatabaseMatrix::initial_setup()
+inline void DatabaseMatrix::count_rows()
 {
-    // Assuming SQLite for simplification
-    Poco::Data::Statement pragmaStmt(session_);
-    pragmaStmt << "PRAGMA table_info(" << table_name_ << ")";
-    pragmaStmt.execute();
-
-    Poco::Data::RecordSet recordSet(pragmaStmt);
-    column_names_.clear();
-    for (size_t i = 0; i < recordSet.rowCount(); ++i, recordSet.moveNext()) {
-        std::string columnName = recordSet.value("name").convert<std::string>();
-        column_names_.push_back(columnName);
+    try
+    {
+        rows_ = 0;
+        Poco::Data::Statement row_statement(session_);
+        row_statement << "SELECT COUNT(*) FROM " << table_name_;
+        
+        if (!condition_.empty())
+            row_statement << " WHERE " << condition_;
+        
+        row_statement, Poco::Data::Keywords::into(rows_),
+            Poco::Data::Keywords::now;
+        row_statement.execute();
     }
+    catch (const std::exception& e)
+    {
+        last_error_ = "Error counting rows: " + std::string(e.what());
+    }
+}
+//-------------------------------------------------------------------
 
-    // Fetching the number of rows
-    rows_ = 0;
-    Poco::Data::Statement rowStmt(session_);
-    rowStmt << "SELECT COUNT(*) FROM " << table_name_, 
-        Poco::Data::Keywords::into(rows_), 
-        Poco::Data::Keywords::now;
-    rowStmt.execute();
+
+
+//-------------------------------------------------------------------
+inline void DatabaseMatrix::count_columns()
+{
+    try
+    {
+        column_names_.clear();
+
+        // Clear the cache
+        cache_window_.clear();
+
+        // Construct and execute the SQL query with a WHERE condition
+        Poco::Data::Statement column_statement(session_);
+        column_statement << "SELECT * FROM " << table_name_;
+        
+        if (!condition_.empty())
+            column_statement << " WHERE " << condition_;
+        
+        column_statement << " LIMIT 1";
+        column_statement.execute();
+
+        // Retrieve column names from the result metadata
+        Poco::Data::RecordSet record_set(column_statement);
+        for (size_t i = 0; i < record_set.columnCount(); ++i)
+        {
+            column_names_.push_back(record_set.columnName(i));
+        }
+
+        if (column_names_.empty())
+        {
+            last_error_ = "No columns found for table " + table_name_;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        last_error_ = "Error counting columns: " + std::string(e.what());
+    }
 }
 //-------------------------------------------------------------------
 
@@ -226,8 +293,17 @@ inline void DatabaseMatrix::preload_data(int64_t row, int64_t column) const
 
     // Construct and execute the SQL query
     Poco::Data::Statement select(session_);
-    select << "SELECT * FROM " << table_name_ << " LIMIT " << (end_row - start_row) 
-           << " OFFSET " << start_row;
+
+    select << "SELECT * FROM " << table_name_;
+
+    if(!condition_.empty())
+        select << " WHERE " << condition_;
+    
+    if(!condition_.empty())
+        select << " ORDER BY " << row_sorting_method_;
+    
+    select << " LIMIT " << (end_row - start_row) << " OFFSET " << start_row;
+    
     select.execute();
 
     // Load the data into the cache
@@ -241,6 +317,34 @@ inline void DatabaseMatrix::preload_data(int64_t row, int64_t column) const
             cache_window_.cache[cache_index++] = record_set[i];
         }
         more = record_set.moveNext();
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+inline void DatabaseMatrix::set_row_sorting_method(const std::string& row_sorting_method)
+{
+    if(row_sorting_method_ != row_sorting_method)
+    {
+        row_sorting_method_ = row_sorting_method;
+        cache_window_.clear();
+        preload_data(0,0);
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+inline void DatabaseMatrix::set_condition(const std::string& condition)
+{
+    if(condition_ != condition)
+    {
+        condition_ = condition;
+        cache_window_.clear();
+        preload_data(0,0);
     }
 }
 //-------------------------------------------------------------------

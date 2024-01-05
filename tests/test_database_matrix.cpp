@@ -52,21 +52,25 @@ TEST_CASE("DatabaseMatrix operations", "[DatabaseMatrix]")
         session << "INSERT INTO test_table (name) VALUES('Bob')", now;
         session << "INSERT INTO test_table (name) VALUES('Charlie')", now;
 
-        LazyMatrix::DatabaseMatrix matrix(session, "test_table");
-
         SECTION("Test row count")
         {
+            LazyMatrix::DatabaseMatrix matrix(session, "test_table");
+
             auto actual_row_count = matrix.rows();
             REQUIRE(actual_row_count == 3);
         }
 
         SECTION("Test column count")
         {
+            LazyMatrix::DatabaseMatrix matrix(session, "test_table");
+
             REQUIRE(matrix.columns() == 2);
         }
 
         SECTION("Test data retrieval")
         {
+            LazyMatrix::DatabaseMatrix matrix(session, "test_table");
+
             // Check first row
             auto name_row1 = matrix(0, 1).convert<std::string>();
             REQUIRE(name_row1 == "Alice");
@@ -78,6 +82,44 @@ TEST_CASE("DatabaseMatrix operations", "[DatabaseMatrix]")
             // Check third row
             auto name_row3 = matrix(2, 1).convert<std::string>();
             REQUIRE(name_row3 == "Charlie");
+        }
+        
+        SECTION("Test with condition")
+        {
+            LazyMatrix::DatabaseMatrix matrix(session, "test_table", "name LIKE 'B%'");
+            
+            REQUIRE(matrix.rows() == 1); // Expecting only one row where name starts with 'B'
+            
+            auto name = matrix(0, 1).convert<std::string>();
+            REQUIRE(name == "Bob"); // Checking if the correct row is fetched
+        }
+        
+        SECTION("Test with different condition")
+        {
+            LazyMatrix::DatabaseMatrix matrix(session, "test_table", "id > 1");
+            
+            REQUIRE(matrix.rows() == 2); // Expecting two rows with id > 1
+            
+            auto name_row1 = matrix(0, 1).convert<std::string>();
+            REQUIRE(name_row1 == "Bob");
+
+            auto name_row2 = matrix(1, 1).convert<std::string>();
+            REQUIRE(name_row2 == "Charlie");
+        }
+        
+        SECTION("Test with row sorting")
+        {
+            LazyMatrix::DatabaseMatrix matrix(session, "test_table");
+            matrix.set_row_sorting_method("id DESC");
+
+            auto name_row1 = matrix(0, 1).convert<std::string>();
+            REQUIRE(name_row1 == "Charlie"); // First row should now be Charlie
+
+            auto name_row2 = matrix(1, 1).convert<std::string>();
+            REQUIRE(name_row2 == "Bob"); // Second row should now be Bob
+
+            auto name_row3 = matrix(2, 1).convert<std::string>();
+            REQUIRE(name_row3 == "Alice"); // Third row should now be Alice
         }
     }
     catch (const Poco::Data::SQLite::SQLiteException& sqle)
