@@ -211,12 +211,12 @@ add_dependencies(${PROJECT_NAME} soci)
 
 # Link to Poco libraries
 target_link_libraries(${PROJECT_NAME} INTERFACE
-    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataSQLite.a
-    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataODBC.a
-    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataMySQL.a
-    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataPostgreSQL.a
-    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoData.a
-    ${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoFoundation.a
+    PocoDataSQLite
+    PocoDataODBC
+    PocoDataMySQL
+    PocoDataPostgreSQL
+    PocoData
+    PocoFoundation
 )
 
 # Link against libdl
