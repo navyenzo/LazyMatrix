@@ -11,6 +11,26 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3")
 # Set the output directory for binaries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Define common arguments for external projects
+# These are used to force the external projects
+# to use the same compiler that is used to build
+# the main project
+set(EXTERNAL_PROJECT_COMPILER_ARGS
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+)
+
+# Get the current build type
+# This is used to make sure that
+# any externalproject_add project
+# uses the same build type as the
+# main project
+if(CMAKE_BUILD_TYPE)
+    set(EXTERNAL_PROJECT_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+else()
+    set(EXTERNAL_PROJECT_BUILD_TYPE "Release")  # Default to Release if not set
+endif()
+
 # These modules are needed for external libraries
 include(FetchContent)
 include(ExternalProject)
@@ -100,9 +120,12 @@ FetchContent_MakeAvailable(pybind11)
 ExternalProject_Add(Poco
     GIT_REPOSITORY https://github.com/pocoproject/poco.git
     GIT_TAG devel
-    CMAKE_ARGS 
+    CMAKE_ARGS
+        ${EXTERNAL_PROJECT_COMPILER_ARGS}
         -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/_deps/poco
         -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_BUILD_TYPE=${EXTERNAL_PROJECT_BUILD_TYPE}
+        -DENABLE_FOUNDATION=ON
         -DENABLE_MYSQL=ON
         -DENABLE_SQLITE=ON
         -DENABLE_DATA=ON
@@ -116,6 +139,8 @@ ExternalProject_Add(Poco
         -DENABLE_PAGECOMPILER=ON
         -DENABLE_PAGECOMPILER_FILE2PAGE=ON
 )
+
+include_directories(${CMAKE_BINARY_DIR}/_deps/poco/include)
 
 link_directories(${CMAKE_BINARY_DIR}/_deps/poco/lib)
 ###############################################################
@@ -169,8 +194,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
     ${pybind11_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/_deps/poco
-    ${CMAKE_BINARY_DIR}/_deps
+    ${CMAKE_BINARY_DIR}/_deps/poco/include
     include_directories(${Python3_INCLUDE_DIRS})
 )
 ###############################################################
@@ -206,16 +230,26 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 # Ensure LazyMatrix is built after Poco is built
 add_dependencies(${PROJECT_NAME} Poco)
 
-# Ensure LazyMatrix is built after SOCI is built
-add_dependencies(${PROJECT_NAME} soci)
-
 # Link to Poco libraries
 target_link_libraries(${PROJECT_NAME} INTERFACE
-    PocoDataSQLite
-    PocoDataODBC
-    PocoDataMySQL
+    PocoPrometheus
+    PocoEncodings
+    PocoJWT
+    PocoZip
+    PocoActiveRecord
+    PocoMongoDB
     PocoDataPostgreSQL
+    PocoDataMySQL
+    PocoDataODBC
+    PocoDataSQLite
     PocoData
+    PocoRedis
+    PocoJSON
+    PocoXML
+    PocoUtil
+    PocoNetSSL
+    PocoCrypto
+    PocoNet
     PocoFoundation
 )
 

@@ -19,12 +19,12 @@
 #include <iostream>
 #include <catch2/catch_all.hpp>
 
+#include "lazy_matrix.hpp"
+
 // Includes used to test DatabaseMatrix
 #include <Poco/Data/SQLite/Connector.h>
 #include <Poco/Data/SQLite/SQLiteException.h>
 #include <Poco/Data/Session.h>
-
-#include "lazy_matrix.hpp"
 //-------------------------------------------------------------------
 
 
