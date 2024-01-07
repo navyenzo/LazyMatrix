@@ -58,13 +58,26 @@ class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType> >
 public:
 
     /**
-     * @brief Constructor for creating a matrix of given dimensions.
+     * @brief Default constructor for creating a matrix of given dimensions.
      * @param rows The number of rows in the matrix.
      * @param columns The number of columns in the matrix.
      */
-    SimpleMatrix(uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
+    SimpleMatrix(uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     {
         this->resize(rows, columns, initial_value);
+    }
+
+    /**
+     * @brief Copy constructor which makes a deep copy
+     * @param matrix The matrix to copy
+     */
+    SimpleMatrix(const SimpleMatrix<DataType>& matrix)
+    {
+        this->resize(matrix.rows(), matrix.columns());
+
+        for(int i = 0; i < matrix.rows(); ++i)
+            for(int j = 0; j < matrix.columns(); ++j)
+                (*this)(i,j) = matrix(i,j);
     }
 
     /**
@@ -84,6 +97,42 @@ public:
         for(int i = 0; i < rows; ++i)
             for(int j = 0; j < columns; ++j)
                 (*this)(i,j) = matrix(i,j);
+    }
+
+    /**
+     * @brief Assignment operator from another simple matrix
+     * @param matrix The matrix to copy
+     */
+    SimpleMatrix<DataType>& operator=(const SimpleMatrix<DataType>& matrix)
+    {
+        this->resize(matrix.rows(), matrix.columns());
+
+        for(int i = 0; i < matrix.rows(); ++i)
+            for(int j = 0; j < matrix.columns(); ++j)
+                (*this)(i,j) = matrix(i,j);
+
+        return (*this);
+    }
+
+    /**
+     * @brief Assignment operator from a generic matrix expression
+     * @param matrix The input matrix we will copy
+     */
+    template<typename MatrixType,
+             std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+
+    SimpleMatrix<DataType>& operator=(const MatrixType& matrix)
+    {
+        auto rows = matrix.rows();
+        auto columns = matrix.columns();
+
+        this->resize(rows, columns);
+
+        for(int i = 0; i < rows; ++i)
+            for(int j = 0; j < columns; ++j)
+                (*this)(i,j) = matrix(i,j);
+        
+        return (*this);
     }
 
     /**
