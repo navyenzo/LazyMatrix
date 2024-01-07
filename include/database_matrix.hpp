@@ -1,12 +1,14 @@
 //-------------------------------------------------------------------
 /**
  * @file database_matrix.hpp
- * @brief Defines the DatabaseMatrix class for accessing database data as a matrix.
+ * @brief Defines the DatabaseMatrix class and associated safety classes.
  *
  * This header file provides the definition of the DatabaseMatrix class, which
  * allows accessing and manipulating data in a SQL database table as if it were
  * a 2D matrix. It utilizes Poco's Data library for database interaction and
- * supports basic matrix operations.
+ * supports basic matrix operations. The file also includes SafeTableName and
+ * SafeColumnName classes to prevent SQL injection by sanitizing table and
+ * column names.
  *
  * @author Vincenzo Barbato
  * @link https://www.linkedin.com/in/vincenzobarbato/
@@ -23,10 +25,13 @@
 
 
 //-------------------------------------------------------------------
-#include <vector>
 #include <string>
+#include <regex>
+#include <stdexcept>
+#include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <cstdint>
 
 #include <Poco/Data/Session.h>
 #include <Poco/Data/RecordSet.h>
@@ -41,6 +46,150 @@
 //-------------------------------------------------------------------
 namespace LazyMatrix
 {
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @class SafeName
+ * @brief Class for validating and encapsulating database identifiers like table and column names.
+ *
+ * Validates a database identifier (table name, column name, etc.) against
+ * a strict pattern. Stores an error message if the identifier is invalid.
+ */
+//-------------------------------------------------------------------
+class SafeName
+{
+public:
+ 
+    /**
+     * Constructor for SafeName.
+     * @param name The raw database identifier to be validated.
+     */
+    SafeName(const std::string& name)
+    {
+        set(name);
+    }
+
+    /**
+     * Constructor for SafeName.
+     * @param name The raw database identifier to be validated.
+     */
+    void set(const std::string& name)
+    {
+        if (!std::regex_match(name, std::regex("^[a-zA-Z0-9_]+$")))
+        {
+            last_error_ = "Invalid identifier: " + name;
+            sanitized_name_.clear(); // Clear the name as it's invalid
+        }
+        else
+        {
+            sanitized_name_ = name; // Set the name if it's valid
+        }
+    }
+
+    /**
+     * Gets the sanitized database identifier.
+     * @return The sanitized identifier.
+     */
+    const std::string& get() const
+    {
+        return sanitized_name_;
+    }
+
+    /**
+     * Gets the last error message.
+     * @return The last error message.
+     */
+    const std::string& get_last_error() const
+    {
+        return last_error_;
+    }
+
+private:
+
+    std::string sanitized_name_; ///< The sanitized database identifier.
+    std::string last_error_;    ///< Last error message.
+};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @class SafeRowSortingMethod
+ * @brief Class for safely handling row sorting methods in database queries.
+ *
+ * Encapsulates a sorting method for database rows. Validates the column
+ * name and sorting order. Stores an error message if there is an issue.
+ */
+//-------------------------------------------------------------------
+class SafeRowSortingMethod
+{
+public:
+
+    /**
+     * Constructor for SafeRowSortingMethod.
+     * @param column The column name to be used in sorting, validated via SafeName.
+     * @param order The sorting order ('ASC' or 'DESC').
+     */
+    SafeRowSortingMethod(const std::string& column = "", const std::string& order = "")
+    {
+        set_parameters(column, order);
+    }
+
+    /**
+     * Sets the parameters for SafeRowSortingMethod.
+     * @param column The column name to be used in sorting, validated via SafeName.
+     * @param order The sorting order ('ASC' or 'DESC').
+     */
+    void set_parameters(const std::string& column, const std::string& order)
+    {
+        SafeName safe_column(column);
+
+        if (!safe_column.get_last_error().empty())
+        {
+            last_error_ = safe_column.get_last_error();
+            return; // Exit the constructor as the column name is invalid
+        }
+
+        sort_method = safe_column.get();
+
+        if (order != "ASC" && order != "DESC")
+        {
+            last_error_ = "Invalid sorting order: " + order;
+            sort_method.clear(); // Clear the sort method as it's invalid
+        }
+        else
+        {
+            sort_method += " " + order;
+        }
+    }
+
+    /**
+     * Gets the safe row sorting method.
+     * @return The safe row sorting method string.
+     */
+    const std::string& get() const
+    {
+        return sort_method;
+    }
+
+    /**
+     * Gets the last error message.
+     * @return The last error message.
+     */
+    const std::string& get_last_error() const
+    {
+        return last_error_;
+    }
+
+private:
+
+    std::string sort_method; ///< The safe sorting method string.
+    std::string last_error_; ///< Last error message.
+};
 //-------------------------------------------------------------------
 
 
@@ -102,11 +251,19 @@ public:
 
     using value_type = Poco::Dynamic::Var;
 
+     /**
+     * Constructor for DatabaseMatrix.
+     * @param session Database session.
+     * @param safe_table_name A SafeName object representing the table name.
+     * @param condition SQL condition (assumed to be safe).
+     * @param cache_window_size Size of the cache window.
+     * @param safe_sorting_method A SafeRowSortingMethod object for row sorting.
+     */
     DatabaseMatrix(Poco::Data::Session& session,
-                   const std::string& table_name,
+                   const SafeName& table_name,
                    const std::string& condition = "",
                    uintptr_t cache_window_size = 100,
-                   const std::string& row_sorting_method = "");
+                   const SafeRowSortingMethod& row_sorting_method = SafeRowSortingMethod("", ""));
 
     const std::string& get_last_error() const;
 
@@ -114,24 +271,20 @@ public:
     uintptr_t columns() const;
     value_type at_(int64_t row, int64_t column) const;
 
-    void set_row_sorting_method(const std::string& row_sorting_method);
+    void set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method);
     void set_condition(const std::string& condition);
 
 
 
 private:
 
-    void initial_setup();
     void count_rows();
     void count_columns();
-    
     void preload_data(int64_t row, int64_t column) const;
-
-
     
     Poco::Data::Session& session_;
-    std::string table_name_;
-    std::string row_sorting_method_;
+    SafeName table_name_;
+    SafeRowSortingMethod row_sorting_method_;
     std::string condition_;
 
     mutable DatabaseWindow cache_window_;
@@ -160,15 +313,15 @@ struct is_type_a_matrix< DatabaseMatrix > : std::true_type
 
 //-------------------------------------------------------------------
 inline DatabaseMatrix::DatabaseMatrix(Poco::Data::Session& session,
-                                      const std::string& table_name,
+                                      const SafeName& table_name,
                                       const std::string& condition,
                                       uintptr_t cache_window_size,
-                                      const std::string& row_sorting_method)
-    : BaseMatrix<DatabaseMatrix>(),
-      session_(session),
-      table_name_(table_name),
-      cache_window_size_(cache_window_size),
-      row_sorting_method_(row_sorting_method)
+                                      const SafeRowSortingMethod& row_sorting_method)
+                                      : session_(session),
+                                        table_name_(table_name),
+                                        condition_(condition),
+                                        cache_window_size_(cache_window_size),
+                                        row_sorting_method_(row_sorting_method)
 {
     count_rows();
     count_columns();
@@ -184,11 +337,13 @@ inline void DatabaseMatrix::count_rows()
     {
         rows_ = 0;
         Poco::Data::Statement row_statement(session_);
-        row_statement << "SELECT COUNT(*) FROM " << table_name_;
         
+        // Use the already validated and sanitized table name directly
+        row_statement << "SELECT COUNT(*) FROM " << table_name_.get();
+
         if (!condition_.empty())
             row_statement << " WHERE " << condition_;
-        
+
         row_statement, Poco::Data::Keywords::into(rows_),
             Poco::Data::Keywords::now;
         row_statement.execute();
@@ -214,11 +369,11 @@ inline void DatabaseMatrix::count_columns()
 
         // Construct and execute the SQL query with a WHERE condition
         Poco::Data::Statement column_statement(session_);
-        column_statement << "SELECT * FROM " << table_name_;
-        
+        column_statement << "SELECT * FROM " << table_name_.get();
+
         if (!condition_.empty())
             column_statement << " WHERE " << condition_;
-        
+
         column_statement << " LIMIT 1";
         column_statement.execute();
 
@@ -231,7 +386,7 @@ inline void DatabaseMatrix::count_columns()
 
         if (column_names_.empty())
         {
-            last_error_ = "No columns found for table " + table_name_;
+            last_error_ = "No columns found for table " + table_name_.get();
         }
     }
     catch (const std::exception& e)
@@ -294,13 +449,13 @@ inline void DatabaseMatrix::preload_data(int64_t row, int64_t column) const
     // Construct and execute the SQL query
     Poco::Data::Statement select(session_);
 
-    select << "SELECT * FROM " << table_name_;
+    select << "SELECT * FROM " << table_name_.get();
 
-    if(!condition_.empty())
+    if (!condition_.empty())
         select << " WHERE " << condition_;
     
-    if(!condition_.empty())
-        select << " ORDER BY " << row_sorting_method_;
+    if (!row_sorting_method_.get().empty())
+        select << " ORDER BY " << row_sorting_method_.get();
     
     select << " LIMIT " << (end_row - start_row) << " OFFSET " << start_row;
     
@@ -324,9 +479,9 @@ inline void DatabaseMatrix::preload_data(int64_t row, int64_t column) const
 
 
 //-------------------------------------------------------------------
-inline void DatabaseMatrix::set_row_sorting_method(const std::string& row_sorting_method)
+inline void DatabaseMatrix::set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method)
 {
-    if(row_sorting_method_ != row_sorting_method)
+    if(row_sorting_method_.get() != row_sorting_method.get())
     {
         row_sorting_method_ = row_sorting_method;
         cache_window_.clear();
@@ -343,6 +498,8 @@ inline void DatabaseMatrix::set_condition(const std::string& condition)
     if(condition_ != condition)
     {
         condition_ = condition;
+        count_rows();
+        count_columns();
         cache_window_.clear();
         preload_data(0,0);
     }
