@@ -230,25 +230,25 @@ add_dependencies(${PROJECT_NAME} Poco)
 
 # Link to Poco libraries
 target_link_libraries(${PROJECT_NAME} INTERFACE
-    PocoPrometheus
-    PocoEncodings
-    PocoJWT
-    PocoZip
-    PocoActiveRecord
-    PocoMongoDB
-    PocoDataPostgreSQL
-    PocoDataMySQL
-    PocoDataODBC
-    PocoDataSQLite
-    PocoData
-    PocoRedis
-    PocoJSON
-    PocoXML
-    PocoUtil
-    PocoNetSSL
-    PocoCrypto
-    PocoNet
-    PocoFoundation
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoPrometheus.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoEncodings.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoJWT.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoZip.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoActiveRecord.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoMongoDB.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataPostgreSQL.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataMySQL.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataODBC.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataSQLite.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoData.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoRedis.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoJSON.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoXML.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoUtil.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoNetSSL.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoCrypto.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoNet.a"
+    "${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoFoundation.a"
 )
 
 # Link against libdl
