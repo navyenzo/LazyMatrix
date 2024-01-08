@@ -126,11 +126,7 @@ ExternalProject_Add(Poco
         -DBUILD_SHARED_LIBS=OFF
         -DCMAKE_BUILD_TYPE=${EXTERNAL_PROJECT_BUILD_TYPE}
         -DENABLE_FOUNDATION=ON
-        -DENABLE_MYSQL=ON
-        -DENABLE_SQLITE=ON
         -DENABLE_DATA=ON
-        -DENABLE_ODBC=ON
-        -DENABLE_POSTGRESQL=ON
         -DENABLE_DATA_ODBC=ON
         -DENABLE_DATA_SQLITE=ON
         -DENABLE_DATA_MYSQL=ON
@@ -138,6 +134,7 @@ ExternalProject_Add(Poco
         -DENABLE_ZIP=ON
         -DENABLE_PAGECOMPILER=ON
         -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+    INSTALL_COMMAND "${CMAKE_COMMAND}" --build <BINARY_DIR> --target install
 )
 
 include_directories(${CMAKE_BINARY_DIR}/_deps/poco/include)
