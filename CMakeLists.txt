@@ -20,17 +20,6 @@ set(EXTERNAL_PROJECT_COMPILER_ARGS
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
 )
 
-# Get the current build type
-# This is used to make sure that
-# any externalproject_add project
-# uses the same build type as the
-# main project
-if(CMAKE_BUILD_TYPE)
-    set(EXTERNAL_PROJECT_BUILD_TYPE ${CMAKE_BUILD_TYPE})
-else()
-    set(EXTERNAL_PROJECT_BUILD_TYPE "Release")  # Default to Release if not set
-endif()
-
 # These modules are needed for external libraries
 include(FetchContent)
 include(ExternalProject)
@@ -78,7 +67,7 @@ FetchContent_Declare(
 
 # Set the Poco specific arguments before calling FetchContent_MakeAvailable
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-set(CMAKE_BUILD_TYPE ${EXTERNAL_PROJECT_BUILD_TYPE} CACHE INTERNAL "")
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE INTERNAL "")
 set(ENABLE_FOUNDATION ON CACHE INTERNAL "")
 set(ENABLE_DATA ON CACHE INTERNAL "")
 set(ENABLE_DATA_ODBC ON CACHE INTERNAL "")
@@ -124,7 +113,7 @@ FetchContent_MakeAvailable(xoshiro)
 ###############################################################
 # dlib library
 ###############################################################
-# Before declaring dlib or any other library
+# Enable position independent code
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Fetch dlib library
@@ -139,16 +128,16 @@ set(DLIB_PNG_SUPPORT ON CACHE BOOL "Enable PNG support in dlib" FORCE)
 set(DLIB_JPEG_SUPPORT ON CACHE BOOL "Enable JPEG support in dlib" FORCE)
 set(DLIB_GIF_SUPPORT ON CACHE BOOL "Enable GIF support in dlib" FORCE)
 
-# Fetch dlib and pass the build type
+# Fetch and add dlib
 FetchContent_GetProperties(dlib)
 if(NOT dlib_POPULATED)
     FetchContent_Populate(dlib)
-    set(CMAKE_BUILD_TYPE ${EXTERNAL_PROJECT_BUILD_TYPE} CACHE STRING "Build type" FORCE)
+    # Pass the build type to Dlib's configuration
+    set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Build type" FORCE)
     add_subdirectory(${dlib_SOURCE_DIR} ${dlib_BINARY_DIR})
 endif()
-
-FetchContent_MakeAvailable(dlib)
 ###############################################################
+
 
 
 
