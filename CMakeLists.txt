@@ -139,6 +139,14 @@ set(DLIB_PNG_SUPPORT ON CACHE BOOL "Enable PNG support in dlib" FORCE)
 set(DLIB_JPEG_SUPPORT ON CACHE BOOL "Enable JPEG support in dlib" FORCE)
 set(DLIB_GIF_SUPPORT ON CACHE BOOL "Enable GIF support in dlib" FORCE)
 
+# Fetch dlib and pass the build type
+FetchContent_GetProperties(dlib)
+if(NOT dlib_POPULATED)
+    FetchContent_Populate(dlib)
+    set(CMAKE_BUILD_TYPE ${EXTERNAL_PROJECT_BUILD_TYPE} CACHE STRING "Build type" FORCE)
+    add_subdirectory(${dlib_SOURCE_DIR} ${dlib_BINARY_DIR})
+endif()
+
 FetchContent_MakeAvailable(dlib)
 ###############################################################
 
