@@ -134,8 +134,8 @@ ExternalProject_Add(Poco
         -DENABLE_ZIP=ON
         -DENABLE_PAGECOMPILER=ON
         -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-    INSTALL_COMMAND "${CMAKE_COMMAND}" --build <BINARY_DIR> --target install
 )
+
 
 include_directories(${CMAKE_BINARY_DIR}/_deps/poco/include)
 
@@ -230,25 +230,25 @@ add_dependencies(${PROJECT_NAME} Poco)
 
 # Link to Poco libraries
 target_link_libraries(${PROJECT_NAME} INTERFACE
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoPrometheusd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoPrometheus.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoEncodingsd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoEncodings.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoJWTd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoJWT.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoZipd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoZip.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoActiveRecordd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoActiveRecord.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoMongoDBd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoMongoDB.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataPostgreSQLd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataPostgreSQL.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataMySQLd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataMySQL.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataODBCd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataODBC.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataSQLited.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDataSQLite.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoDatad.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoData.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoRedisd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoRedis.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoJSONd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoJSON.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoXMLd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoXML.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoUtild.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoUtil.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoNetSSLd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoNetSSL.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoCryptod.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoCrypto.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoNetd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoNet.a>"
-    "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoFoundationd.a,${CMAKE_BINARY_DIR}/_deps/poco/lib/libPocoFoundation.a>"
+    "$<IF:$<CONFIG:Debug>,PocoPrometheusd,PocoPrometheus>"
+    "$<IF:$<CONFIG:Debug>,PocoEncodingsd,PocoEncodings>"
+    "$<IF:$<CONFIG:Debug>,PocoJWTd,PocoJWT>"
+    "$<IF:$<CONFIG:Debug>,PocoZipd,PocoZip>"
+    "$<IF:$<CONFIG:Debug>,PocoActiveRecordd,PocoActiveRecord>"
+    "$<IF:$<CONFIG:Debug>,PocoMongoDBd,PocoMongoDB>"
+    "$<IF:$<CONFIG:Debug>,PocoDataPostgreSQLd,PocoDataPostgreSQL>"
+    "$<IF:$<CONFIG:Debug>,PocoDataMySQLd,PocoDataMySQL>"
+    "$<IF:$<CONFIG:Debug>,PocoDataODBCd,PocoDataODBC>"
+    "$<IF:$<CONFIG:Debug>,PocoDataSQLited,PocoDataSQLite>"
+    "$<IF:$<CONFIG:Debug>,PocoDatad,PocoData>"
+    "$<IF:$<CONFIG:Debug>,PocoRedisd,PocoRedis>"
+    "$<IF:$<CONFIG:Debug>,PocoJSONd,PocoJSON>"
+    "$<IF:$<CONFIG:Debug>,PocoXMLd,PocoXML>"
+    "$<IF:$<CONFIG:Debug>,PocoUtild,PocoUtil>"
+    "$<IF:$<CONFIG:Debug>,PocoNetSSLd,PocoNetSSL>"
+    "$<IF:$<CONFIG:Debug>,PocoCryptod,PocoCrypto>"
+    "$<IF:$<CONFIG:Debug>,PocoNetd,PocoNet>"
+    "$<IF:$<CONFIG:Debug>,PocoFoundationd,PocoFoundation>"
 )
 
 # Link against libdl
