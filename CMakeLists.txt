@@ -52,6 +52,50 @@ FetchContent_MakeAvailable(mio)
 
 
 ###############################################################
+# NOTE: This library depends on both Poco libraries (for databases)
+#       as well as Eigen library for Matrix and advanced mathematical
+#       functions. Poco library defines an "uninstall" target and
+#       Eigen library defines an "uninstall" target only if one has
+#       not already been defined.  This means that in order to
+#       bring in Poco and Eigen libraries using FetchContent, Poco
+#       library has to be fetched before eigen library
+###############################################################
+
+
+
+###############################################################
+# Poco library
+###############################################################
+# Include the FetchContent module
+include(FetchContent)
+
+# Declare the FetchContent for Poco
+FetchContent_Declare(
+  Poco
+  GIT_REPOSITORY https://github.com/pocoproject/poco.git
+  GIT_TAG devel
+)
+
+# Set the Poco specific arguments before calling FetchContent_MakeAvailable
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(CMAKE_BUILD_TYPE ${EXTERNAL_PROJECT_BUILD_TYPE} CACHE INTERNAL "")
+set(ENABLE_FOUNDATION ON CACHE INTERNAL "")
+set(ENABLE_DATA ON CACHE INTERNAL "")
+set(ENABLE_DATA_ODBC ON CACHE INTERNAL "")
+set(ENABLE_DATA_SQLITE ON CACHE INTERNAL "")
+set(ENABLE_DATA_MYSQL ON CACHE INTERNAL "")
+set(ENABLE_DATA_POSTGRESQL ON CACHE INTERNAL "")
+set(ENABLE_ZIP ON CACHE INTERNAL "")
+set(ENABLE_PAGECOMPILER ON CACHE INTERNAL "")
+set(ENABLE_PAGECOMPILER_FILE2PAGE ON CACHE INTERNAL "")
+
+# Make Poco available for the current project
+FetchContent_MakeAvailable(Poco)
+###############################################################
+
+
+
+###############################################################
 # eigen library
 ###############################################################
 FetchContent_Declare(
@@ -110,36 +154,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(pybind11)
-###############################################################
-
-
-
-###############################################################
-# Poco library
-###############################################################
-ExternalProject_Add(Poco
-    GIT_REPOSITORY https://github.com/pocoproject/poco.git
-    GIT_TAG devel
-    CMAKE_ARGS
-        ${EXTERNAL_PROJECT_COMPILER_ARGS}
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/_deps/poco
-        -DBUILD_SHARED_LIBS=OFF
-        -DCMAKE_BUILD_TYPE=${EXTERNAL_PROJECT_BUILD_TYPE}
-        -DENABLE_FOUNDATION=ON
-        -DENABLE_DATA=ON
-        -DENABLE_DATA_ODBC=ON
-        -DENABLE_DATA_SQLITE=ON
-        -DENABLE_DATA_MYSQL=ON
-        -DENABLE_DATA_POSTGRESQL=ON
-        -DENABLE_ZIP=ON
-        -DENABLE_PAGECOMPILER=ON
-        -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-)
-
-
-include_directories(${CMAKE_BINARY_DIR}/_deps/poco/include)
-
-link_directories(${CMAKE_BINARY_DIR}/_deps/poco/lib)
 ###############################################################
 
 
@@ -225,30 +239,27 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
     LazyMatrix_GIF
 )
 
-# Ensure LazyMatrix is built after Poco is built
-add_dependencies(${PROJECT_NAME} Poco)
-
 # Link to Poco libraries
 target_link_libraries(${PROJECT_NAME} INTERFACE
-    "$<IF:$<CONFIG:Debug>,PocoPrometheusd,PocoPrometheus>"
-    "$<IF:$<CONFIG:Debug>,PocoEncodingsd,PocoEncodings>"
-    "$<IF:$<CONFIG:Debug>,PocoJWTd,PocoJWT>"
-    "$<IF:$<CONFIG:Debug>,PocoZipd,PocoZip>"
-    "$<IF:$<CONFIG:Debug>,PocoActiveRecordd,PocoActiveRecord>"
-    "$<IF:$<CONFIG:Debug>,PocoMongoDBd,PocoMongoDB>"
-    "$<IF:$<CONFIG:Debug>,PocoDataPostgreSQLd,PocoDataPostgreSQL>"
-    "$<IF:$<CONFIG:Debug>,PocoDataMySQLd,PocoDataMySQL>"
-    "$<IF:$<CONFIG:Debug>,PocoDataODBCd,PocoDataODBC>"
-    "$<IF:$<CONFIG:Debug>,PocoDataSQLited,PocoDataSQLite>"
-    "$<IF:$<CONFIG:Debug>,PocoDatad,PocoData>"
-    "$<IF:$<CONFIG:Debug>,PocoRedisd,PocoRedis>"
-    "$<IF:$<CONFIG:Debug>,PocoJSONd,PocoJSON>"
-    "$<IF:$<CONFIG:Debug>,PocoXMLd,PocoXML>"
-    "$<IF:$<CONFIG:Debug>,PocoUtild,PocoUtil>"
-    "$<IF:$<CONFIG:Debug>,PocoNetSSLd,PocoNetSSL>"
-    "$<IF:$<CONFIG:Debug>,PocoCryptod,PocoCrypto>"
-    "$<IF:$<CONFIG:Debug>,PocoNetd,PocoNet>"
-    "$<IF:$<CONFIG:Debug>,PocoFoundationd,PocoFoundation>"
+    Poco::Prometheus
+    Poco::Encodings
+    Poco::JWT
+    Poco::Zip
+    Poco::ActiveRecord
+    Poco::MongoDB
+    Poco::DataPostgreSQL
+    Poco::DataMySQL
+    Poco::DataODBC
+    Poco::DataSQLite
+    Poco::Data
+    Poco::Redis
+    Poco::JSON
+    Poco::XML
+    Poco::Util
+    Poco::NetSSL
+    Poco::Crypto
+    Poco::Net
+    Poco::Foundation
 )
 
 # Link against libdl
