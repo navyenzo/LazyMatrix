@@ -123,10 +123,18 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Fetch dlib library
 FetchContent_Declare(
-  dlib
-  GIT_REPOSITORY https://github.com/davisking/dlib.git
-  GIT_TAG master
+    dlib
+    GIT_REPOSITORY https://github.com/davisking/dlib.git
+    GIT_TAG master
+    CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 )
+
+# Adjust CMAKE_CXX_FLAGS for dlib based on the build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(DLIB_ENABLE_ASSERTS_FLAG "-DENABLE_ASSERTS")
+else()
+    set(DLIB_ENABLE_ASSERTS_FLAG "")
+endif()
 
 # Set required definitions for dlib image support
 set(DLIB_PNG_SUPPORT ON CACHE BOOL "Enable PNG support in dlib" FORCE)
@@ -137,10 +145,13 @@ set(DLIB_GIF_SUPPORT ON CACHE BOOL "Enable GIF support in dlib" FORCE)
 FetchContent_GetProperties(dlib)
 if(NOT dlib_POPULATED)
     FetchContent_Populate(dlib)
-    # Pass the build type to Dlib's configuration
-    set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Build type" FORCE)
-    add_subdirectory(${dlib_SOURCE_DIR} ${dlib_BINARY_DIR})
+    add_subdirectory(${dlib_SOURCE_DIR} ${dlib_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
+
+add_library(dlib_custom INTERFACE)
+target_include_directories(dlib_custom INTERFACE ${dlib_SOURCE_DIR}/include)
+target_compile_options(dlib_custom INTERFACE ${DLIB_ENABLE_ASSERTS_FLAG})
+target_link_libraries(dlib_custom INTERFACE dlib::dlib)
 ###############################################################
 
 
@@ -218,8 +229,8 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 ###############################################################
 # Linking
 ###############################################################
-# Link dlib to LazyMatrix
-target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
+# Linking dlib_custom to LazyMatrix
+target_link_libraries(LazyMatrix INTERFACE dlib_custom)
 
 # Find the required libraries for non-vcpkg (particularly on Linux)
 find_package(ZLIB REQUIRED MODULE)
