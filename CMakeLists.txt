@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.16)
 
 project(LazyMatrix VERSION 1.0)
 
+# Print the current build type/target
+message(STATUS "Current Built Type for project LazyMatrix: ${CMAKE_BUILD_TYPE}")
+
+
+
 ###############################################################
 # Compiler options
 set(CMAKE_CXX_STANDARD 17)
