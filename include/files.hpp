@@ -28,6 +28,7 @@
 
 #include <system_error>
 #include <fstream>
+#include <vector>
 
 #if __has_include("filesystem")
     #include <filesystem>
@@ -117,7 +118,8 @@ inline fs::path create_file_with_specified_size_and_unique_name(
     std::size_t desired_file_size,
     std::error_code& file_creation_error,
     std::string filename_template = "XXXXXX",
-    const fs::path& directory_where_file_will_reside = fs::temp_directory_path()) {
+    const fs::path& directory_where_file_will_reside = fs::temp_directory_path())
+{
 
     // Ensure the filename template ends with exactly "XXXXXX"
     const size_t x_count = 6;
@@ -138,7 +140,8 @@ inline fs::path create_file_with_specified_size_and_unique_name(
 
         // Create and open the file to ensure it exists
         std::ofstream file_stream(filename, std::ios::binary | std::ios::out);
-        if (!file_stream) {
+        if (!file_stream)
+        {
             file_creation_error.assign(errno, std::generic_category());
             return fs::path(); // Return an empty path on failure
         }
@@ -149,10 +152,13 @@ inline fs::path create_file_with_specified_size_and_unique_name(
 
         // Create and open a unique temporary file using mkstemp
         int fd = mkstemp(&full_template[0]);
-        if (fd != -1) {
+        if (fd != -1)
+        {
             close(fd); // Close the file descriptor as we only need the unique filename
             filename = fs::path(full_template); // Update filename with the generated unique filename
-        } else {
+        }
+        else
+        {
             // Handle errors in file creation
             file_creation_error.assign(errno, std::generic_category());
             return fs::path(); // Return an empty path on failure
@@ -163,11 +169,50 @@ inline fs::path create_file_with_specified_size_and_unique_name(
     fs::resize_file(filename, desired_file_size, file_creation_error);
 
     // Additional check to confirm the file size is as expected
-    if (!file_creation_error && fs::file_size(filename) != desired_file_size) {
+    if (!file_creation_error && fs::file_size(filename) != desired_file_size)
+    {
         file_creation_error.assign(std::make_error_code(std::errc::io_error).value(), std::generic_category());
     }
 
     return filename; // Return the path of the created file
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief List all files in a directory and subdirectories matching a specific name or pattern.
+ * 
+ * @param directory The directory to search in.
+ * @param name_to_match The name or pattern to match.
+ * @return std::vector<fs::path> A vector of file paths that match the given name or pattern.
+ */
+//-------------------------------------------------------------------
+inline std::vector<fs::path> list_files_matching_name(const fs::path& directory, const std::string& name_to_match)
+{
+    std::vector<fs::path> matching_files;
+    std::error_code ec;
+
+    // Check if directory exists and is indeed a directory
+    if (!fs::exists(directory, ec) || !fs::is_directory(directory, ec))
+        return matching_files;
+
+    for (const auto& entry : fs::recursive_directory_iterator(directory, ec))
+    {
+        if (ec)
+            break; // Stop if an error occurred during directory traversal
+
+        if (entry.is_regular_file(ec) && entry.path().filename().string().find(name_to_match) != std::string::npos)
+        {
+            matching_files.push_back(entry.path());
+        }
+
+        if (ec)
+            break; // Stop if an error occurred while accessing file properties
+    }
+
+    return matching_files;
 }
 //-------------------------------------------------------------------
 
