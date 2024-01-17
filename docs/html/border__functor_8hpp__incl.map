@@ -1,0 +1,6 @@
+<map id="include/border_functor.hpp" name="include/border_functor.hpp">
+<area shape="rect" id="node1" title="Provides functionality to handle matrix border cases." alt="" coords="16,5,211,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,91,107"/>
+<area shape="rect" id="node3" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="115,80,245,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="140,155,220,181"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="include/element_by_element_binary_expression.hpp" name="include/element_by_element_binary_expression.hpp">
+<area shape="rect" id="node1" title="Provides element&#45;by&#45;element binary operations for matrices." alt="" coords="139,5,376,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,95,91,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="115,95,202,121"/>
+<area shape="rect" id="node4" title=" " alt="" coords="226,95,289,121"/>
+<area shape="rect" id="node5" title=" " alt="" coords="313,95,391,121"/>
+<area shape="rect" id="node6" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="416,95,547,121"/>
+<area shape="rect" id="node7" title=" " alt="" coords="441,169,521,196"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="include/matrix_multiplication.hpp" name="include/matrix_multiplication.hpp">
+<area shape="rect" id="node1" title="Provides functionality for matrix multiplication in the LazyMatrix library." alt="" coords="65,5,307,32"/>
+<area shape="rect" id="node2" href="$simple__matrix_8hpp.html" title="Defines the SimpleMatrix class for basic 2D matrix operations." alt="" coords="114,80,258,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,155,68,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="92,155,179,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="203,155,270,181"/>
+<area shape="rect" id="node6" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="294,155,425,181"/>
+<area shape="rect" id="node7" title=" " alt="" coords="319,229,399,256"/>
+</map>

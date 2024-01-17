@@ -1,0 +1,5 @@
+<map id="include/reverse_view.hpp" name="include/reverse_view.hpp">
+<area shape="rect" id="node1" title="Provides the ReverseView class for creating a reversed view of matrix expressions in LazyMatrix." alt="" coords="5,5,192,32"/>
+<area shape="rect" id="node2" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="33,80,164,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="59,155,139,181"/>
+</map>

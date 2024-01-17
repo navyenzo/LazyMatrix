@@ -1,0 +1,5 @@
+<map id="include/augment_columns_view.hpp" name="include/augment_columns_view.hpp">
+<area shape="rect" id="node1" title="Provides functionality to augment two matrices column&#45;wise." alt="" coords="5,5,199,47"/>
+<area shape="rect" id="node2" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="37,95,167,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="62,169,142,196"/>
+</map>

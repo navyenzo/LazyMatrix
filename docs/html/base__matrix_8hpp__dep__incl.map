@@ -1,0 +1,51 @@
+<map id="include/base_matrix.hpp" name="include/base_matrix.hpp">
+<area shape="rect" id="node1" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="2145,5,2328,32"/>
+<area shape="rect" id="node2" href="$augment__columns_8hpp.html" title="Provides functionality to augment two matrices column&#45;wise." alt="" coords="30,177,251,203"/>
+<area shape="rect" id="node3" href="$lazy__matrix_8hpp.html" title="Main include file for the LazyMatrix library." alt="" coords="2071,348,2250,375"/>
+<area shape="rect" id="node15" href="$augment__columns__view_8hpp.html" title="Provides functionality to augment two matrices column&#45;wise." alt="" coords="200,259,393,300"/>
+<area shape="rect" id="node16" href="$augment__rows_8hpp.html" title="Provides functionality to augment two matrices row&#45;wise." alt="" coords="326,177,523,203"/>
+<area shape="rect" id="node17" href="$augment__rows__view_8hpp.html" title="Provides functionality to augment two matrices row&#45;wise as a view." alt="" coords="553,259,723,300"/>
+<area shape="rect" id="node18" href="$border__functor_8hpp.html" title="Provides functionality to handle matrix border cases." alt="" coords="598,177,793,203"/>
+<area shape="rect" id="node20" href="$border__functor__view_8hpp.html" title="Provides views for matrix border handling." alt="" coords="985,169,1153,211"/>
+<area shape="rect" id="node21" href="$csv__matrix_8hpp.html" title="Memory maps CSV files and provides matrix&#45;like access to numeric data within." alt="" coords="1287,266,1461,293"/>
+<area shape="rect" id="node22" href="$database__matrix_8hpp.html" title="Defines the DatabaseMatrix class and associated safety classes." alt="" coords="1227,177,1438,203"/>
+<area shape="rect" id="node23" href="$diff_8hpp.html" title="Functionality for first&#45;order difference calculation in matrices." alt="" coords="1537,266,1659,293"/>
+<area shape="rect" id="node24" href="$downsampling_8hpp.html" title="This file contains functions useful for downsampling data in different ways." alt="" coords="1513,177,1709,203"/>
+<area shape="rect" id="node25" href="$element__by__element__binary__expression_8hpp.html" title="Provides element&#45;by&#45;element binary operations for matrices." alt="" coords="1835,169,2073,211"/>
+<area shape="rect" id="node26" href="$element__by__element__unary__expression_8hpp.html" title="Provides element&#45;by&#45;element unary operations for matrices." alt="" coords="1889,259,2123,300"/>
+<area shape="rect" id="node27" href="$image__matrix_8hpp.html" title="Provides the ImageMatrix class to handle images with pixel&#45;level manipulation." alt="" coords="2074,87,2266,114"/>
+<area shape="rect" id="node28" href="$output__operators_8hpp.html" title=" " alt="" coords="2197,177,2409,203"/>
+<area shape="rect" id="node29" href="$python__bindings_8hpp.html" title="Python bindings for the LazyMatrix library." alt="" coords="2249,266,2457,293"/>
+<area shape="rect" id="node30" href="$matrix_8hpp.html" title="Defines the Matrix class, a key component of the LazyMatrix library for memory&#45;mapped matrix operatio..." alt="" coords="817,177,961,203"/>
+<area shape="rect" id="node32" href="$matrix__generators_8hpp.html" title="Provides matrix generation functionality for the LazyMatrix library." alt="" coords="2483,177,2705,203"/>
+<area shape="rect" id="node33" href="$moving__average_8hpp.html" title="Provides functionality for computing simple moving averages of matrix rows or columns." alt="" coords="2541,266,2751,293"/>
+<area shape="rect" id="node34" href="$polymorphic__matrix_8hpp.html" title="Provides polymorphic wrappers for various matrix&#45;like data structures in LazyMatrix." alt="" coords="2779,169,2934,211"/>
+<area shape="rect" id="node35" href="$reverse_8hpp.html" title="Provides the Reverse class for creating a non&#45;modifiable reversed view of matrix expressions in LazyM..." alt="" coords="2832,266,2983,293"/>
+<area shape="rect" id="node36" href="$reverse__view_8hpp.html" title="Provides the ReverseView class for creating a reversed view of matrix expressions in LazyMatrix." alt="" coords="2594,87,2781,114"/>
+<area shape="rect" id="node37" href="$roi_8hpp.html" title="Provides functionality to select a Region Of Interest (ROI) in matrices." alt="" coords="2805,87,2924,114"/>
+<area shape="rect" id="node38" href="$roi__view_8hpp.html" title="Provides functionality to create a view representing a Region Of Interest (ROI) in matrices." alt="" coords="2947,87,3102,114"/>
+<area shape="rect" id="node39" href="$selector_8hpp.html" title="Provides functionality for selecting specific rows and/or columns from matrices." alt="" coords="1581,87,1733,114"/>
+<area shape="rect" id="node40" href="$selector__view_8hpp.html" title="Provides functionality for creating views that select specific rows and/or columns from matrices." alt="" coords="1757,87,1948,114"/>
+<area shape="rect" id="node41" href="$shuffle_8hpp.html" title="Provides functionality to shuffle rows and/or columns of matrices." alt="" coords="3127,87,3272,114"/>
+<area shape="rect" id="node42" href="$shuffle__view_8hpp.html" title=" " alt="" coords="3296,87,3479,114"/>
+<area shape="rect" id="node43" href="$simple__data__2d__matrix__wrapper_8hpp.html" title="Provides a wrapper to treat simple data types as 2D matrix&#45;like objects." alt="" coords="3503,80,3685,121"/>
+<area shape="rect" id="node44" href="$simple__matrix_8hpp.html" title="Defines the SimpleMatrix class for basic 2D matrix operations." alt="" coords="3518,177,3713,203"/>
+<area shape="rect" id="node46" href="$strassen__matrix__multiplication_8hpp.html" title="Strassen&#39;s algorithm for efficient matrix multiplication." alt="" coords="3630,259,3809,300"/>
+<area shape="rect" id="node47" href="$sorting_8hpp.html" title="Provides functionality to create a view of a matrix with sorted rows or columns." alt="" coords="3811,87,3958,114"/>
+<area shape="rect" id="node48" href="$transpose_8hpp.html" title="Provides the Transpose class for creating a transposed view of matrix expressions in LazyMatrix." alt="" coords="3982,87,4147,114"/>
+<area shape="rect" id="node49" href="$transpose__view_8hpp.html" title="Provides the TransposeView class for transposing matrix expressions in LazyMatrix." alt="" coords="4171,87,4374,114"/>
+<area shape="rect" id="node4" href="$test__python__bindings_8cpp.html" title="Test file for Python bindings of the LazyMatrix library." alt="" coords="1011,423,1198,464"/>
+<area shape="rect" id="node5" href="$test__2d__matrix__arithmetic__operations_8cpp.html" title="Tests for 2D matrix arithmetic operations in the LazyMatrix library." alt="" coords="1223,423,1421,464"/>
+<area shape="rect" id="node6" href="$test__csv__matrix_8cpp.html" title="Test cases for CSVMatrix class using Catch2 and Doxygen comments." alt="" coords="1446,430,1635,457"/>
+<area shape="rect" id="node7" href="$test__database__matrix_8cpp.html" title="Test cases for DatabaseMatrix class using Catch2 and SQLite." alt="" coords="1660,423,1811,464"/>
+<area shape="rect" id="node8" href="$test__downsampling_8cpp.html" title="Tests for downsampling functionality in LazyMatrix." alt="" coords="1835,430,2047,457"/>
+<area shape="rect" id="node9" href="$test__files__utils_8cpp.html" title="Test file for file and directory utilities in the LazyMatrix library." alt="" coords="2071,430,2250,457"/>
+<area shape="rect" id="node10" href="$test__image__matrix__image__loading_8cpp.html" title="Tests for image matrix loading in the LazyMatrix library." alt="" coords="2274,423,2455,464"/>
+<area shape="rect" id="node11" href="$test__lttb__downsampling_8cpp.html" title="Tests for triangle bucket downsampling functionality in LazyMatrix." alt="" coords="2480,430,2721,457"/>
+<area shape="rect" id="node12" href="$test__padding_8cpp.html" title="Tests for matrix padding functionality in LazyMatrix." alt="" coords="2745,430,2915,457"/>
+<area shape="rect" id="node13" href="$test__polymorphic__wrappers_8cpp.html" title="Tests for polymorphic wrappers in the LazyMatrix library." alt="" coords="2939,423,3110,464"/>
+<area shape="rect" id="node14" href="$test__sorting_8cpp.html" title="Tests for sorting functionality in LazyMatrix." alt="" coords="3134,430,3297,457"/>
+<area shape="rect" id="node19" href="$filters_8hpp.html" title="Provides filtering functionality for matrices." alt="" coords="819,266,958,293"/>
+<area shape="rect" id="node31" href="$matrix3d_8hpp.html" title="Defines the Matrix3D class, an integral part of the LazyMatrix library for 3D memory&#45;mapped matrix op..." alt="" coords="993,266,1153,293"/>
+<area shape="rect" id="node45" href="$matrix__multiplication_8hpp.html" title="Provides functionality for matrix multiplication in the LazyMatrix library." alt="" coords="3313,266,3555,293"/>
+</map>

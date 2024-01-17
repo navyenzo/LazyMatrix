@@ -1,0 +1,5 @@
+<map id="include/roi.hpp" name="include/roi.hpp">
+<area shape="rect" id="node1" title="Provides functionality to select a Region Of Interest (ROI) in matrices." alt="" coords="11,5,130,32"/>
+<area shape="rect" id="node2" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="5,80,136,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="31,155,111,181"/>
+</map>

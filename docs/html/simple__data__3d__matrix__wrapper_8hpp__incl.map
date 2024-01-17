@@ -1,0 +1,5 @@
+<map id="include/simple_data_3d_matrix_wrapper.hpp" name="include/simple_data_3d_matrix_wrapper.hpp">
+<area shape="rect" id="node1" title="Provides a wrapper to treat simple data types as 3D matrix&#45;like objects." alt="" coords="5,5,188,47"/>
+<area shape="rect" id="node2" href="$base__matrix3d_8hpp.html" title="Defines the BaseMatrix3D class as a foundation for 3D matrix operations in the LazyMatrix library." alt="" coords="23,95,170,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="57,169,137,196"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="include/simple_matrix.hpp" name="include/simple_matrix.hpp">
+<area shape="rect" id="node1" title="Defines the SimpleMatrix class for basic 2D matrix operations." alt="" coords="89,5,283,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,68,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="92,80,179,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="203,80,270,107"/>
+<area shape="rect" id="node5" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="294,80,425,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="319,155,399,181"/>
+</map>

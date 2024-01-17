@@ -1,0 +1,15 @@
+<map id="include/downsampling.hpp" name="include/downsampling.hpp">
+<area shape="rect" id="node1" title="This file contains functions useful for downsampling data in different ways." alt="" coords="1057,5,1253,32"/>
+<area shape="rect" id="node2" href="$lazy__matrix_8hpp.html" title="Main include file for the LazyMatrix library." alt="" coords="1065,80,1244,107"/>
+<area shape="rect" id="node3" href="$test__python__bindings_8cpp.html" title="Test file for Python bindings of the LazyMatrix library." alt="" coords="5,155,192,196"/>
+<area shape="rect" id="node4" href="$test__2d__matrix__arithmetic__operations_8cpp.html" title="Tests for 2D matrix arithmetic operations in the LazyMatrix library." alt="" coords="217,155,415,196"/>
+<area shape="rect" id="node5" href="$test__csv__matrix_8cpp.html" title="Test cases for CSVMatrix class using Catch2 and Doxygen comments." alt="" coords="440,162,629,189"/>
+<area shape="rect" id="node6" href="$test__database__matrix_8cpp.html" title="Test cases for DatabaseMatrix class using Catch2 and SQLite." alt="" coords="654,155,805,196"/>
+<area shape="rect" id="node7" href="$test__downsampling_8cpp.html" title="Tests for downsampling functionality in LazyMatrix." alt="" coords="829,162,1041,189"/>
+<area shape="rect" id="node8" href="$test__files__utils_8cpp.html" title="Test file for file and directory utilities in the LazyMatrix library." alt="" coords="1065,162,1244,189"/>
+<area shape="rect" id="node9" href="$test__image__matrix__image__loading_8cpp.html" title="Tests for image matrix loading in the LazyMatrix library." alt="" coords="1268,155,1449,196"/>
+<area shape="rect" id="node10" href="$test__lttb__downsampling_8cpp.html" title="Tests for triangle bucket downsampling functionality in LazyMatrix." alt="" coords="1474,162,1715,189"/>
+<area shape="rect" id="node11" href="$test__padding_8cpp.html" title="Tests for matrix padding functionality in LazyMatrix." alt="" coords="1739,162,1909,189"/>
+<area shape="rect" id="node12" href="$test__polymorphic__wrappers_8cpp.html" title="Tests for polymorphic wrappers in the LazyMatrix library." alt="" coords="1933,155,2104,196"/>
+<area shape="rect" id="node13" href="$test__sorting_8cpp.html" title="Tests for sorting functionality in LazyMatrix." alt="" coords="2128,162,2291,189"/>
+</map>

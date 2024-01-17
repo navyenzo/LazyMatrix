@@ -1,0 +1,101 @@
+<map id="tests/test_csv_matrix.cpp" name="tests/test_csv_matrix.cpp">
+<area shape="rect" id="node1" title="Test cases for CSVMatrix class using Catch2 and Doxygen comments." alt="" coords="3729,5,3919,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="3664,80,3819,107"/>
+<area shape="rect" id="node3" href="$lazy__matrix_8hpp.html" title="Main include file for the LazyMatrix library." alt="" coords="3843,80,3970,107"/>
+<area shape="rect" id="node4" href="$files_8hpp.html" title="File and directory utilities for the LazyMatrix library." alt="" coords="361,341,439,367"/>
+<area shape="rect" id="node10" href="$robust__mutex_8hpp.html" title="Defines a robust mutex class for inter&#45;process synchronization." alt="" coords="6957,162,7097,189"/>
+<area shape="rect" id="node13" href="$numerical__constants_8hpp.html" title="Defines important numerical constants for the LazyMatrix library." alt="" coords="4654,341,4839,367"/>
+<area shape="rect" id="node14" href="$convert__numbers_8hpp.html" title="Provides functionality to convert strings to numbers and evaluate mathematical expressions." alt="" coords="6807,251,6969,278"/>
+<area shape="rect" id="node20" href="$circular__iterator_8hpp.html" title="Defines a circular iterator for containers in LazyMatrix library." alt="" coords="1061,162,1213,189"/>
+<area shape="rect" id="node22" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="2919,423,3049,449"/>
+<area shape="rect" id="node23" href="$base__matrix3d_8hpp.html" title="Defines the BaseMatrix3D class as a foundation for 3D matrix operations in the LazyMatrix library." alt="" coords="6052,341,6199,367"/>
+<area shape="rect" id="node24" href="$simple__data__2d__matrix__wrapper_8hpp.html" title="Provides a wrapper to treat simple data types as 2D matrix&#45;like objects." alt="" coords="4825,155,4999,196"/>
+<area shape="rect" id="node25" href="$simple__data__3d__matrix__wrapper_8hpp.html" title="Provides a wrapper to treat simple data types as 3D matrix&#45;like objects." alt="" coords="5775,155,5950,196"/>
+<area shape="rect" id="node26" href="$polymorphic__matrix_8hpp.html" title="Provides polymorphic wrappers for various matrix&#45;like data structures in LazyMatrix." alt="" coords="2365,251,2547,278"/>
+<area shape="rect" id="node29" href="$polymorphic__matrix3d_8hpp.html" title="Provides polymorphic wrappers for various 3d&#45;matrix&#45;like data structures in LazyMatrix." alt="" coords="2571,251,2768,278"/>
+<area shape="rect" id="node30" href="$simple__matrix_8hpp.html" title="Defines the SimpleMatrix class for basic 2D matrix operations." alt="" coords="3488,251,3632,278"/>
+<area shape="rect" id="node33" href="$simple__matrix3d_8hpp.html" title="Defines the SimpleMatrix3D class for basic 3D matrix operations." alt="" coords="3656,251,3816,278"/>
+<area shape="rect" id="node34" href="$matrix_8hpp.html" title="Defines the Matrix class, a key component of the LazyMatrix library for memory&#45;mapped matrix operatio..." alt="" coords="731,251,824,278"/>
+<area shape="rect" id="node39" href="$matrix3d_8hpp.html" title="Defines the Matrix3D class, an integral part of the LazyMatrix library for 3D memory&#45;mapped matrix op..." alt="" coords="819,162,928,189"/>
+<area shape="rect" id="node40" href="$csv__matrix_8hpp.html" title="Memory maps CSV files and provides matrix&#45;like access to numeric data within." alt="" coords="1232,251,1355,278"/>
+<area shape="rect" id="node44" href="$interval_8hpp.html" title="Defines the Interval class for representing and manipulating intervals." alt="" coords="5301,162,5401,189"/>
+<area shape="rect" id="node48" href="$image__matrix_8hpp.html" title="Provides the ImageMatrix class to handle images with pixel&#45;level manipulation." alt="" coords="6599,341,6740,367"/>
+<area shape="rect" id="node53" href="$transpose__view_8hpp.html" title="Provides the TransposeView class for transposing matrix expressions in LazyMatrix." alt="" coords="5126,162,5277,189"/>
+<area shape="rect" id="node54" href="$transpose_8hpp.html" title="Provides the Transpose class for creating a transposed view of matrix expressions in LazyMatrix." alt="" coords="5425,162,5540,189"/>
+<area shape="rect" id="node55" href="$reverse__view_8hpp.html" title="Provides the ReverseView class for creating a reversed view of matrix expressions in LazyMatrix." alt="" coords="5615,162,5751,189"/>
+<area shape="rect" id="node56" href="$reverse_8hpp.html" title="Provides the Reverse class for creating a non&#45;modifiable reversed view of matrix expressions in LazyM..." alt="" coords="1745,162,1844,189"/>
+<area shape="rect" id="node57" href="$augment__rows_8hpp.html" title="Provides functionality to augment two matrices row&#45;wise." alt="" coords="1868,162,2015,189"/>
+<area shape="rect" id="node58" href="$augment__rows__view_8hpp.html" title="Provides functionality to augment two matrices row&#45;wise as a view." alt="" coords="2039,162,2222,189"/>
+<area shape="rect" id="node59" href="$augment__columns_8hpp.html" title="Provides functionality to augment two matrices column&#45;wise." alt="" coords="2620,162,2791,189"/>
+<area shape="rect" id="node60" href="$augment__columns__view_8hpp.html" title="Provides functionality to augment two matrices column&#45;wise." alt="" coords="2815,162,3022,189"/>
+<area shape="rect" id="node61" href="$border__functor_8hpp.html" title="Provides functionality to handle matrix border cases." alt="" coords="4181,251,4325,278"/>
+<area shape="rect" id="node62" href="$border__functor__view_8hpp.html" title="Provides views for matrix border handling." alt="" coords="2995,251,3178,278"/>
+<area shape="rect" id="node63" href="$padding_8hpp.html" title="Provides functionality for padding matrix expressions." alt="" coords="3841,251,3943,278"/>
+<area shape="rect" id="node64" href="$padding__view_8hpp.html" title="Provides functionality for padding matrix expressions." alt="" coords="3968,251,4107,278"/>
+<area shape="rect" id="node65" href="$roi_8hpp.html" title="Provides functionality to select a Region Of Interest (ROI) in matrices." alt="" coords="3047,162,3113,189"/>
+<area shape="rect" id="node66" href="$roi__view_8hpp.html" title="Provides functionality to create a view representing a Region Of Interest (ROI) in matrices." alt="" coords="3188,162,3292,189"/>
+<area shape="rect" id="node67" href="$selector_8hpp.html" title="Provides functionality for selecting specific rows and/or columns from matrices." alt="" coords="2189,251,2291,278"/>
+<area shape="rect" id="node68" href="$selector__view_8hpp.html" title="Provides functionality for creating views that select specific rows and/or columns from matrices." alt="" coords="2027,251,2165,278"/>
+<area shape="rect" id="node69" href="$sorting_8hpp.html" title="Provides functionality to create a view of a matrix with sorted rows or columns." alt="" coords="1723,251,1818,278"/>
+<area shape="rect" id="node71" href="$shuffle_8hpp.html" title="Provides functionality to shuffle rows and/or columns of matrices." alt="" coords="1605,251,1699,278"/>
+<area shape="rect" id="node73" href="$shuffle__view_8hpp.html" title=" " alt="" coords="1449,251,1580,278"/>
+<area shape="rect" id="node74" href="$moving__average_8hpp.html" title="Provides functionality for computing simple moving averages of matrix rows or columns." alt="" coords="3367,162,3526,189"/>
+<area shape="rect" id="node75" href="$matrix__generators_8hpp.html" title="Provides matrix generation functionality for the LazyMatrix library." alt="" coords="4603,251,4773,278"/>
+<area shape="rect" id="node77" href="$matrix__multiplication_8hpp.html" title="Provides functionality for matrix multiplication in the LazyMatrix library." alt="" coords="3878,162,4069,189"/>
+<area shape="rect" id="node78" href="$diff_8hpp.html" title="Functionality for first&#45;order difference calculation in matrices." alt="" coords="4437,162,4507,189"/>
+<area shape="rect" id="node79" href="$filters_8hpp.html" title="Provides filtering functionality for matrices." alt="" coords="4309,162,4395,189"/>
+<area shape="rect" id="node80" href="$fft_8hpp.html" title="Provides Fast Fourier Transform (FFT) functionalities for matrices." alt="" coords="5679,251,5743,278"/>
+<area shape="rect" id="node84" href="$element__by__element__binary__expression_8hpp.html" title="Provides element&#45;by&#45;element binary operations for matrices." alt="" coords="5161,244,5337,285"/>
+<area shape="rect" id="node86" href="$element__by__element__unary__expression_8hpp.html" title="Provides element&#45;by&#45;element unary operations for matrices." alt="" coords="4965,244,5137,285"/>
+<area shape="rect" id="node87" href="$database__matrix_8hpp.html" title="Defines the DatabaseMatrix class and associated safety classes." alt="" coords="3253,251,3413,278"/>
+<area shape="rect" id="node93" href="$downsampling_8hpp.html" title="This file contains functions useful for downsampling data in different ways." alt="" coords="2349,162,2494,189"/>
+<area shape="rect" id="node94" href="$output__operators_8hpp.html" title=" " alt="" coords="5903,251,6065,278"/>
+<area shape="rect" id="node95" href="$strassen__matrix__multiplication_8hpp.html" title="Strassen&#39;s algorithm for efficient matrix multiplication." alt="" coords="3550,162,3802,189"/>
+<area shape="rect" id="node96" href="$python__bindings_8hpp.html" title="Python bindings for the LazyMatrix library." alt="" coords="6181,162,6339,189"/>
+<area shape="rect" id="node5" title=" " alt="" coords="346,423,454,449"/>
+<area shape="rect" id="node6" title=" " alt="" coords="478,423,551,449"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1723,423,1786,449"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,423,187,449"/>
+<area shape="rect" id="node9" title=" " alt="" coords="211,423,322,449"/>
+<area shape="rect" id="node11" title=" " alt="" coords="6993,251,7060,278"/>
+<area shape="rect" id="node12" title=" " alt="" coords="7085,251,7169,278"/>
+<area shape="rect" id="node15" title=" " alt="" coords="5490,341,5553,367"/>
+<area shape="rect" id="node16" title=" " alt="" coords="6297,497,6377,524"/>
+<area shape="rect" id="node17" title=" " alt="" coords="6764,341,6839,367"/>
+<area shape="rect" id="node18" title=" " alt="" coords="5407,341,5465,367"/>
+<area shape="rect" id="node19" title=" " alt="" coords="6863,341,6929,367"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1102,251,1173,278"/>
+<area shape="rect" id="node27" title=" " alt="" coords="2565,341,2643,367"/>
+<area shape="rect" id="node28" title=" " alt="" coords="2398,341,2490,367"/>
+<area shape="rect" id="node31" title=" " alt="" coords="3827,341,3914,367"/>
+<area shape="rect" id="node32" title=" " alt="" coords="4149,341,4216,367"/>
+<area shape="rect" id="node35" title=" " alt="" coords="625,341,689,367"/>
+<area shape="rect" id="node36" title=" " alt="" coords="815,333,959,375"/>
+<area shape="rect" id="node37" title=" " alt="" coords="4480,341,4579,367"/>
+<area shape="rect" id="node38" title=" " alt="" coords="514,341,601,367"/>
+<area shape="rect" id="node41" title=" " alt="" coords="2097,341,2221,367"/>
+<area shape="rect" id="node42" title=" " alt="" coords="1034,341,1094,367"/>
+<area shape="rect" id="node43" title=" " alt="" coords="1118,341,1215,367"/>
+<area shape="rect" id="node45" title=" " alt="" coords="5493,251,5603,278"/>
+<area shape="rect" id="node46" title=" " alt="" coords="4040,341,4125,367"/>
+<area shape="rect" id="node47" title=" " alt="" coords="5412,251,5468,278"/>
+<area shape="rect" id="node49" title=" " alt="" coords="6749,423,6854,449"/>
+<area shape="rect" id="node50" title=" " alt="" coords="6879,423,7001,449"/>
+<area shape="rect" id="node51" title=" " alt="" coords="6426,423,6606,449"/>
+<area shape="rect" id="node52" title=" " alt="" coords="6631,423,6724,449"/>
+<area shape="rect" id="node70" title=" " alt="" coords="1493,341,1568,367"/>
+<area shape="rect" id="node72" title=" " alt="" coords="1593,341,1717,367"/>
+<area shape="rect" id="node76" title=" " alt="" coords="4392,341,4456,367"/>
+<area shape="rect" id="node81" title=" " alt="" coords="5253,341,5331,367"/>
+<area shape="rect" id="node82" title=" " alt="" coords="5679,341,5782,367"/>
+<area shape="rect" id="node83" title=" " alt="" coords="5807,341,5977,367"/>
+<area shape="rect" id="node85" title=" " alt="" coords="5142,341,5229,367"/>
+<area shape="rect" id="node88" title=" " alt="" coords="3021,341,3080,367"/>
+<area shape="rect" id="node89" title=" " alt="" coords="3104,341,3259,367"/>
+<area shape="rect" id="node90" title=" " alt="" coords="3283,341,3453,367"/>
+<area shape="rect" id="node91" title=" " alt="" coords="4915,341,5066,367"/>
+<area shape="rect" id="node92" title=" " alt="" coords="3478,341,3650,367"/>
+<area shape="rect" id="node97" title=" " alt="" coords="6141,251,6230,278"/>
+<area shape="rect" id="node98" title=" " alt="" coords="6254,251,6413,278"/>
+<area shape="rect" id="node99" title=" " alt="" coords="6437,251,6579,278"/>
+</map>

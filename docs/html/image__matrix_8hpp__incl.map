@@ -1,0 +1,9 @@
+<map id="include/image_matrix.hpp" name="include/image_matrix.hpp">
+<area shape="rect" id="node1" title="Provides the ImageMatrix class to handle images with pixel&#45;level manipulation." alt="" coords="277,5,469,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,111,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="135,80,258,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="283,80,463,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="487,80,581,107"/>
+<area shape="rect" id="node6" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="605,80,735,107"/>
+<area shape="rect" id="node7" title=" " alt="" coords="630,155,710,181"/>
+</map>

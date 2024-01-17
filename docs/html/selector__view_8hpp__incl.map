@@ -1,0 +1,8 @@
+<map id="include/selector_view.hpp" name="include/selector_view.hpp">
+<area shape="rect" id="node1" title="Provides functionality for creating views that select specific rows and/or columns from matrices." alt="" coords="116,5,307,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,97,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="121,80,184,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="208,80,332,107"/>
+<area shape="rect" id="node5" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="357,80,487,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="382,155,462,181"/>
+</map>

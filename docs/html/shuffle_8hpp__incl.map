@@ -1,0 +1,9 @@
+<map id="include/shuffle.hpp" name="include/shuffle.hpp">
+<area shape="rect" id="node1" title="Provides functionality to shuffle rows and/or columns of matrices." alt="" coords="161,5,307,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,68,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="93,80,167,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="191,80,277,107"/>
+<area shape="rect" id="node5" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="301,80,431,107"/>
+<area shape="rect" id="node7" title=" " alt="" coords="456,80,580,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="326,155,406,181"/>
+</map>

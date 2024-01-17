@@ -1,0 +1,10 @@
+<map id="include/matrix_generators.hpp" name="include/matrix_generators.hpp">
+<area shape="rect" id="node1" title="Provides matrix generation functionality for the LazyMatrix library." alt="" coords="229,5,451,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,69,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="93,80,160,107"/>
+<area shape="rect" id="node4" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="184,80,315,107"/>
+<area shape="rect" id="node6" href="$numerical__constants_8hpp.html" title="Defines important numerical constants for the LazyMatrix library." alt="" coords="339,80,525,107"/>
+<area shape="rect" id="node7" title=" " alt="" coords="549,80,648,107"/>
+<area shape="rect" id="node8" title=" " alt="" coords="673,80,797,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="209,155,289,181"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="include/polymorphic_matrix3d.hpp" name="include/polymorphic_matrix3d.hpp">
+<area shape="rect" id="node1" title="Provides polymorphic wrappers for various 3d&#45;matrix&#45;like data structures in LazyMatrix." alt="" coords="76,5,231,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,95,83,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="107,95,199,121"/>
+<area shape="rect" id="node4" href="$base__matrix3d_8hpp.html" title="Defines the BaseMatrix3D class as a foundation for 3D matrix operations in the LazyMatrix library." alt="" coords="224,95,371,121"/>
+<area shape="rect" id="node5" title=" " alt="" coords="257,169,337,196"/>
+</map>

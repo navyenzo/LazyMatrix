@@ -1,0 +1,9 @@
+<map id="include/strassen_matrix_multiplication.hpp" name="include/strassen_matrix_multiplication.hpp">
+<area shape="rect" id="node1" title="Strassen&#39;s algorithm for efficient matrix multiplication." alt="" coords="43,5,221,47"/>
+<area shape="rect" id="node2" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="5,169,136,196"/>
+<area shape="rect" id="node4" href="$simple__matrix_8hpp.html" title="Defines the SimpleMatrix class for basic 2D matrix operations." alt="" coords="120,95,264,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="31,244,111,271"/>
+<area shape="rect" id="node5" title=" " alt="" coords="161,169,223,196"/>
+<area shape="rect" id="node6" title=" " alt="" coords="247,169,334,196"/>
+<area shape="rect" id="node7" title=" " alt="" coords="359,169,425,196"/>
+</map>

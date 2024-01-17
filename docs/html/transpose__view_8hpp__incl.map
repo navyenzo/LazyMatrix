@@ -1,0 +1,5 @@
+<map id="include/transpose_view.hpp" name="include/transpose_view.hpp">
+<area shape="rect" id="node1" title="Provides the TransposeView class for transposing matrix expressions in LazyMatrix." alt="" coords="5,5,208,32"/>
+<area shape="rect" id="node2" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="41,80,172,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="67,155,147,181"/>
+</map>

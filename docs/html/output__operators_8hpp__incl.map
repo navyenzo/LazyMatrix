@@ -1,0 +1,12 @@
+<map id="include/output_operators.hpp" name="include/output_operators.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="174,5,386,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="204,229,284,256"/>
+<area shape="rect" id="node3" title=" " alt="" coords="31,80,182,107"/>
+<area shape="rect" id="node4" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="281,155,412,181"/>
+<area shape="rect" id="node5" href="$base__matrix3d_8hpp.html" title="Defines the BaseMatrix3D class as a foundation for 3D matrix operations in the LazyMatrix library." alt="" coords="207,80,353,107"/>
+<area shape="rect" id="node6" href="$image__matrix_8hpp.html" title="Provides the ImageMatrix class to handle images with pixel&#45;level manipulation." alt="" coords="500,80,641,107"/>
+<area shape="rect" id="node7" title=" " alt="" coords="554,155,659,181"/>
+<area shape="rect" id="node8" title=" " alt="" coords="684,155,807,181"/>
+<area shape="rect" id="node9" title=" " alt="" coords="831,155,1011,181"/>
+<area shape="rect" id="node10" title=" " alt="" coords="436,155,529,181"/>
+</map>

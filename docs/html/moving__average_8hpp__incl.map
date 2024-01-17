@@ -1,0 +1,5 @@
+<map id="include/moving_average.hpp" name="include/moving_average.hpp">
+<area shape="rect" id="node1" title="Provides functionality for computing simple moving averages of matrix rows or columns." alt="" coords="5,5,216,32"/>
+<area shape="rect" id="node2" href="$base__matrix_8hpp.html" title="Defines the BaseMatrix class as a foundation for matrix operations in the LazyMatrix library." alt="" coords="45,80,176,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="71,155,151,181"/>
+</map>
