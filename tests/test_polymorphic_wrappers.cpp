@@ -46,8 +46,6 @@ TEST_CASE("Wrapping a 3d matrix with polymorphic wrapper with non-const access",
     mat(1,0,0) = 5; mat(1,0,1) = 6;
     mat(1,1,0) = 7; mat(1,1,1) = 8;
 
-    std::cout << "\n\n\n3d matrix =\n" << mat << "\n\n\n";
-
     // Wrap the matrix with a polymorphic wrapper
     auto wrapper = LazyMatrix::wrap_matrix3d(mat);
 
