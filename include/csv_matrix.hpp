@@ -14,7 +14,10 @@
  * The integration with the mio library ensures cross-platform compatibility for memory-mapping operations.
  * 
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

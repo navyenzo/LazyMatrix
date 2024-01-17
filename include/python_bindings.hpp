@@ -8,8 +8,10 @@
  * storage constructors of matrix classes, along with their member functions.
  *
  * @author Vincenzo Barbato
- * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
- *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

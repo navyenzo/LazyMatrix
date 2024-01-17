@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------
 /**
- * @file test_file_utils.cpp
+ * @file test_files_utils.cpp
  * @brief Test file for file and directory utilities in the LazyMatrix library.
  *
  * This file contains tests for the file and directory utility functions
@@ -8,8 +8,10 @@
  * Specifically, it tests the functionality of listing files matching a specific name or pattern.
  *
  * @author Vincenzo Barbato
- * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
- *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

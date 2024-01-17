@@ -9,8 +9,10 @@
  * allowing changes to be reflected in the original data.
  *
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
- * @namespace LazyMatrix
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

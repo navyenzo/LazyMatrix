@@ -9,7 +9,10 @@
  * and machine learning applications where random sampling or permutation is required.
  *
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

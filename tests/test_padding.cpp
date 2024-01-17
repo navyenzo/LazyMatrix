@@ -6,8 +6,10 @@
  * This file contains test cases to verify the correct implementation of padding
  *
  * @author Vincenzo Barbato
- * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
- *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

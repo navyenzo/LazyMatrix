@@ -1,4 +1,23 @@
 //-------------------------------------------------------------------
+/**
+ * @file test_image_matrix_image_loading.cpp
+ * @brief Tests for image matrix loading in the LazyMatrix library.
+ *
+ * This file contains tests for loading and processing images as matrices,
+ * ensuring the functionality works correctly and efficiently with different
+ * image formats and sizes.
+ * 
+ * @author Vincenzo Barbato
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
+ */
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 #include <iostream>
 #include <catch2/catch_all.hpp>
 #include "lazy_matrix.hpp"

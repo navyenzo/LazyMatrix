@@ -1,4 +1,23 @@
 //-------------------------------------------------------------------
+/**
+ * @file test_polymorphic_wrappers.cpp
+ * @brief Tests for polymorphic wrappers in the LazyMatrix library.
+ *
+ * This file includes tests for the polymorphic wrappers, ensuring that
+ * they correctly abstract and manage various matrix operations and
+ * types consistently and effectively.
+ *
+ * @author Vincenzo Barbato
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
+ */
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 #include <iostream>
 #include <catch2/catch_all.hpp>
 #include "lazy_matrix.hpp"

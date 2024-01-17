@@ -1,3 +1,9 @@
+# This CMakeLists.txt is for the [tests/python_tests] directory of the LazyMatrix project.
+# It sets up the build configuration for the test suite, including specifying test files,
+# linking required libraries, and defining any necessary compiler options or flags.
+
+
+
 # Catch2 library used for testing
 include(FetchContent)
 FetchContent_Declare(

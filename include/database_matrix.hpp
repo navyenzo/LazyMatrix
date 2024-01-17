@@ -11,9 +11,10 @@
  * column names.
  *
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
- * @see https://github.com/navyenzo/LazyMatrix.git
- * @namespace LazyMatrix
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

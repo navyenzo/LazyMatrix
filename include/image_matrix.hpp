@@ -10,8 +10,10 @@
  * pixel types that are compatible with dlib.
  *
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
- * @namespace LazyMatrix
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

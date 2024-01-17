@@ -16,7 +16,10 @@
  * Recurring Template Pattern (CRTP) to achieve polymorphism without virtual functions.
  * 
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

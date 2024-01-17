@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------
 /**
- * \file test_lazy_matrix_python_bindings.cpp
+ * \file test_python_bindings.cpp
  * \brief Test file for Python bindings of the LazyMatrix library.
  *
  * This file contains a test case for the Python bindings of the LazyMatrix library using pybind11.
@@ -10,8 +10,10 @@
  * redirects it to C++ for validation. The Catch2 framework is used for structuring the test case.
  * 
  * @author Vincenzo Barbato
- * @contact GitHub Project: https://github.com/navyenzo/LazyMatrix.git
- *          LinkedIn: https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

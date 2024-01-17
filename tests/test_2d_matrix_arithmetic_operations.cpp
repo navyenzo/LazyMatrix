@@ -1,14 +1,36 @@
+//-------------------------------------------------------------------
+/**
+ * @file test_2d_matrix_arithmetic_operations.cpp
+ * @brief Tests for 2D matrix arithmetic operations in the LazyMatrix library.
+ *
+ * This file contains tests for various 2D matrix arithmetic operations
+ * including addition, subtraction, multiplication, etc., to validate
+ * the correctness and efficiency of these operations.
+ * 
+ * @author Vincenzo Barbato
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
+ */
+//-------------------------------------------------------------------
+
+
+
 #define CATCH_CONFIG_MAIN // This define is needed once only when using Catch2
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 
 
 
+//-------------------------------------------------------------------
 #include <catch2/catch_all.hpp>
 #include <chrono>
 #include "lazy_matrix.hpp"
+//-------------------------------------------------------------------
 
 
 
+//-------------------------------------------------------------------
 TEST_CASE("2D Matrix Addition", "[Matrix2D]")
 {
     // Create matrices
@@ -35,9 +57,11 @@ TEST_CASE("2D Matrix Addition", "[Matrix2D]")
     REQUIRE(result(1, 0) == 10); // 3 + 7
     REQUIRE(result(1, 1) == 12); // 4 + 8
 }
+//-------------------------------------------------------------------
 
 
 
+//-------------------------------------------------------------------
 TEST_CASE("2D Matrix Subtraction", "[Matrix2D]")
 {
     // Create matrices
@@ -64,9 +88,11 @@ TEST_CASE("2D Matrix Subtraction", "[Matrix2D]")
     REQUIRE(result(1, 0) == -4); // 3 - 7
     REQUIRE(result(1, 1) == -4); // 4 - 8
 }
+//-------------------------------------------------------------------
 
 
 
+//-------------------------------------------------------------------
 TEST_CASE("2D Matrix Multiplication", "[Matrix2D]")
 {
     // Create matrices
@@ -93,9 +119,11 @@ TEST_CASE("2D Matrix Multiplication", "[Matrix2D]")
     REQUIRE(result(1, 0) == 43);
     REQUIRE(result(1, 1) == 50);
 }
+//-------------------------------------------------------------------
 
 
 
+//-------------------------------------------------------------------
 TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
 {
     // Create two random 10x10 matrices
@@ -137,3 +165,4 @@ TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
         }
     }
 }
+//-------------------------------------------------------------------

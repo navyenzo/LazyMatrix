@@ -7,9 +7,12 @@
  * particularly its ability to interact with a SQLite database and perform basic operations
  * such as fetching the number of rows and columns and reading data using operator()(i, j).
  * 
+ * 
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
- * @see https://github.com/navyenzo/LazyMatrix.git
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

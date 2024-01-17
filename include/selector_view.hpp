@@ -8,7 +8,10 @@
  * Unlike the non-view selectors, these classes allow modification of the original matrix through the view.
  *
  * @author Vincenzo Barbato
- * @link https://www.linkedin.com/in/vincenzobarbato/
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 
