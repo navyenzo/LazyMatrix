@@ -146,6 +146,18 @@ struct is_type_a_matrix3d< PolymorphicMatrixWrapper3D<MatrixType> > : std::true_
 
 
 //-------------------------------------------------------------------
+// Aliases for the polymorphic matrix and wrapper
+//-------------------------------------------------------------------
+template<typename DataType>
+using Data3D = PolymorphicMatrix3D<DataType>;
+
+template<typename MatrixType>
+using SpecializedData3D = PolymorphicMatrixWrapper3D<MatrixType>;
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 /**
  * @brief Wraps a matrix in a PolymorphicMatrixWrapper3D and returns a shared pointer to PolymorphicMatrix3D.
  * 

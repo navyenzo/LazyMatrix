@@ -45,7 +45,7 @@ namespace LazyMatrix
  * This class defines a generic interface for matrices, allowing for 
  * operations like accessing elements and querying dimensions. It's
  * templated to handle different data types within the matrix.
- */
+ */ 
 //-------------------------------------------------------------------
 template<typename DataType>
 
@@ -139,6 +139,18 @@ private:
 template<typename MatrixType>
 
 struct is_type_a_matrix< PolymorphicMatrixWrapper<MatrixType> > : std::true_type {};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Aliases for the polymorphic matrix and wrapper
+//-------------------------------------------------------------------
+template<typename DataType>
+using Data = PolymorphicMatrix<DataType>;
+
+template<typename MatrixType>
+using SpecializedData = PolymorphicMatrixWrapper<MatrixType>;
 //-------------------------------------------------------------------
 
 
