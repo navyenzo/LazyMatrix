@@ -104,7 +104,7 @@ public:
      */
     const DataType& at_(int64_t page, int64_t row, int64_t column) const
     {
-        return data_[page*row*columns() + row*columns() + column];
+        return data_[page*rows()*columns() + row*columns() + column];
     }
 
     /**
@@ -116,7 +116,7 @@ public:
      */
     DataType& at_(int64_t page, int64_t row, int64_t column)
     {
-        return data_[page*row*columns() + row*columns() + column];
+        return data_[page*rows()*columns() + row*columns() + column];
     }
 
     /**

@@ -82,12 +82,12 @@ public:
 //-------------------------------------------------------------------
 template<typename MatrixType>
 
-class PolymorphicMatrixWrapper3D : public PolymorphicMatrix3D<typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type>
+class PolymorphicMatrixWrapper3D : public PolymorphicMatrix3D<typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type>
 {
 public:
 
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type;
     
 
 

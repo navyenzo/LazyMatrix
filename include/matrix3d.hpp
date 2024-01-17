@@ -322,12 +322,12 @@ public:
 
     const DataType& at_(int64_t page, int64_t row, int64_t column)const
     {
-        return reinterpret_cast<const DataType*>(mapped_file_.cbegin() + sizeof(Matrix3DHeader))[page*row*columns() + row*columns() + column];
+        return reinterpret_cast<const DataType*>(mapped_file_.cbegin() + sizeof(Matrix3DHeader))[page*rows()*columns() + row*columns() + column];
     }
 
     DataType& at_(int64_t page, int64_t row, int64_t column)
     {
-        return reinterpret_cast<DataType*>(mapped_file_.begin() + sizeof(Matrix3DHeader))[page*row*columns() + row*columns() + column];
+        return reinterpret_cast<DataType*>(mapped_file_.begin() + sizeof(Matrix3DHeader))[page*rows()*columns() + row*columns() + column];
     }
 
 

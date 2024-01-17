@@ -208,21 +208,21 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
 
     os << "(" << expression.pages() << "x" << expression.rows() << "x" << expression.columns() << ")\n";
 
-    for(int i = 0; i < expression.pages(); ++i)
+    for(int k = 0; k < expression.pages(); ++k)
     {
         os << "(" << expression.rows() << "x" << expression.columns() << ")\n";
 
-        for(int j = 0; j < expression.rows(); ++j)
+        for(int i = 0; i < expression.rows(); ++i)
         {
-            for(int k = 0; k < expression.columns() - 1; ++k)
+            for(int j = 0; j < expression.columns() - 1; ++j)
             {
                 if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
                 {
-                    os << expression(i,j,k).toString() << ",";
+                    os << expression(k,i,j).toString() << ",";
                 }
                 else
                 {
-                    os << expression(i,j,k) << ",";
+                    os << expression(k,i,j) << ",";
                 }
             }
 
@@ -230,11 +230,11 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
             {
                 if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
                 {
-                    os << expression(i,j,expression.columns() - 1).toString() << "\n";
+                    os << expression(k,i,expression.columns() - 1).toString() << "\n";
                 }
                 else
                 {
-                    os << expression(i,j,expression.columns() - 1) << "\n";
+                    os << expression(k,i,expression.columns() - 1) << "\n";
                 }
             }
         }
