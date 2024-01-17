@@ -239,11 +239,12 @@ struct DatabaseWindow
 //-------------------------------------------------------------------
 /**
  * @class DatabaseMatrix
- * @brief Allows representing and accessing a SQL database table as a 2D matrix.
+ * @brief Represents and accesses a SQL database table as a 2D matrix.
  *
- * DatabaseMatrix provides an interface to treat SQL database tables as 2D matrices,
- * enabling matrix-like data access. It uses a DatabaseWindow for caching and efficient
- * data retrieval.
+ * This class provides an interface to treat SQL database tables as 2D matrices,
+ * enabling matrix-like data access and operations. It uses a DatabaseWindow
+ * for caching and efficient data retrieval. The class supports basic matrix
+ * operations and ensures safe interaction with the database.
  */
 //-------------------------------------------------------------------
 class DatabaseMatrix : public BaseMatrix<DatabaseMatrix>
@@ -254,11 +255,12 @@ public:
 
      /**
      * Constructor for DatabaseMatrix.
-     * @param session Database session.
-     * @param safe_table_name A SafeName object representing the table name.
-     * @param condition SQL condition (assumed to be safe).
-     * @param cache_window_size Size of the cache window.
-     * @param safe_sorting_method A SafeRowSortingMethod object for row sorting.
+     * Initializes the matrix with the given database session and table information.
+     * @param session Database session for connectivity.
+     * @param table_name SafeName object representing the sanitized table name.
+     * @param condition SQL condition for data retrieval (default is empty).
+     * @param cache_window_size Size of cache window for data retrieval (default is 100).
+     * @param row_sorting_method SafeRowSortingMethod object for defining row sorting (default is empty).
      */
     DatabaseMatrix(Poco::Data::Session& session,
                    const SafeName& table_name,
@@ -266,35 +268,77 @@ public:
                    uintptr_t cache_window_size = 100,
                    const SafeRowSortingMethod& row_sorting_method = SafeRowSortingMethod("", ""));
 
-    const std::string& get_last_error() const;
-
+    /**
+     * Gets the number of rows in the matrix.
+     * @return Number of rows.
+     */
     uintptr_t rows() const;
+
+    /**
+     * Gets the number of columns in the matrix.
+     * @return Number of columns.
+     */
     uintptr_t columns() const;
+
+    /**
+     * Accesses an element of the matrix at the specified row and column.
+     * @param row Row index.
+     * @param column Column index.
+     * @return The value at the specified position in the matrix.
+     */
     value_type at_(int64_t row, int64_t column) const;
 
+    /**
+     * Sets the row sorting method for the matrix.
+     * @param row_sorting_method The new sorting method.
+     */
     void set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method);
+
+    /**
+     * Sets the SQL condition for data retrieval.
+     * @param condition The new SQL condition.
+     */
     void set_condition(const std::string& condition);
+
+    /**
+     * Retrieves the last error message, if any.
+     * @return The last error message.
+     */
+    const std::string& get_last_error() const;
 
 
 
 private:
 
+    /**
+     * Counts the number of rows in the matrix.
+     */
     void count_rows();
+
+    /**
+     * Counts the number of columns in the matrix.
+     */
     void count_columns();
+
+    /**
+     * Preloads data into the cache for the specified row and column.
+     * @param row Row index around which to preload data.
+     * @param column Column index around which to preload data.
+     */
     void preload_data(int64_t row, int64_t column) const;
-    
-    Poco::Data::Session& session_;
-    SafeName table_name_;
-    SafeRowSortingMethod row_sorting_method_;
-    std::string condition_;
 
-    mutable DatabaseWindow cache_window_;
-    uintptr_t cache_window_size_ = 100;
+    Poco::Data::Session& session_;                 ///< Database session for connectivity.
+    SafeName table_name_;                          ///< Sanitized table name.
+    SafeRowSortingMethod row_sorting_method_;      ///< Method for row sorting.
+    std::string condition_;                        ///< SQL condition for data retrieval.
 
-    uintptr_t rows_ = 0;
-    std::vector<std::string> column_names_;
+    mutable DatabaseWindow cache_window_;          ///< Cache window for efficient data retrieval.
+    uintptr_t cache_window_size_ = 100;            ///< Size of the cache window.
 
-    std::string last_error_;
+    uintptr_t rows_ = 0;                           ///< Number of rows in the matrix.
+    std::vector<std::string> column_names_;        ///< Names of columns in the matrix.
+
+    std::string last_error_;                       ///< Last error message, if any.
 };
 //-------------------------------------------------------------------
 

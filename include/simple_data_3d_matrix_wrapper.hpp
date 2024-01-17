@@ -56,6 +56,7 @@ class SimpleData3DMatrixWrapper : public BaseMatrix3D<SimpleData3DMatrixWrapper<
 {
 public:
 
+    
     SimpleData3DMatrixWrapper(const SimpleDataType& value) : value_(value)
     {
     }
@@ -93,8 +94,11 @@ public:
     
 
     /**
-     * @brief const access of the wrapped value, ignoring page, row and column indices.
+     * @brief Const access of the wrapped value, ignoring page, row, and column indices.
      * 
+     * This function returns the same wrapped value regardless of the specified indices.
+     * 
+     * @param page Page index (ignored).
      * @param row Row index (ignored).
      * @param column Column index (ignored).
      * @return The wrapped value.
@@ -105,8 +109,11 @@ public:
     }
 
     /**
-     * @brief Non-const access of the wrapped value, ignoring page, row and column indices.
+     * @brief Non-const access of the wrapped value, ignoring page, row, and column indices.
      * 
+     * This function returns the same wrapped value regardless of the specified indices.
+     * 
+     * @param page Page index (ignored).
      * @param row Row index (ignored).
      * @param column Column index (ignored).
      * @return The wrapped value.

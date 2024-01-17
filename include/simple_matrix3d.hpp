@@ -60,10 +60,11 @@ class SimpleMatrix3D : public BaseMatrix3D<SimpleMatrix3D<DataType> >
 public:
 
     /**
-     * @brief Constructor for creating a matrix of given dimensions.
-     * @param pages The number of pages in the matrix.
-     * @param rows The number of rows in the matrix.
-     * @param columns The number of columns in the matrix.
+     * @brief Constructor for creating a 3D matrix of given dimensions.
+     * @param pages The number of pages in the 3D matrix.
+     * @param rows The number of rows in each page of the 3D matrix.
+     * @param columns The number of columns in each row of the 3D matrix.
+     * @param initial_value The initial value to set for each element in the matrix. Defaults to static_cast<DataType>(0).
      */
     SimpleMatrix3D(uintptr_t pages, uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
     {

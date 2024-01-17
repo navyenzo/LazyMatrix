@@ -60,9 +60,10 @@ class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType> >
 public:
 
     /**
-     * @brief Default constructor for creating a matrix of given dimensions.
-     * @param rows The number of rows in the matrix.
-     * @param columns The number of columns in the matrix.
+     * Default constructor. Creates a matrix of specified dimensions with all elements initialized to a default value.
+     * @param rows The number of rows in the matrix. Default is 0.
+     * @param columns The number of columns in the matrix. Default is 0.
+     * @param initial_value The initial value for each element of the matrix. Default is static_cast<DataType>(0).
      */
     SimpleMatrix(uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     {
@@ -70,8 +71,8 @@ public:
     }
 
     /**
-     * @brief Copy constructor which makes a deep copy
-     * @param matrix The matrix to copy
+     * Copy constructor. Creates a deep copy of the given matrix.
+     * @param matrix The SimpleMatrix object to copy.
      */
     SimpleMatrix(const SimpleMatrix<DataType>& matrix)
     {
@@ -83,8 +84,8 @@ public:
     }
 
     /**
-     * @brief Constructor from a generic matrix expression
-     * @param matrix The input matrix we will copy
+     * Constructor from a generic matrix expression.
+     * @param matrix The matrix expression from which to initialize this matrix.
      */
     template<typename MatrixType,
              std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
@@ -102,8 +103,9 @@ public:
     }
 
     /**
-     * @brief Assignment operator from another simple matrix
-     * @param matrix The matrix to copy
+     * Copy assignment operator. Assigns the matrix with a deep copy of the given matrix.
+     * @param matrix The SimpleMatrix object to copy.
+     * @return A reference to this matrix.
      */
     SimpleMatrix<DataType>& operator=(const SimpleMatrix<DataType>& matrix)
     {
@@ -117,8 +119,9 @@ public:
     }
 
     /**
-     * @brief Assignment operator from a generic matrix expression
-     * @param matrix The input matrix we will copy
+     * Assignment operator from a generic matrix expression.
+     * @param matrix The matrix expression from which to assign this matrix.
+     * @return A reference to this matrix.
      */
     template<typename MatrixType,
              std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
@@ -138,8 +141,8 @@ public:
     }
 
     /**
-     * @brief Gets the number of rows in the matrix.
-     * @return Number of rows.
+     * Gets the number of rows in the matrix.
+     * @return The number of rows.
      */
     uintptr_t rows() const
     {
@@ -147,8 +150,8 @@ public:
     }
 
     /**
-     * @brief Gets the number of columns in the matrix.
-     * @return Number of columns.
+     * Gets the number of columns in the matrix.
+     * @return The number of columns.
      */
     uintptr_t columns() const
     {
@@ -156,9 +159,9 @@ public:
     }
 
     /**
-     * @brief Accesses the element at the specified position (const version).
-     * @param row Row index of the element.
-     * @param column Column index of the element.
+     * Accesses the element at the specified position (const version).
+     * @param row The row index of the element.
+     * @param column The column index of the element.
      * @return The element at the specified position.
      */
     const DataType& at_(int64_t row, int64_t column) const
@@ -167,9 +170,9 @@ public:
     }
 
     /**
-     * @brief Accesses the element at the specified position (modifiable version).
-     * @param row Row index of the element.
-     * @param column Column index of the element.
+     * Accesses the element at the specified position (modifiable version).
+     * @param row The row index of the element.
+     * @param column The column index of the element.
      * @return A reference to the element at the specified position.
      */
     DataType& at_(int64_t row, int64_t column)
@@ -178,10 +181,10 @@ public:
     }
 
     /**
-     * @brief Resizes the matrix to new dimensions and initializes to a specified value.
-     * @param rows New number of rows.
-     * @param columns New number of columns.
-     * @param initial_value Value to initialize new elements (default = 0).
+     * Resizes the matrix to new dimensions, initializing new elements to a specified value.
+     * @param rows The new number of rows.
+     * @param columns The new number of columns.
+     * @param initial_value The value to initialize new elements to. Default is static_cast<DataType>(0).
      */
     void resize(uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
     {
@@ -207,9 +210,8 @@ public:
 
 private:
 
-    uintptr_t rows_ = 0;                 ///< Number of rows in the matrix.
-    uintptr_t columns_ = 0;              ///< Number of columns in the matrix.
-
+    uintptr_t rows_ = 0;                 ///< The number of rows in the matrix.
+    uintptr_t columns_ = 0;              ///< The number of columns in the matrix.
     std::vector<DataType> data_;         ///< The flat array storing matrix elements.
 };
 //-------------------------------------------------------------------
