@@ -75,6 +75,18 @@ public:
 
 //-------------------------------------------------------------------
 /**
+ * @brief Compile time function to check if the type is a matrix expression type.
+ */
+//-------------------------------------------------------------------
+template<typename DataType>
+
+struct is_type_a_matrix3d< PolymorphicMatrix3D<DataType> > : std::true_type {};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
  * @class PolymorphicMatrixWrapper3D
  * @brief Wrapper class that provides a polymorphic interface to a given 3d-matrix type.
  *

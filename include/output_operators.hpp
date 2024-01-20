@@ -30,6 +30,7 @@
 #include "base_matrix.hpp"
 #include "base_matrix3d.hpp"
 #include "image_matrix.hpp"
+#include "polymorphic_matrix.hpp"
 //-------------------------------------------------------------------
 
 
@@ -42,7 +43,7 @@
 
 //-------------------------------------------------------------------
 /**
- * @brief Outputs a pixel value to a stream
+ * @brief Outputs a dlib::rgb_pixel value to a stream
  * 
  * @param out The output stream.
  * @param pixel The pixel to output.
@@ -64,7 +65,19 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::rgb_pixel& pixel)
                    << pixel.blue << ")";
     }
 }
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Outputs a dlib::bgr_pixel value to a stream
+ * 
+ * @param out The output stream.
+ * @param pixel The pixel to output.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
 inline std::ostream& operator<<(std::ostream& out, const dlib::bgr_pixel& pixel)
 {
     if constexpr (std::is_same_v<decltype(pixel.red), unsigned char>)
@@ -80,7 +93,19 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::bgr_pixel& pixel)
                    << pixel.red << ")";
     }
 }
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Outputs a dlib::rgb_alpha_pixel value to a stream
+ * 
+ * @param out The output stream.
+ * @param pixel The pixel to output.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
 inline std::ostream& operator<<(std::ostream& out, const dlib::rgb_alpha_pixel& pixel)
 {
     if constexpr (std::is_same_v<decltype(pixel.red), unsigned char>)
@@ -98,7 +123,19 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::rgb_alpha_pixel& 
                    << pixel.alpha << ")";
     }
 }
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Outputs a dlib::bgr_alpha_pixel value to a stream
+ * 
+ * @param out The output stream.
+ * @param pixel The pixel to output.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
 inline std::ostream& operator<<(std::ostream& out, const dlib::bgr_alpha_pixel& pixel)
 {
     if constexpr (std::is_same_v<decltype(pixel.red), unsigned char>)
@@ -116,7 +153,19 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::bgr_alpha_pixel& 
                    << pixel.alpha << ")";
     }
 }
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Outputs a dlib::hsi_pixel value to a stream
+ * 
+ * @param out The output stream.
+ * @param pixel The pixel to output.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
 inline std::ostream& operator<<(std::ostream& out, const dlib::hsi_pixel& pixel)
 {
     if constexpr (std::is_same_v<decltype(pixel.h), unsigned char>)
@@ -132,7 +181,19 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::hsi_pixel& pixel)
                    << pixel.i << ")";
     }
 }
+//-------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Outputs a dlib::hsv_pixel value to a stream
+ * 
+ * @param out The output stream.
+ * @param pixel The pixel to output.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
 inline std::ostream& operator<<(std::ostream& out, const dlib::hsv_pixel& pixel)
 {
     if constexpr (std::is_same_v<decltype(pixel.h), unsigned char>)
@@ -153,7 +214,13 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::hsv_pixel& pixel)
 
 
 //-------------------------------------------------------------------
-// Utility function used to print a 2d matrix expression to an output stream
+/**
+ * @brief Prints a 2d matrix expression to an output stream.
+ * 
+ * @param os The output stream we're printing to.
+ * @param expression The 2d matrix we're printing.
+ * @return std::ostream& The output stream.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<LazyMatrix::is_type_a_matrix<MatrixType>{}>* = nullptr>
@@ -199,7 +266,13 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
 
 
 //-------------------------------------------------------------------
-// Utility function used to print a 3d expression to an output stream
+/**
+ * @brief Prints a 3d matrix expression to an output stream.
+ * 
+ * @param os The output stream we're printing to.
+ * @param expression The 3d matrix we're printing.
+ * @return std::ostream& The output stream.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType,
          std::enable_if_t<LazyMatrix::is_type_a_matrix3d<MatrixType>{}>* = nullptr>
