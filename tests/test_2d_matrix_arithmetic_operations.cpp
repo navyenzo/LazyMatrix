@@ -126,9 +126,11 @@ TEST_CASE("2D Matrix Multiplication", "[Matrix2D]")
 //-------------------------------------------------------------------
 TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
 {
+    int64_t dimension_length = 16;
+
     // Create two random 10x10 matrices
-    auto random_mat1 = LazyMatrix::generate_random_matrix<int>(10, 10, -10, 10);
-    auto random_mat2 = LazyMatrix::generate_random_matrix<int>(10, 10, -10, 10);
+    auto random_mat1 = LazyMatrix::generate_random_matrix<int>(dimension_length, dimension_length, -10, 10);
+    auto random_mat2 = LazyMatrix::generate_random_matrix<int>(dimension_length, dimension_length, -10, 10);
 
     // Convert random generators to actual matrices for multiplication
     auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(*random_mat1);
@@ -148,13 +150,13 @@ TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
     auto result_strassen = LazyMatrix::strassen_matrix_multiply(mat1, mat2);
     auto end_strassen = clock::now();
     std::chrono::duration<double> elapsed_strassen = end_strassen - start_strassen;
-    std::cout << "Time taken for Strassen multiplication: " << elapsed_strassen.count() << " seconds\n";
+    std::cout << "Time taken for Strassen multiplication: " << elapsed_strassen.count() << " seconds\n\n\n";
 
     // Check dimensions
-    REQUIRE(result_naive.rows() == 10);
-    REQUIRE(result_naive.columns() == 10);
-    REQUIRE(result_strassen.rows() == 10);
-    REQUIRE(result_strassen.columns() == 10);
+    REQUIRE(result_naive.rows() == dimension_length);
+    REQUIRE(result_naive.columns() == dimension_length);
+    REQUIRE(result_strassen.rows() == dimension_length);
+    REQUIRE(result_strassen.columns() == dimension_length);
 
     // Check each element
     for (int64_t i = 0; i < 10; ++i)

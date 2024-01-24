@@ -58,14 +58,14 @@ namespace LazyMatrix
  * @return Trimmed matrix.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType,
-         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+template<typename MatrixType,
+         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
 
 inline auto
 
-trim_matrix(ReferenceType matrix, int rows, int columns)
+trim_matrix(const MatrixType& matrix, int rows, int columns)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
 
     auto trimmed = MatrixFactory::create_simple_matrix<value_type>(rows, columns);
     
@@ -91,8 +91,8 @@ trim_matrix(ReferenceType matrix, int rows, int columns)
  * occurs at the midpoint of the rows and columns of the matrix. It's used
  * as a part of the Strassen algorithm for matrix multiplication.
  *
- * @tparam ReferenceType1 Type of the source matrix.
- * @tparam ReferenceType2 Type of the submatrices.
+ * @tparam MatrixType1 Type of the source matrix.
+ * @tparam MatrixType2 Type of the submatrices.
  * @param matrix The matrix to be split.
  * @param a11 Upper left submatrix.
  * @param a12 Upper right submatrix.
@@ -100,14 +100,20 @@ trim_matrix(ReferenceType matrix, int rows, int columns)
  * @param a22 Lower right submatrix.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType1,
-         typename ReferenceType2,
-         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
-         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
+template<typename MatrixType1,
+         typename MatrixType2,
+         typename MatrixType3,
+         typename MatrixType4,
+         typename MatrixType5,
+         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType3>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType4>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType5>{}>* = nullptr>
 
 inline void
 
-strassen_split(ReferenceType1 matrix, ReferenceType2 a11, ReferenceType2 a12, ReferenceType2 a21, ReferenceType2 a22)
+strassen_split(const MatrixType1& matrix, MatrixType2& a11, MatrixType3& a12, MatrixType4& a21, MatrixType5& a22)
 {
     int mid_row = matrix.rows() / 2;
     int mid_col = matrix.columns() / 2;
@@ -151,16 +157,22 @@ strassen_split(ReferenceType1 matrix, ReferenceType2 a11, ReferenceType2 a12, Re
  * @return Combined matrix.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType,
-         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+template<typename MatrixType1,
+         typename MatrixType2,
+         typename MatrixType3,
+         typename MatrixType4,
+         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType3>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType4>{}>* = nullptr>
 
 inline auto
 
-strassen_combine(ReferenceType a11, ReferenceType a12, ReferenceType a21, ReferenceType a22)
+strassen_combine(const MatrixType1& a11, const MatrixType2& a12, const MatrixType3& a21, const MatrixType4& a22)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
 
-    auto result = MatrixFactory::create_simple_matrix<value_type>(a11.rows() * 2, a11.columns() * 2);
+    auto result = SimpleMatrix<value_type>(a11.rows() * 2, a11.columns() * 2);
     int mid_row = result.rows() / 2;
     int mid_col = result.columns() / 2;
 
@@ -203,16 +215,18 @@ strassen_combine(ReferenceType a11, ReferenceType a12, ReferenceType a21, Refere
  * @return Sum of the two matrices.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType,
-         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+template<typename MatrixType1,
+         typename MatrixType2,
+         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
 inline auto
 
-strassen_add(ReferenceType a, ReferenceType b)
+strassen_add(const MatrixType1& a, const MatrixType2& b)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
 
-    auto result = MatrixFactory::create_simple_matrix<value_type>(a.rows(), a.columns());
+    auto result = SimpleMatrix<value_type>(a.rows(), a.columns());
 
     for (int i = 0; i < a.rows(); ++i)
     {
@@ -238,16 +252,18 @@ strassen_add(ReferenceType a, ReferenceType b)
  * @return Result of the subtraction.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType,
-         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+template<typename MatrixType1,
+         typename MatrixType2,
+         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
 inline auto
 
-strassen_subtract(ReferenceType a, ReferenceType b)
+strassen_subtract(const MatrixType1& a, const MatrixType2& b)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
 
-    auto result = MatrixFactory::create_simple_matrix<value_type>(a.rows(), a.columns());
+    auto result = SimpleMatrix<value_type>(a.rows(), a.columns());
 
     for (int i = 0; i < a.rows(); ++i)
     {
@@ -282,19 +298,22 @@ strassen_subtract(ReferenceType a, ReferenceType b)
  *       back to conventional matrix multiplication.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType,
-         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+template<typename MatrixType1,
+         typename MatrixType2,
+         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
 inline auto
 
-strassen_multiply_recursive(ReferenceType a, ReferenceType b)
+strassen_multiply_recursive(const MatrixType1& a, const MatrixType2& b)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
 
     // Base case for recursion
     if (a.rows() <= 2 || a.columns() <= 2 || b.rows() <= 2 || b.columns() <= 2)
     {
-        auto result = MatrixFactory::create_simple_matrix<value_type>(a.rows(), b.columns());
+        auto result = SimpleMatrix<value_type>(a.rows(), b.columns());
+
         for (int i = 0; i < result.rows(); ++i)
         {
             for (int j = 0; j < result.columns(); ++j)
@@ -305,6 +324,7 @@ strassen_multiply_recursive(ReferenceType a, ReferenceType b)
                 }
             }
         }
+
         return result;
     }
 
@@ -312,15 +332,15 @@ strassen_multiply_recursive(ReferenceType a, ReferenceType b)
     int mid_row = a.rows() / 2;
     int mid_col = a.columns() / 2;
 
-    auto a11 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
-    auto a12 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
-    auto a21 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
-    auto a22 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
+    auto a11 = SimpleMatrix<value_type>(mid_row, mid_col);
+    auto a12 = SimpleMatrix<value_type>(mid_row, mid_col);
+    auto a21 = SimpleMatrix<value_type>(mid_row, mid_col);
+    auto a22 = SimpleMatrix<value_type>(mid_row, mid_col);
 
-    auto b11 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
-    auto b12 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
-    auto b21 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
-    auto b22 = MatrixFactory::create_simple_matrix<value_type>(mid_row, mid_col);
+    auto b11 = SimpleMatrix<value_type>(mid_row, mid_col);
+    auto b12 = SimpleMatrix<value_type>(mid_row, mid_col);
+    auto b21 = SimpleMatrix<value_type>(mid_row, mid_col);
+    auto b22 = SimpleMatrix<value_type>(mid_row, mid_col);
 
     strassen_split(a, a11, a12, a21, a22);
     strassen_split(b, b11, b12, b21, b22);
@@ -357,8 +377,8 @@ strassen_multiply_recursive(ReferenceType a, ReferenceType b)
  * This approach is particularly efficient for large matrices where the
  * conventional multiplication becomes computationally expensive.
  *
- * @tparam ReferenceType1 Type of the first matrix operand.
- * @tparam ReferenceType2 Type of the second matrix operand.
+ * @tparam MatrixType1 Type of the first matrix operand.
+ * @tparam MatrixType2 Type of the second matrix operand.
  * @param a The first matrix operand, not modified by padding.
  * @param b The second matrix operand, not modified by padding.
  * @return Matrix containing the result of the multiplication.
@@ -388,7 +408,7 @@ strassen_matrix_multiply(ReferenceType1 a, ReferenceType2 b)
     auto padded_b = create_padded_matrix_view(b, new_size, new_size, static_cast<value_type>(0));
 
     // Perform Strassen multiplication on the padded matrices
-    auto result = strassen_multiply_recursive(padded_a, padded_b);
+    auto result = strassen_multiply_recursive(*padded_a, *padded_b);
 
     // Trim the result back to the size of the original matrix
     return trim_matrix(result, a.rows(), b.columns());
