@@ -25,6 +25,7 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -48,35 +49,84 @@ namespace LazyMatrix
  * and modifying the data. This class does not create a copy of the data but rather provides
  * a different view of the same data with the ability to modify the original matrix.
  *
- * @tparam MatrixType The type of the underlying matrix expression.
+ * @tparam ReferenceType The type of the underlying matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct ReverseView : public BaseMatrix< ReverseView<MatrixType> >
+class ReverseView : public BaseMatrix< ReverseView<ReferenceType> >
 {
-    ReverseView<MatrixType>(MatrixType& expression, bool should_rows_be_reversed, bool should_columns_be_reversed)
-    : expression_(expression),
-      should_rows_be_reversed_(should_rows_be_reversed),
-      should_columns_be_reversed_(should_columns_be_reversed)
+public:
+
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+
+    /**
+     * @brief Construct a new Reverse View< Matrix Type> object
+     * 
+     * @param expression THe input matrix expression
+     * @param should_rows_be_reversed Whether rows should be reversed
+     * @param should_columns_be_reversed Whether columns should be reversed
+     */
+    ReverseView<ReferenceType>(ReferenceType expression, bool should_rows_be_reversed, bool should_columns_be_reversed)
     {
+        set_expression(expression);
+        set_should_rows_be_reversed(should_rows_be_reversed);
+        set_should_columns_be_reversed(should_columns_be_reversed);
     }
-    
 
+    /**
+     * @brief Sets the reference to the matrix expression
+     * @param left_side_expression Reference to the matrix.
+     */
+    void set_expression(ReferenceType expression)
+    {
+        expression_ = expression;
+    }
 
+    /**
+     * @brief Set the should rows be reversed object
+     * 
+     * @param should_rows_be_reversed 
+     */
+    void set_should_rows_be_reversed(bool should_rows_be_reversed)
+    {
+        should_rows_be_reversed_ = should_rows_be_reversed;
+    }
+
+    /**
+     * @brief Set the should columns be reversed object
+     * 
+     * @param should_columns_be_reversed 
+     */
+    void set_should_columns_be_reversed(bool should_columns_be_reversed)
+    {
+        should_columns_be_reversed_ = should_columns_be_reversed;
+    }
+
+    /**
+     * @brief Returns the number of rows Of the resulting matrix.
+     */
     uintptr_t rows()const
     {
         return this->expression_.rows();
     }
 
+    /**
+     * @brief Returns the total number of columns of the resulting matrix.
+     */
     uintptr_t columns()const
     {
         return this->expression_.columns();
     }
 
-
-
-    decltype(auto) at_(int64_t row, int64_t column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int64_t row, int64_t column)const
     {
         int64_t actual_row = row;
         int64_t actual_column = column;
@@ -90,7 +140,14 @@ struct ReverseView : public BaseMatrix< ReverseView<MatrixType> >
         return expression_(actual_row, actual_column);
     }
 
-    decltype(auto) at_(int64_t row,int64_t column)
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
+    at_(int64_t row,int64_t column)
     {
         int64_t actual_row = row;
         int64_t actual_column = column;
@@ -106,7 +163,7 @@ struct ReverseView : public BaseMatrix< ReverseView<MatrixType> >
 
 
 
-    const MatrixType& get_expression()
+    const ReferenceType& get_expression()
     {
         return expression_;
     }
@@ -115,7 +172,7 @@ struct ReverseView : public BaseMatrix< ReverseView<MatrixType> >
 
 private:
 
-    MatrixType& expression_;
+    ReferenceType expression_;
     bool should_rows_be_reversed_ = true;
     bool should_columns_be_reversed_ = true;
 };
@@ -126,9 +183,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix< ReverseView<MatrixType> > : std::true_type
+struct is_type_a_matrix< ReverseView<ReferenceType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -137,27 +194,38 @@ struct is_type_a_matrix< ReverseView<MatrixType> > : std::true_type
 
 //-------------------------------------------------------------------
 /**
- * @brief Helper function to create a ReverseView from a matrix expression.
- *
- * This function provides an easy way to create a ReverseView of a given matrix.
- * It checks at compile time if the provided object is a matrix expression and returns
- * a ReverseView object that offers access with reversed rows and/or columns.
- *
- * @tparam MatrixType The type of the matrix expression.
- * @param m Reference to the matrix expression.
+ * @brief Creates a reverse view of an input matrix expression
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix expression
  * @param should_rows_be_reversed Flag indicating if rows should be reversed.
  * @param should_columns_be_reversed Flag indicating if columns should be reversed.
- * @return ReverseView<MatrixType> A view of the matrix with reversed rows and/or columns.
+ * @return A SharedMatrixRef or ConstSharedMatrixRef to the
+ *         ReverseView matrix object.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-reverse_view(MatrixType& m, bool should_rows_be_reversed, bool should_columns_be_reversed)
+create_reversed_matrix_view(ReferenceType m,
+                            bool should_rows_be_reversed,
+                            bool should_columns_be_reversed)
 {
-    return ReverseView<MatrixType>(m, should_rows_be_reversed, should_columns_be_reversed);
+    auto view = std::make_shared<ReverseView<ReferenceType>>(m, should_rows_be_reversed, should_columns_be_reversed);
+
+    // Use the trait to determine if non-const access is available
+    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
+
+    // Conditionally selecting the return type
+    using ReturnType = std::conditional_t
+    <
+        hasNonConstAccess,
+        SharedMatrixRef<ReverseView<ReferenceType>>,
+        ConstSharedMatrixRef<ReverseView<ReferenceType>>
+    >;
+
+    return ReturnType(view);
 }
 //-------------------------------------------------------------------
 

@@ -37,11 +37,12 @@
 //-------------------------------------------------------------------
 TEST_CASE("Sorting test: Specific row", "[Sorting]")
 {
-    LazyMatrix::SimpleMatrix<double> matrix(3, 3, 0.0);
+    auto matrix = LazyMatrix::MatrixFactory::create_simple_matrix<double>(3, 3, 0.0);
+
     // Fill matrix with test data
-    matrix.at_(0, 0) = 3.0; matrix.at_(0, 1) = 1.0; matrix.at_(0, 2) = 2.0;
-    matrix.at_(1, 0) = 2.0; matrix.at_(1, 1) = 3.0; matrix.at_(1, 2) = 1.0;
-    matrix.at_(2, 0) = 1.0; matrix.at_(2, 1) = 2.0; matrix.at_(2, 2) = 3.0;
+    matrix(0, 0) = 3.0; matrix(0, 1) = 1.0; matrix(0, 2) = 2.0;
+    matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
+    matrix(2, 0) = 1.0; matrix(2, 1) = 2.0; matrix(2, 2) = 3.0;
 
     std::vector<int64_t> sorted_indices;
     LazyMatrix::get_sorted_indices(matrix, 1, true, sorted_indices); // Sort the second row
@@ -63,11 +64,12 @@ TEST_CASE("Sorting test: Specific row", "[Sorting]")
 //-------------------------------------------------------------------
 TEST_CASE("Sorting test: Specific column", "[Sorting]")
 {
-    LazyMatrix::SimpleMatrix<double> matrix(3, 3, 0.0);
+    auto matrix = LazyMatrix::MatrixFactory::create_simple_matrix<double>(3, 3, 0.0);
+
     // Fill matrix with test data
-    matrix.at_(0, 0) = 3.0; matrix.at_(0, 1) = 1.0; matrix.at_(0, 2) = 2.0;
-    matrix.at_(1, 0) = 2.0; matrix.at_(1, 1) = 3.0; matrix.at_(1, 2) = 1.0;
-    matrix.at_(2, 0) = 1.0; matrix.at_(2, 1) = 2.0; matrix.at_(2, 2) = 3.0;
+    matrix(0, 0) = 3.0; matrix(0, 1) = 1.0; matrix(0, 2) = 2.0;
+    matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
+    matrix(2, 0) = 1.0; matrix(2, 1) = 2.0; matrix(2, 2) = 3.0;
 
     std::vector<int64_t> sorted_indices;
     LazyMatrix::get_sorted_indices(matrix, 2, false, sorted_indices); // Sort the third column
@@ -89,7 +91,8 @@ TEST_CASE("Sorting test: Specific column", "[Sorting]")
 //-------------------------------------------------------------------
 TEST_CASE("Sorting test: Circular indices", "[Sorting]")
 {
-    LazyMatrix::SimpleMatrix<double> matrix(3, 3, 0.0);
+    auto matrix = LazyMatrix::MatrixFactory::create_simple_matrix<double>(3, 3, 0.0);
+
     // Fill matrix with test data
     matrix(0, 0) = 3.0; matrix(0, 1) = 1.0; matrix(0, 2) = 2.0;
     matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
@@ -120,7 +123,8 @@ TEST_CASE("Sorting test: Circular indices", "[Sorting]")
 //-------------------------------------------------------------------
 TEST_CASE("Mutable sorted matrix view test", "[Sorting View]")
 {
-    LazyMatrix::SimpleMatrix<double> matrix(3, 3, 0.0);
+    auto matrix = LazyMatrix::MatrixFactory::create_simple_matrix<double>(3, 3, 0.0);
+
     // Fill matrix with test data
     matrix(0, 0) = 3.0; matrix(0, 1) = 1.0; matrix(0, 2) = 2.0;
     matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
@@ -128,7 +132,7 @@ TEST_CASE("Mutable sorted matrix view test", "[Sorting View]")
 
     int64_t index_of_row_to_sort = 1;
 
-    auto sorted_view = LazyMatrix::sorted_matrix_view(matrix, index_of_row_to_sort, true); // Create a mutable sorted view
+    auto sorted_view = LazyMatrix::create_sorted_matrix_view(matrix, index_of_row_to_sort, true); // Create a mutable sorted view
 
     // Verify sorting correctness
     REQUIRE(sorted_view(index_of_row_to_sort, 0) <= sorted_view(index_of_row_to_sort, 1));
@@ -139,36 +143,5 @@ TEST_CASE("Mutable sorted matrix view test", "[Sorting View]")
 
     // Check if the modification is reflected in the original matrix
     REQUIRE(matrix(index_of_row_to_sort, 2) == 10.0);
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-/**
- * @brief Test for immutable sorted matrix view.
- *
- * This test examines the behavior of the sorted_matrix function, which generates
- * an immutable view of a sorted matrix. The key aspect being tested is whether 
- * modifications made to the view do not affect the original matrix, thereby 
- * confirming the immutability of the view. This test ensures the integrity of the 
- * original matrix data when using sorted views for read-only purposes.
- */
-//-------------------------------------------------------------------
-TEST_CASE("Immutable sorted matrix view test", "[Sorting]")
-{
-    LazyMatrix::SimpleMatrix<double> matrix(3, 3, 0.0);
-    // Fill matrix with test data
-    matrix(0, 0) = 3.0; matrix(0, 1) = 1.0; matrix(0, 2) = 2.0;
-    matrix(1, 0) = 2.0; matrix(1, 1) = 3.0; matrix(1, 2) = 1.0;
-    matrix(2, 0) = 1.0; matrix(2, 1) = 2.0; matrix(2, 2) = 3.0;
-
-    int64_t index_of_column_to_sort = 1;
-
-    auto sorted_view = LazyMatrix::sorted_matrix(matrix, index_of_column_to_sort, false); // Create an immutable sorted view
-
-    // Verify sorting correctness
-    REQUIRE(sorted_view(0, index_of_column_to_sort) <= sorted_view(1, index_of_column_to_sort));
-    REQUIRE(sorted_view(1, index_of_column_to_sort) <= sorted_view(2, index_of_column_to_sort));
 }
 //-------------------------------------------------------------------

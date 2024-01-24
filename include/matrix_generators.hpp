@@ -28,6 +28,7 @@
 
 #include "base_matrix.hpp"
 #include "numerical_constants.hpp"
+#include "shared_references.hpp"
 
 // eigen library for fast/efficient matrix math
 #include "Eigen/Eigen"
@@ -57,12 +58,12 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class Iota : public BaseMatrix< Iota<DataType> >
+class IotaMatrix : public BaseMatrix< IotaMatrix<DataType> >
 {
 public:
 
-    Iota<DataType>(int rows, int columns, DataType starting_value = static_cast<DataType>(0), DataType step = static_cast<DataType>(1))
-    : BaseMatrix< Iota<DataType> >(),
+    IotaMatrix(int rows, int columns, DataType starting_value = static_cast<DataType>(0), DataType step = static_cast<DataType>(1))
+    : BaseMatrix< IotaMatrix<DataType> >(),
       rows_(rows),
       columns_(columns),
       starting_value_(starting_value),
@@ -106,7 +107,7 @@ private:
 //-------------------------------------------------------------------
 template<typename DataType>
 
-struct is_type_a_matrix< Iota<DataType> > : std::true_type
+struct is_type_a_matrix< IotaMatrix<DataType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -127,7 +128,7 @@ class RandomMatrix : public BaseMatrix< RandomMatrix<DataType> >
 {
 public:
 
-    RandomMatrix<DataType>(int rows, int columns, DataType min_value, DataType max_value, int64_t steps = 4294967296)
+    RandomMatrix(int rows, int columns, DataType min_value, DataType max_value, int64_t steps = 4294967296)
     : BaseMatrix< RandomMatrix<DataType> >(),
       rows_(rows),
       columns_(columns),
@@ -197,13 +198,13 @@ class SineWaveMatrix : public BaseMatrix< SineWaveMatrix<DataType> >
 {
 public:
 
-    SineWaveMatrix<DataType>(int number_of_data_points,
-                             DataType amplitude = 1,
-                             DataType frequency = 1,
-                             DataType phase_offset_in_radians = 0,
-                             DataType y_offset = 0,
-                             DataType delta_time = 0.1,
-                             DataType initial_time = 0)
+    SineWaveMatrix(int number_of_data_points,
+                   DataType amplitude = 1,
+                   DataType frequency = 1,
+                   DataType phase_offset_in_radians = 0,
+                   DataType y_offset = 0,
+                   DataType delta_time = 0.1,
+                   DataType initial_time = 0)
     : BaseMatrix< SineWaveMatrix<DataType> >(),
       rows_(number_of_data_points),
       columns_(1),
@@ -263,6 +264,104 @@ template<typename DataType>
 struct is_type_a_matrix< SineWaveMatrix<DataType> > : std::true_type
 {
 };
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Generates an Iota matrix object.
+ * @tparam DataType The type of value inside the generated matrix.
+ * @param rows The number of rows the generated matrix is supposed to have.
+ * @param columns The number of columns the generated matrix is supposed to have.
+ * @param starting_value The starting value for the iota formula.
+ * @param step The change between two consecutive values in the generated matrix.
+ * @return A ConstSharedMatrixRef to the IotaMatrix object.
+ */
+//-------------------------------------------------------------------
+template<typename DataType>
+
+inline auto
+
+generate_iota_matrix(int rows,
+                     int columns,
+                     DataType starting_value = static_cast<DataType>(0),
+                     DataType step = static_cast<DataType>(1))
+{
+    auto view = std::make_shared<IotaMatrix<DataType>>(rows, columns, starting_value, step);
+    return ConstSharedMatrixRef<IotaMatrix<DataType>>(view);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Generates a matrix whose values are random. Its values change
+ *        every time the user asks for them. For example asking for value
+ *        m(3,4) will return a different value every time.
+ * @tparam DataType The type of value inside the generated matrix.
+ * @param rows The number of rows the generated matrix is supposed to have.
+ * @param columns The number of columns the generated matrix is supposed to have.
+ * @param min_value The minimum bound of the generated random values.
+ * @param max_value The maximum bound of the generated random values.
+ * @param steps The value used in the generation of the random values.
+ * @return A ConstSharedMatrixRef to the RandomMatrix object.
+ */
+//-------------------------------------------------------------------
+template<typename DataType>
+
+inline auto
+
+generate_random_matrix(int rows,
+                       int columns,
+                       DataType min_value,
+                       DataType max_value,
+                       int64_t steps = 4294967296)
+{
+    auto view = std::make_shared<RandomMatrix<DataType>>(rows, columns, min_value, max_value, steps);
+    return ConstSharedMatrixRef<RandomMatrix<DataType>>(view);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Generates a single column vector whose values form a sine wave.
+ * @tparam DataType The type of value inside the generated matrix.
+ * @param number_of_data_points The number of rows (number of samples).
+ * @param amplitude The amplitude of the sine wave.
+ * @param frequency The frequency of the sine wave.
+ * @param phase_offset_in_radians The phase offset of the sine wave (pi/2 = cosine wave).
+ * @param y_offset The y-offset (move wave up and down).
+ * @param delta_time The sampling period.
+ * @param initial_time Initial time used to generate sine wave.
+ * @return A ConstSharedMatrixRef to the SineWaveMatrix object.
+ */
+//-------------------------------------------------------------------
+template<typename DataType>
+
+inline auto
+
+generate_sine_wave_matrix(int number_of_data_points,
+                          DataType amplitude = 1,
+                          DataType frequency = 1,
+                          DataType phase_offset_in_radians = 0,
+                          DataType y_offset = 0,
+                          DataType delta_time = 0.1,
+                          DataType initial_time = 0)
+{
+    auto view = std::make_shared<SineWaveMatrix<DataType>>(number_of_data_points,
+                                                           amplitude,
+                                                           frequency,
+                                                           phase_offset_in_radians,
+                                                           y_offset,
+                                                           delta_time,
+                                                           initial_time);
+                                                          
+    return ConstSharedMatrixRef<SineWaveMatrix<DataType>>(view);
+}
 //-------------------------------------------------------------------
 
 

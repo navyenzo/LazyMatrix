@@ -133,6 +133,17 @@ inline bool does_memory_contain_mapped_matrix(const char* memory_mapped_matrix,
 
 //-------------------------------------------------------------------
 /**
+ * @brief Forward declation of the MatrixFactory class which is used
+ *        to create SharedMatrixRef references of matrices.
+ */
+//-------------------------------------------------------------------
+class MatrixFactory;
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
  * @brief Template class for a matrix that utilizes memory-mapped files for storage.
  * 
  * This allows the matrix to be shared across multiple processes. 
@@ -146,6 +157,8 @@ template<typename DataType>
 class Matrix : public BaseMatrix< Matrix<DataType> >
 {
 public:
+
+    friend class MatrixFactory;
 
     /**
      * @brief Default constructor. Initializes a matrix with given rows and columns.

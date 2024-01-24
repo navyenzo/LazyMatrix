@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------
 /**
- * @file sorting.hpp
+ * @file sorting_view.hpp
  * @brief Provides functionality to create a view of a matrix with sorted rows or columns.
  *
  * This file contains the function for generating a vector of sorted indices based on 
@@ -30,6 +30,7 @@
 #include <numeric>
 
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -50,17 +51,17 @@ namespace LazyMatrix
  * corresponding to these elements and sorts the indices based on the values in the row 
  * or column. The sorting is performed in ascending order.
  *
- * @tparam MatrixType The type of the matrix expression.
+ * @tparam ReferenceType The type of the matrix expression.
  * @param matrix The matrix expression.
  * @param index The index of the row or column to be sorted.
  * @param sort_by_row Boolean flag to indicate row-wise (true) or column-wise (false) sorting.
  * @param sorted_indices A reference to a vector where sorted indices will be stored.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-inline void get_sorted_indices(const MatrixType& matrix,
+inline void get_sorted_indices(const ReferenceType& matrix,
                                int64_t index, 
                                bool sort_by_row,
                                std::vector<int64_t>& sorted_indices)
@@ -92,60 +93,104 @@ inline void get_sorted_indices(const MatrixType& matrix,
 //-------------------------------------------------------------------
 /**
  * @class SortedView
- * @brief Class for sorting rows or columns of a matrix expression
- *        using a user specified row or column to use as the sorting
- *        vector for all the other rows or columns in the matrix
- *        expression
+ * @brief Class for creating a sorted view of a matrix expression
+ *        that either sorts rows or columns.
+ *        It uses a user specified row or column to sort all other rows
+ *        or columns of the input matrix expression.
  *
- * @tparam MatrixType The type of the matrix expression.
+ * @tparam Reference The type of the shared matrix reference.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-class SortedView : public BaseMatrix< SortedView<MatrixType> >
+class SortedView : public BaseMatrix< SortedView<ReferenceType> >
 {
 public:
 
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-
-
-    SortedView<MatrixType>(MatrixType& expression, int64_t index_of_row_or_column_to_use_to_sort, bool sort_by_rows)
+    /**
+     * @brief Construct a new Sorted View object
+     * 
+     * @param expression The input matrix to be sorted.
+     * @param index_of_row_or_column_to_use_to_sort Which row or column to use when sorting.
+     * @param sort_by_rows Boolean whether to sort by rows or columns
+     */
+    SortedView(ReferenceType expression,
+               int64_t index_of_row_or_column_to_use_to_sort,
+               bool sort_by_rows)
     : expression_(expression),
       index_of_row_or_column_to_use_to_sort_(index_of_row_or_column_to_use_to_sort),
       sort_by_rows_(sort_by_rows)
     {
         get_sorted_indices(expression_, index_of_row_or_column_to_use_to_sort_, sort_by_rows_, sorted_indeces_);
     }
-    
 
+    /**
+     * @brief Sets the reference to the matrix expression
+     * @param left_side_expression Reference to the matrix.
+     */
+    void set_expression(ReferenceType expression)
+    {
+        expression_ = expression;
+        get_sorted_indices(expression_, index_of_row_or_column_to_use_to_sort_, sort_by_rows_, sorted_indeces_);
+    }
 
+    /**
+     * @brief Set the index of row or column to use to sort object
+     * 
+     * @param index_of_row_or_column_to_use_to_sort 
+     */
+    void set_index_of_row_or_column_to_use_to_sort(int64_t index_of_row_or_column_to_use_to_sort)
+    {
+        index_of_row_or_column_to_use_to_sort_ = index_of_row_or_column_to_use_to_sort;
+        get_sorted_indices(expression_, index_of_row_or_column_to_use_to_sort_, sort_by_rows_, sorted_indeces_);
+    }
+
+    /**
+     * @brief Set the sort by rows object
+     * 
+     * @param sort_by_rows 
+     */
+    void set_sort_by_rows(bool sort_by_rows)
+    {
+        sort_by_rows_ = sort_by_rows;
+        get_sorted_indices(expression_, index_of_row_or_column_to_use_to_sort_, sort_by_rows_, sorted_indeces_);
+    }
+
+    /**
+     * @brief Returns the number of rows Of the resulting matrix.
+     */
     uintptr_t rows()const
     {
-        return this->expression_.rows();
+        return expression_.rows();
     }
 
+    /**
+     * @brief Returns the total number of columns of the resulting matrix.
+     */
     uintptr_t columns()const
     {
-        return this->expression_.columns();
+        return expression_.columns();
     }
-
-
-
-    const MatrixType& get_expression()
-    {
-        return expression_;
-    }
-
+    
+    /**
+     * @brief Get the index of row or column to use to sort object
+     * @return The index of row or column used to sort object
+     */
     int64_t get_index_of_row_to_use_to_sort()const
     {
         return index_of_row_or_column_to_use_to_sort_;
     }
 
-
-
-    value_type& at_(int64_t row, int64_t column)
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int64_t row, int64_t column)const
     {
         if(sort_by_rows_)
             return expression_.circ_at(row, sorted_indeces_[column]);
@@ -153,7 +198,14 @@ public:
             return expression_.circ_at(sorted_indeces_[row], column);
     }
 
-    const value_type& at_(int64_t row, int64_t column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
+    at_(int64_t row, int64_t column)
     {
         if(sort_by_rows_)
             return expression_.circ_at(row, sorted_indeces_[column]);
@@ -165,7 +217,7 @@ public:
 
 private:
 
-    MatrixType& expression_;
+    ReferenceType expression_;
 
     int64_t index_of_row_or_column_to_use_to_sort_;
 
@@ -180,103 +232,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix< SortedView<MatrixType> > : std::true_type
-{
-};
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-/**
- * @class Sorted
- * @brief Class for sorting rows or columns of a matrix expression
- *        using a user specified row or column to use as the sorting
- *        vector for all the other rows or columns in the matrix
- *        expression
- * 
- *        This one does not allow modification of original matrix data
- *
- * @tparam MatrixType The type of the matrix expression.
- */
-//-------------------------------------------------------------------
-template<typename MatrixType>
-
-class Sorted : public BaseMatrix< Sorted<MatrixType> >
-{
-public:
-
-    // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
-
-
-
-    Sorted<MatrixType>(const MatrixType& expression, int64_t index_of_row_or_column_to_use_to_sort, bool sort_by_rows)
-    : expression_(expression),
-      index_of_row_or_column_to_use_to_sort_(index_of_row_or_column_to_use_to_sort),
-      sort_by_rows_(sort_by_rows)
-    {
-        get_sorted_indices(expression_, index_of_row_or_column_to_use_to_sort_, sort_by_rows_, sorted_indeces_);
-    }
-    
-
-
-    uintptr_t rows()const
-    {
-        return this->expression_.rows();
-    }
-
-    uintptr_t columns()const
-    {
-        return this->expression_.columns();
-    }
-
-
-
-    const MatrixType& get_expression()
-    {
-        return expression_;
-    }
-
-    int64_t get_index_of_row_to_use_to_sort()const
-    {
-        return index_of_row_or_column_to_use_to_sort_;
-    }
-
-
-
-    const value_type& at_(int64_t row, int64_t column)const
-    {
-        if(sort_by_rows_)
-            return expression_.circ_at(row, sorted_indeces_[column]);
-        else
-            return expression_.circ_at(sorted_indeces_[row], column);
-    }
-
-
-
-private:
-
-    const MatrixType& expression_;
-
-    int64_t index_of_row_or_column_to_use_to_sort_;
-
-    bool sort_by_rows_;
-
-    std::vector<int64_t> sorted_indeces_;
-};
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Compile time functions to check if the type is an expression type
-//-------------------------------------------------------------------
-template<typename MatrixType>
-
-struct is_type_a_matrix< Sorted<MatrixType> > : std::true_type
+struct is_type_a_matrix< SortedView<ReferenceType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -286,26 +244,43 @@ struct is_type_a_matrix< Sorted<MatrixType> > : std::true_type
 //-------------------------------------------------------------------
 // helper functions
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Creates a sorted view of a matrix.
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix expression
+ * @param index_of_row_or_column_to_use_to_sort Index of the row or column to use for sorting.
+ * @param sort_by_rows Flag to indicate whether to sort by rows.
+ * @return A SharedMatrixRef or ConstSharedMatrixRef to the
+ *         SortedView matrix object.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-sorted_matrix_view(MatrixType& m, int64_t index_of_row_or_column_to_use_to_sort, bool sort_by_rows)
+create_sorted_matrix_view(ReferenceType m,
+                          int64_t index_of_row_or_column_to_use_to_sort,
+                          bool sort_by_rows)
 {
-    return SortedView<MatrixType>(m, index_of_row_or_column_to_use_to_sort, sort_by_rows);
-}
+    auto view = std::make_shared<SortedView<ReferenceType>>(m, index_of_row_or_column_to_use_to_sort, sort_by_rows);
 
+    // Use the trait to determine if non-const access is available
+    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
 
+    // Conditionally selecting the return type
+    using ReturnType = std::conditional_t
+    <
+        hasNonConstAccess,
+        SharedMatrixRef<SortedView<ReferenceType>>,
+        ConstSharedMatrixRef<SortedView<ReferenceType>>
+    >;
 
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
-
-inline auto
-
-sorted_matrix(const MatrixType& m, int64_t index_of_row_or_column_to_use_to_sort, bool sort_by_rows)
-{
-    return Sorted<MatrixType>(m, index_of_row_or_column_to_use_to_sort, sort_by_rows);
+    return ReturnType(view);
 }
 //-------------------------------------------------------------------
 

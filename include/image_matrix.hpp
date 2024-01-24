@@ -44,6 +44,17 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
+ * @brief Forward declation of the MatrixFactory class which is used
+ *        to create SharedMatrixRef references of matrices.
+ */
+//-------------------------------------------------------------------
+class MatrixFactory;
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
  * @brief Trait to check if a type is a valid pixel type for use with dlib.
  *
  * This trait ensures that only pixel types supported by dlib are used with ImageMatrix.
@@ -107,6 +118,8 @@ template<typename PixelType = dlib::rgb_pixel>
 class ImageMatrix : public BaseMatrix< ImageMatrix<PixelType> >
 {
 public:
+
+    friend class MatrixFactory;
 
     /**
      * @brief Static assertion to ensure the pixel type is valid.

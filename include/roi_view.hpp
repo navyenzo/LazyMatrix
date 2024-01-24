@@ -25,6 +25,7 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -43,13 +44,18 @@ namespace LazyMatrix
  * @class ROIView
  * @brief Class to create a view representing a modifiable Region Of Interest within a matrix.
  *
- * @tparam MatrixType The type of the matrix expression.
+ * @tparam ReferenceType The type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct ROIView : public BaseMatrix< ROIView<MatrixType> >
+class ROIView : public BaseMatrix< ROIView<ReferenceType> >
 {
+public:
+
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+
     /**
      * @brief Constructs a ROIView object from a matrix expression and coordinates.
      *
@@ -59,38 +65,61 @@ struct ROIView : public BaseMatrix< ROIView<MatrixType> >
      * @param row2 The ending row index of the ROI.
      * @param column2 The ending column index of the ROI.
      */
-    ROIView<MatrixType>(MatrixType& expression,
-                        int64_t row1, int64_t column1, int64_t row2, int64_t column2)
-    : expression_(expression),
-      row1_(row1),
-      column1_(column1),
-      row2_(row2),
-      column2_(column2)
+    ROIView<ReferenceType>(ReferenceType& expression,
+                           int64_t row1, int64_t column1, int64_t row2, int64_t column2)
     {
+        set_expression(expression);
+        set_roi_bounds(row1, column1, row2, column2);
     }
-    
 
+    /**
+     * @brief Sets the reference to the matrix expression
+     * @param left_side_expression Reference to the matrix.
+     */
+    void set_expression(ReferenceType expression)
+    {
+        expression_ = expression;
+    }
 
+    /**
+     * @brief Set the roi bounds object
+     * 
+     * @param row1 
+     * @param column1 
+     * @param row2 
+     * @param column2 
+     */
+    void set_roi_bounds(int64_t row1, int64_t column1, int64_t row2, int64_t column2)
+    {
+        row1_ = row1;
+        column1_ = column1;
+        row2_ = row2;
+        column2_ = column2;
+    }
+
+    /**
+     * @brief Return the number of rows of the resulting matrix
+     */
     uintptr_t rows()const
     {
         return std::abs(row2_ - row1_) + 1;
     }
 
+    /**
+     * @brief Return the number of columns of the resulting matrix
+     */
     uintptr_t columns()const
     {
         return std::abs(column2_ - column1_) + 1;
     }
 
-
-
-    const MatrixType& get_expression()const
-    {
-        return expression_;
-    }
-    
-    
-
-    decltype(auto) at_(int64_t row, int64_t column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int64_t row, int64_t column)const
     {
         int64_t actual_row = row1_;
         int64_t actual_column = column1_;
@@ -114,7 +143,14 @@ struct ROIView : public BaseMatrix< ROIView<MatrixType> >
         return expression_.circ_at(actual_row, actual_column);
     }
 
-    decltype(auto) at_(int64_t row, int64_t column)
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
+    at_(int64_t row, int64_t column)
     {
         int64_t actual_row = row1_;
         int64_t actual_column = column1_;
@@ -142,7 +178,7 @@ struct ROIView : public BaseMatrix< ROIView<MatrixType> >
 
 private:
 
-    const MatrixType& expression_;
+    ReferenceType expression_;
     
     int64_t row1_ = 0;
     int64_t column1_ = 0;
@@ -156,9 +192,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix< ROIView<MatrixType> > : std::true_type
+struct is_type_a_matrix< ROIView<ReferenceType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -166,16 +202,40 @@ struct is_type_a_matrix< ROIView<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Create a Region Of Interest (ROI) view of a given matrix expression
+/**
+ * @brief Creates a ROI of an input matrix (Region Of Interest).
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix expression
+ * @param row1 first row of the ROI.
+ * @param column1 first column of the ROI.
+ * @param row2 second row of the ROI.
+ * @param column2 second column of the ROI.
+ * @return A SharedMatrixRef or ConstSharedMatrixRef to the
+ *         ROI matrix object.
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-roi_view(MatrixType& m1, int64_t row1, int64_t column1, int64_t row2, int64_t column2)
+create_roi_view(ReferenceType m,
+                          int64_t row1, int64_t column1, int64_t row2, int64_t column2)
 {
-    return ROIView(m1, row1, column1, row2, column2);
+    auto view = std::make_shared<ROIView<ReferenceType>>(m, row1, column1, row2, column2);
+
+    // Use the trait to determine if non-const access is available
+    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
+
+    // Conditionally selecting the return type
+    using ReturnType = std::conditional_t
+    <
+        hasNonConstAccess,
+        SharedMatrixRef<ROIView<ReferenceType>>,
+        ConstSharedMatrixRef<ROIView<ReferenceType>>
+    >;
+
+    return ReturnType(view);
 }
 //-------------------------------------------------------------------
 

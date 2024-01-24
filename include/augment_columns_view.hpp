@@ -4,8 +4,10 @@
  * @brief Provides functionality to augment two matrices column-wise.
  *
  * This file contains the AugmentColumnsView template class, which is used to 
- * create a view combining two matrices by augmenting their columns. It essentially
- * places the columns of the second matrix to the right of the first matrix.
+ * create a view of two input matrix expressions combined together by
+ * augmenting their columns.  It essentially places the columns of the second
+ * matrix expression to the right of the first matrix expression.
+ * This class only creates a view and doesn't actually copy any data.
  *
  * @author Vincenzo Barbato
  * 
@@ -24,134 +26,123 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
 
-//-------------------------------------------------------------------
-// Define every thing within the namespace LazyMatrix
 //-------------------------------------------------------------------
 namespace LazyMatrix
 {
-//-------------------------------------------------------------------
-
-
-
 //-------------------------------------------------------------------
 /**
  * @class AugmentColumnsView
  * @brief Augments two matrices by columns to create a new matrix view.
  *
- * @tparam MatrixType1 Type of the left side matrix in the augmentation.
- * @tparam MatrixType2 Type of the right side matrix in the augmentation.
+ * @tparam ReferenceType1 Type of the left side matrix in the augmentation.
+ * @tparam ReferenceType2 Type of the right side matrix in the augmentation.
+ *
+ * This class represents a view that augments the columns of two matrices.
+ * It places the columns of the second matrix to the right of the first matrix,
+ * creating a combined matrix view without modifying the original matrices.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
-struct AugmentColumnsView : public BaseMatrix< AugmentColumnsView<MatrixType1, MatrixType2> >
+class AugmentColumnsView : public BaseMatrix<AugmentColumnsView<ReferenceType1, ReferenceType2>>
 {
-    // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
+public:
 
-
+    // Type of value that is stored in the matrix
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
     /**
-     * @brief Constructs a view which augments the columns of two matrices.
-     *
+     * @brief Constructs a new matrix by augmenting the columns of two matrices.
      * @param left_side_expression Reference to the left side matrix.
      * @param right_side_expression Reference to the right side matrix.
      */
-    AugmentColumnsView<MatrixType1, MatrixType2>(MatrixType1& left_side_expression,
-                                                 MatrixType2& right_side_expression)
-    : left_side_expression_(left_side_expression),
-      right_side_expression_(right_side_expression)
+    AugmentColumnsView(ReferenceType1 left_side_expression,
+                       ReferenceType2 right_side_expression)
     {
-    }
-
-
-
-    uintptr_t rows()const
-    {
-        return std::max(this->left_side_expression_.rows(), this->right_side_expression_.rows());
-    }
-
-    uintptr_t columns()const
-    {
-        return this->left_side_expression_.columns() + this->right_side_expression_.columns();
-    }
-
-
-
-    const MatrixType1& get_left_side_expression()const
-    {
-        return left_side_expression_;
+        set_left_side_expression(left_side_expression);
+        set_right_side_expression(right_side_expression);
     }
     
-    const MatrixType2& get_right_side_expression()const
+    /**
+     * @brief Sets the reference to the left side matrix expression
+     * @param left_side_expression Reference to the left side matrix.
+     */
+    void set_left_side_expression(ReferenceType1 left_side_expression)
     {
-        return right_side_expression_;
+        left_side_expression_ = left_side_expression;
     }
 
-    
-
-    const value_type& at_(int64_t row, int64_t column)const
+    /**
+     * @brief Sets the reference to the right side matrix expression
+     * @param right_side_expression Reference to the right side matrix.
+     */
+    void set_right_side_expression(ReferenceType2 right_side_expression)
     {
-        if(column < this->left_side_expression_.columns())
-        {
-            if(row < this->left_side_expression_.rows())
-                return this->left_side_expression_.at(row, column);
-            else
-                return zero_;
-        }
-        else
-        {
-            if(row < this->right_side_expression_.rows())
-                return this->right_side_expression_.at(row, column - this->left_side_expression_.columns());
-            else
-                return zero_;
-        }
+        right_side_expression_ = right_side_expression;
     }
 
-    value_type& at_(int64_t row, int64_t column)
+    /**
+     * @brief Returns the number of rows in the augmented matrix.
+     * @return The maximum number of rows between both matrices.
+     */
+    uintptr_t rows() const
     {
-        if(column < this->left_side_expression_.columns())
-        {
-            if(row < this->left_side_expression_.rows())
-                return this->left_side_expression_.at(row, column);
-            else
-                return zero_;
-        }
+        return std::max(left_side_expression_.rows(), right_side_expression_.rows());
+    }
+
+    /**
+     * @brief Returns the total number of columns in the augmented matrix.
+     * @return Sum of the columns of both matrices.
+     */
+    uintptr_t columns() const
+    {
+        return left_side_expression_.columns() + right_side_expression_.columns();
+    }
+
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int64_t row, int64_t column) const
+    {
+        if(column < left_side_expression_.columns())
+            return row < left_side_expression_.rows() ? left_side_expression_.at(row, column) : zero_;
         else
-        {
-            if(row < this->right_side_expression_.rows())
-                return this->right_side_expression_.at(row, column - this->left_side_expression_.columns());
-            else
-                return zero_;
-        }
+            return row < right_side_expression_.rows() ? right_side_expression_.at(row, column - left_side_expression_.columns()) : zero_;
+    }
+
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    std::enable_if_t<has_non_const_access<ReferenceType1>{} && has_non_const_access<ReferenceType2>{}, value_type&>
+    at_(int64_t row, int64_t column)
+    {
+        if(column < left_side_expression_.columns())
+            return row < left_side_expression_.rows() ? left_side_expression_.at(row, column) : zero_;
+        else
+            return row < right_side_expression_.rows() ? right_side_expression_.at(row, column - left_side_expression_.columns()) : zero_;
     }
 
 
 
 private:
 
-    MatrixType1& left_side_expression_;
-    MatrixType2& right_side_expression_;
-
-    value_type zero_ = static_cast<value_type>(0);
-};
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Compile time functions to check if the type is an expression type
-//-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2>
-
-struct is_type_a_matrix< AugmentColumnsView<MatrixType1, MatrixType2> > : std::true_type
-{
+    ReferenceType1 left_side_expression_;
+    ReferenceType2 right_side_expression_;
+    mutable value_type zero_ = static_cast<value_type>(0);
 };
 //-------------------------------------------------------------------
 
@@ -159,29 +150,40 @@ struct is_type_a_matrix< AugmentColumnsView<MatrixType1, MatrixType2> > : std::t
 
 //-------------------------------------------------------------------
 /**
- * @brief Function to augment two matrices by columns.
- *
- * This function takes two matrix expressions and creates a view that represents
- * the augmentation of these matrices by columns.
- *
- * @tparam MatrixType1 Type of the left side matrix.
- * @tparam MatrixType2 Type of the right side matrix.
- * @param m1 Reference to the left side matrix.
- * @param m2 Reference to the right side matrix.
- * @return An AugmentColumnsView object representing the augmented matrix.
+ * @brief Creates an augmented view of two matrices by columns.
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return A SharedMatrixRef or ConstSharedMatrixRef to the
+ *         AugmentColumnsView combining both matrices.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-augment_by_columns_view(MatrixType1& m1,
-                        MatrixType2& m2)
+augment_by_columns_view(ReferenceType1 m1,
+                        ReferenceType2 m2)
 {
-    return AugmentColumnsView<MatrixType1,MatrixType2>(m1, m2);
+    auto view = std::make_shared<AugmentColumnsView<ReferenceType1, ReferenceType2>>(m1, m2);
+    
+    // Use the trait to determine if non-const access is available
+    constexpr bool hasNonConstAccess1 = has_non_const_access<ReferenceType1>::value;
+    constexpr bool hasNonConstAccess2 = has_non_const_access<ReferenceType2>::value;
+
+    // Conditionally selecting the return type
+    using ReturnType = std::conditional_t
+    <
+        hasNonConstAccess1 && hasNonConstAccess2,
+        SharedMatrixRef<AugmentColumnsView<ReferenceType1, ReferenceType2>>,
+        ConstSharedMatrixRef<AugmentColumnsView<ReferenceType1, ReferenceType2>>
+    >;
+
+    return ReturnType(view);
 }
 //-------------------------------------------------------------------
 

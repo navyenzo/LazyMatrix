@@ -55,6 +55,17 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
+ * @brief Forward declation of the MatrixFactory class which is
+ *        used to create SharedMatrixRef references of csv matrices.
+ */
+//-------------------------------------------------------------------
+class MatrixFactory;
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
  * @class CSVMatrix
  * @brief Memory-mapped CSV file reader providing matrix-like access to data.
  *
@@ -79,6 +90,8 @@ template<typename DataType>
 class CSVMatrix : public BaseMatrix< CSVMatrix<DataType> >
 {
 public:
+
+    friend class MatrixFactory;
 
     // Default constructor
     CSVMatrix(char string_delimiter = '\"',
@@ -117,7 +130,7 @@ public:
 
 
 
-//private: // Private functions
+private: // Private functions
     
     uintptr_t find_end_of_current_row(uintptr_t current_position_in_csv_string)const;
     uintptr_t find_end_of_current_column(uintptr_t current_position_in_csv_string, uintptr_t end_of_row)const;

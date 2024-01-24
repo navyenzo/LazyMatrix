@@ -56,7 +56,7 @@ TEST_CASE("DatabaseMatrix operations", "[DatabaseMatrix]")
         session << "INSERT INTO test_table (name) VALUES('Charlie')", now;
         
         LazyMatrix::SafeName safe_table_name("test_table");
-        LazyMatrix::DatabaseMatrix matrix(session, safe_table_name);
+        auto matrix = LazyMatrix::MatrixFactory::create_database_matrix(session, safe_table_name);
 
         SECTION("Test row count and column count")
         {
@@ -81,7 +81,7 @@ TEST_CASE("DatabaseMatrix operations", "[DatabaseMatrix]")
         
         SECTION("Test with condition")
         {
-            matrix.set_condition("name LIKE 'B%'");
+            matrix->set_condition("name LIKE 'B%'");
             
             REQUIRE(matrix.rows() == 1); // Expecting only one row where name starts with 'B'
             
@@ -91,7 +91,7 @@ TEST_CASE("DatabaseMatrix operations", "[DatabaseMatrix]")
         
         SECTION("Test with different condition")
         {
-            matrix.set_condition("id > 1");
+            matrix->set_condition("id > 1");
             
             REQUIRE(matrix.rows() == 2); // Expecting two rows with id > 1
             
@@ -105,7 +105,7 @@ TEST_CASE("DatabaseMatrix operations", "[DatabaseMatrix]")
         SECTION("Test with row sorting")
         {
             LazyMatrix::SafeRowSortingMethod safe_row_sorting_method("id", "DESC");
-            matrix.set_row_sorting_method(safe_row_sorting_method);
+            matrix->set_row_sorting_method(safe_row_sorting_method);
 
             auto name_row1 = matrix(0, 1).convert<std::string>();
             REQUIRE(name_row1 == "Charlie"); // First row should now be Charlie

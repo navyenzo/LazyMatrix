@@ -34,8 +34,8 @@
 TEST_CASE("2D Matrix Addition", "[Matrix2D]")
 {
     // Create matrices
-    LazyMatrix::Matrix<int> mat1(2, 2);
-    LazyMatrix::Matrix<int> mat2(2, 2);
+    auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
+    auto mat2 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
 
     // Populate matrices
     mat1(0,0) = 1; mat1(0,1) = 2;
@@ -65,8 +65,8 @@ TEST_CASE("2D Matrix Addition", "[Matrix2D]")
 TEST_CASE("2D Matrix Subtraction", "[Matrix2D]")
 {
     // Create matrices
-    LazyMatrix::Matrix<int> mat1(2, 2);
-    LazyMatrix::Matrix<int> mat2(2, 2);
+    auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
+    auto mat2 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
 
     // Populate matrices
     mat1(0,0) = 1; mat1(0,1) = 2;
@@ -96,8 +96,8 @@ TEST_CASE("2D Matrix Subtraction", "[Matrix2D]")
 TEST_CASE("2D Matrix Multiplication", "[Matrix2D]")
 {
     // Create matrices
-    LazyMatrix::Matrix<int> mat1(2, 2);
-    LazyMatrix::Matrix<int> mat2(2, 2);
+    auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
+    auto mat2 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
 
     // Populate matrices
     mat1(0,0) = 1; mat1(0,1) = 2;
@@ -127,12 +127,12 @@ TEST_CASE("2D Matrix Multiplication", "[Matrix2D]")
 TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
 {
     // Create two random 10x10 matrices
-    LazyMatrix::RandomMatrix<int> random_mat1(10, 10, -10, 10);
-    LazyMatrix::RandomMatrix<int> random_mat2(10, 10, -10, 10);
+    auto random_mat1 = LazyMatrix::generate_random_matrix<int>(10, 10, -10, 10);
+    auto random_mat2 = LazyMatrix::generate_random_matrix<int>(10, 10, -10, 10);
 
     // Convert random generators to actual matrices for multiplication
-    LazyMatrix::Matrix<int> mat1(random_mat1);
-    LazyMatrix::Matrix<int> mat2(random_mat2);
+    auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(*random_mat1);
+    auto mat2 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(*random_mat2);
 
      using clock = std::chrono::high_resolution_clock;
 

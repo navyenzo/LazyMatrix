@@ -47,19 +47,29 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
- * @class ShuffleView
- * @brief Class for shuffling rows and/or columns of a matrix expression.
+ * @class ShuffledView
+ * @brief Class for shuffling rows and/or columns of an input matrix expression.
  *
- * @tparam MatrixType The type of the matrix expression.
+ * @tparam ReferenceType The type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-class ShuffleView : public BaseMatrix< ShuffleView<MatrixType> >
+class ShuffledView : public BaseMatrix< ShuffledView<ReferenceType> >
 {
 public:
 
-    ShuffleView<MatrixType>(MatrixType& expression, bool should_rows_be_shuffled, bool should_columns_be_shuffled)
+    // Type of value that is stored in the expression
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+
+    /**
+     * @brief Construct a new Shuffle object
+     * 
+     * @param expression The input matrix expression
+     * @param should_rows_be_shuffled Boolean to know whether to shuffle rows
+     * @param should_columns_be_shuffled Boolean to know whether to shuffle columns
+     */
+    ShuffledView(ReferenceType& expression, bool should_rows_be_shuffled, bool should_columns_be_shuffled)
     : expression_(expression),
       should_rows_be_shuffled_(should_rows_be_shuffled),
       should_columns_be_shuffled_(should_columns_be_shuffled)
@@ -77,34 +87,42 @@ public:
         if(should_columns_be_shuffled_)
             std::shuffle(column_indeces_.begin(), column_indeces_.end(), rng);
     }
-    
 
-
+    /**
+     * @brief Return the number of rows of the resulting matrix.
+     */
     uintptr_t rows()const
     {
         return this->expression_.rows();
     }
 
+    /**
+     * @brief Return the number of columns of the resulting matrix.
+     */
     uintptr_t columns()const
     {
         return this->expression_.columns();
     }
 
-
-
-    const MatrixType& get_expression()
-    {
-        return expression_;
-    }
-
-
-
-    decltype(auto) at_(int64_t row, int64_t column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int64_t row, int64_t column)const
     {
         return expression_.circ_at(row_indeces_[row], column_indeces_[column]);
     }
 
-    decltype(auto) at_(int64_t row, int64_t column)
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
+    at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(row_indeces_[row], column_indeces_[column]);
     }
@@ -113,7 +131,7 @@ public:
 
 private:
 
-    MatrixType& expression_;
+    ReferenceType expression_;
     
     bool should_rows_be_shuffled_ = true;
     bool should_columns_be_shuffled_ = true;
@@ -128,9 +146,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix< ShuffleView<MatrixType> > : std::true_type
+struct is_type_a_matrix< ShuffledView<ReferenceType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -140,14 +158,43 @@ struct is_type_a_matrix< ShuffleView<MatrixType> > : std::true_type
 //-------------------------------------------------------------------
 // helper function
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Creates a shuffled view of a matrix (rows, columns or both).
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix expression
+ * @param should_rows_be_shuffled Whether it should shuffle rows.
+ * @param should_columns_be_shuffled Whether it should shuffle columns.
+ * @return A SharedMatrixRef or ConstSharedMatrixRef to the shuffled
+ *         view of the input matrix expression.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-shuffle_view(MatrixType& m, bool should_rows_be_reversed, bool should_columns_be_reversed)
+create_shuffled_matrix_view(ReferenceType m,
+                            bool should_rows_be_shuffled,
+                            bool should_columns_be_shuffled)
 {
-    return ShuffleView<MatrixType>(m, should_rows_be_reversed, should_columns_be_reversed);
+    auto view = std::make_shared<ShuffledView<ReferenceType>>(m, should_rows_be_shuffled, should_columns_be_shuffled);
+
+    // Use the trait to determine if non-const access is available
+    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
+
+    // Conditionally selecting the return type
+    using ReturnType = std::conditional_t
+    <
+        hasNonConstAccess,
+        SharedMatrixRef<ShuffledView<ReferenceType>>,
+        ConstSharedMatrixRef<ShuffledView<ReferenceType>>
+    >;
+
+    return ReturnType(view);
 }
 //-------------------------------------------------------------------
 

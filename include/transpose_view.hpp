@@ -26,6 +26,7 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -42,64 +43,89 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 
 /**
- * @class TransposeView
+ * @class Transpose
  * @brief A view class that provides a transposed view of a matrix.
  *
- * TransposeView presents a transposed interface to the underlying matrix expression. It swaps
- * rows and columns, allowing for operations as if the matrix were transposed. This class does
- * not create a copy of the data, but rather provides a different view of the same data. Thus,
- * modifications through this view will affect the original matrix.
+ * Transpose presents a transposed view of the input matrix expression.
+ * It swaps rows and columns, allowing for operations as if the original
+ * matrix were transposed. This class does not create a copy of the
+ * input matrix, just a view of it.
  *
- * @tparam MatrixType The type of the underlying matrix expression.
+ * @tparam ReferenceType The type of the underlying matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-class TransposeView : public BaseMatrix< TransposeView<MatrixType> >
+class Transpose : public BaseMatrix< Transpose<ReferenceType> >
 {
 public:
 
-    TransposeView<MatrixType>(MatrixType& expression)
-    : expression_(expression)
+    // Type of value that is stored in the matrix
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+
+    /**
+     * @brief Construct a new Transpose View< Reference Type> object
+     * 
+     * @param expression The input matrix expression.
+     */
+    explicit Transpose<ReferenceType>(ReferenceType expression)
     {
+        set_expression(expression);
     }
     
+    /**
+     * @brief Sets the reference to the input matrix expression
+     * @param expression Reference to the input matrix.
+     */
+    void set_expression(ReferenceType expression)
+    {
+        expression_ = expression;
+    }
 
-
+    /**
+     * @brief Returns the number of rows of the resulting matrix.
+     */
     uintptr_t rows()const
     {
         return this->expression_.columns();
     }
 
+    /**
+     * @brief Returns the number of columns of the resulting matrix.
+     */
     uintptr_t columns()const
     {
         return this->expression_.rows();
     }
 
-
-
-    decltype(auto) at_(int64_t row, int64_t column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int64_t row, int64_t column)const
     {
         return expression_(column, row);
     }
 
-    decltype(auto) at_(int64_t row, int64_t column)
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
+    at_(int64_t row, int64_t column)
     {
         return expression_(column, row);
-    }
-
-
-
-    const MatrixType& get_expression()
-    {
-        return expression_;
     }
 
 
 
 private:
 
-    MatrixType& expression_;
+    ReferenceType expression_;
 };
 //-------------------------------------------------------------------
 
@@ -108,9 +134,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix< TransposeView<MatrixType> > : std::true_type
+struct is_type_a_matrix< Transpose<ReferenceType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -119,25 +145,32 @@ struct is_type_a_matrix< TransposeView<MatrixType> > : std::true_type
 
 //-------------------------------------------------------------------
 /**
- * @brief Helper function to create a TransposeView from a matrix expression.
- *
- * This function provides an easy way to create a TransposeView of a given matrix.
- * It checks at compile time if the provided object is a matrix expression and returns
- * a TransposeView object.
- *
- * @tparam MatrixType The type of the matrix expression.
- * @param m Reference to the matrix expression.
- * @return TransposeView<MatrixType> A transposed view of the matrix expression.
+ * @brief Returns the transpose of the input matrix expression.
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix expression
+ * @return A SharedMatrixRef or ConstSharedMatrixRef to the
+ *         transpose view of the input matrix expression
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-inline auto
-
-transpose_view(MatrixType& m)
+inline auto transpose(ReferenceType m)
 {
-    return TransposeView<MatrixType>(m);
+    auto view = std::make_shared<Transpose<ReferenceType>>(m);
+
+    // Use the trait to determine if non-const access is available
+    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
+
+    // Conditionally selecting the return type
+    using ReturnType = std::conditional_t
+    <
+        hasNonConstAccess,
+        SharedMatrixRef<Transpose<ReferenceType>>,
+        ConstSharedMatrixRef<Transpose<ReferenceType>>
+    >;
+
+    return ReturnType(view);
 }
 //-------------------------------------------------------------------
 

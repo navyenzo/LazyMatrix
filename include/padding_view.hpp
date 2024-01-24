@@ -26,6 +26,8 @@
 //-------------------------------------------------------------------
 #include <algorithm>
 #include <cstdint>
+
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -44,58 +46,99 @@ namespace LazyMatrix
  * @class PaddedMatrix
  * @brief Pads matrix expression with a constant value
  *
- * @tparam MatrixType Type of the matrix expression.
+ * @tparam ReferenceType Type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct PaddedMatrixView : public BaseMatrix< PaddedMatrixView<MatrixType> >
+class PaddedMatrixView : public BaseMatrix< PaddedMatrixView<ReferenceType> >
 {
+public:
+
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-
-
-    PaddedMatrixView<MatrixType>(MatrixType& expression, uintptr_t padded_rows, uintptr_t padded_columns, const value_type& constant_value_for_padding = static_cast<value_type>(0))
-    : expression_(expression),
-      padded_rows_(padded_rows),
-      padded_columns_(padded_columns),
-      constant_value_for_padding_(constant_value_for_padding)
+    /**
+     * @brief Construct a new Padded Matrix View< Matrix Type> object.
+     * 
+     * @param expression The input matrix expression.
+     * @param padded_rows Number of rows after padding.
+     * @param padded_columns Number of columns after padding.
+     * @param constant_value_for_padding value used for the padding (defaulted to zero).
+     */
+    PaddedMatrixView<ReferenceType>(ReferenceType expression,
+                                    uintptr_t padded_rows,
+                                    uintptr_t padded_columns,
+                                    value_type constant_value_for_padding = static_cast<value_type>(0))
     {
+        set_expression(expression);
+        set_padded_rows(padded_rows);
+        set_padded_columns(padded_columns);
+        set_constant_value_for_padding(constant_value_for_padding);
     }
 
+    /**
+     * @brief Sets the reference to the matrix expression
+     * @param expression Reference to the matrix.
+     */
+    void set_expression(ReferenceType expression)
+    {
+        expression_ = expression;
+    }
 
+    /**
+     * @brief Set the number of rows after padding
+     * 
+     * @param padded_rows 
+     */
+    void set_padded_rows(uintptr_t padded_rows)
+    {
+        padded_rows_ = padded_rows;
+    }
 
+    /**
+     * @brief Set the number of columns after padding
+     * 
+     * @param padded_columns
+     */
+    void set_padded_columns(uintptr_t padded_columns)
+    {
+        padded_columns_ = padded_columns;
+    }
+
+    /**
+     * @brief Set the constant value used for the padding
+     * 
+     * @param constant_value_for_padding 
+     */
+    void set_constant_value_for_padding(const value_type& constant_value_for_padding)
+    {
+        constant_value_for_padding_ = constant_value_for_padding;
+    }
+
+    /**
+     * @brief Returns the number of rows Of the resulting matrix.
+     */
     uintptr_t rows()const
     {
         return padded_rows_;
     }
 
+    /**
+     * @brief Returns the total number of columns of the resulting matrix.
+     */
     uintptr_t columns()const
     {
         return padded_columns_;
     }
-
-
-
-    const MatrixType& get_expression_()const
-    {
-        return expression_;
-    }
-
-    const value_type& get_constant_value_for_padding()const
-    {
-        return constant_value_for_padding_;
-    }
-
-    void set_constant_value(const value_type& constant_value_for_padding)
-    {
-        constant_value_for_padding_ = constant_value_for_padding;
-    }
     
-
-
-   const value_type& at_(int64_t row, int64_t column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int64_t row, int64_t column)const
     {
         if(row < 0 || row >= expression_.rows() || column < 0 || column >= expression_.columns())
             return constant_value_for_padding_;
@@ -103,7 +146,14 @@ struct PaddedMatrixView : public BaseMatrix< PaddedMatrixView<MatrixType> >
         return expression_(row, column);
     }
 
-    value_type& at_(int64_t row, int64_t column)
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
+    at_(int64_t row, int64_t column)
     {
         if(row < 0 || row >= expression_.rows() || column < 0 || column >= expression_.columns())
             return constant_value_for_padding_;
@@ -115,10 +165,9 @@ struct PaddedMatrixView : public BaseMatrix< PaddedMatrixView<MatrixType> >
 
 private:
 
-    MatrixType& expression_;
-
-    const uintptr_t padded_rows_;
-    const uintptr_t padded_columns_;
+    ReferenceType expression_;
+    uintptr_t padded_rows_;
+    uintptr_t padded_columns_;
     value_type constant_value_for_padding_ = static_cast<value_type>(0);
 };
 //-------------------------------------------------------------------
@@ -128,9 +177,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix< PaddedMatrixView<MatrixType> > : std::true_type
+struct is_type_a_matrix< PaddedMatrixView<ReferenceType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -138,20 +187,41 @@ struct is_type_a_matrix< PaddedMatrixView<MatrixType> > : std::true_type
 
 
 //-------------------------------------------------------------------
-// Pad a matrix and be able to edit original source matrix
+/**
+ * @brief Creates a sorted view of a matrix.
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m The input matrix expression.
+ * @param padded_rows Number of rows after padding.
+ * @param padded_columns Number of columns after padding.
+ * @param constant_value_for_padding value used for the padding (defaulted to zero).
+ * @return A SharedMatrixRef or ConstSharedMatrixRef to the
+ *         SortedView matrix object.
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         typename DataType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-pad_matrix_view(MatrixType& m,
-                uintptr_t padded_rows,
-                uintptr_t padded_columns,
-                const DataType& constant_value_for_padding)
+create_padded_matrix_view(ReferenceType m,
+                          uintptr_t padded_rows,
+                          uintptr_t padded_columns,
+                          typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type constant_value_for_padding = 0)
 {
-    return PaddedMatrixView<MatrixType>(m, padded_rows, padded_columns, constant_value_for_padding);
+    auto view = std::make_shared<PaddedMatrixView<ReferenceType>>(m, padded_rows, padded_columns);
+
+    // Use the trait to determine if non-const access is available
+    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
+
+    // Conditionally selecting the return type
+    using ReturnType = std::conditional_t
+    <
+        hasNonConstAccess,
+        SharedMatrixRef<PaddedMatrixView<ReferenceType>>,
+        ConstSharedMatrixRef<PaddedMatrixView<ReferenceType>>
+    >;
+
+    return ReturnType(view);
 }
 //-------------------------------------------------------------------
 

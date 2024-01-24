@@ -53,6 +53,17 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
+ * @brief Forward declation of the MatrixFactory class which is
+ *        used to create SharedMatrixRef references of database matrices.
+ */
+//-------------------------------------------------------------------
+class MatrixFactory;
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
  * @class SafeName
  * @brief Class for validating and encapsulating database identifiers like table and column names.
  *
@@ -63,6 +74,8 @@ namespace LazyMatrix
 class SafeName
 {
 public:
+
+    friend class MatrixFactory;
  
     /**
      * Constructor for SafeName.
@@ -286,19 +299,19 @@ public:
      * @param column Column index.
      * @return The value at the specified position in the matrix.
      */
-    value_type at_(int64_t row, int64_t column) const;
+    const value_type& at_(int64_t row, int64_t column) const;
 
     /**
      * Sets the row sorting method for the matrix.
      * @param row_sorting_method The new sorting method.
      */
-    void set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method);
+    void set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method)const;
 
     /**
      * Sets the SQL condition for data retrieval.
      * @param condition The new SQL condition.
      */
-    void set_condition(const std::string& condition);
+    void set_condition(const std::string& condition)const;
 
     /**
      * Retrieves the last error message, if any.
@@ -313,12 +326,12 @@ private:
     /**
      * Counts the number of rows in the matrix.
      */
-    void count_rows();
+    void count_rows()const;
 
     /**
      * Counts the number of columns in the matrix.
      */
-    void count_columns();
+    void count_columns()const;
 
     /**
      * Preloads data into the cache for the specified row and column.
@@ -327,18 +340,18 @@ private:
      */
     void preload_data(int64_t row, int64_t column) const;
 
-    Poco::Data::Session& session_;                 ///< Database session for connectivity.
-    SafeName table_name_;                          ///< Sanitized table name.
-    SafeRowSortingMethod row_sorting_method_;      ///< Method for row sorting.
-    std::string condition_;                        ///< SQL condition for data retrieval.
+    Poco::Data::Session& session_;                      ///< Database session for connectivity.
+    SafeName table_name_;                               ///< Sanitized table name.
+    mutable SafeRowSortingMethod row_sorting_method_;   ///< Method for row sorting.
+    mutable std::string condition_;                     ///< SQL condition for data retrieval.
 
-    mutable DatabaseWindow cache_window_;          ///< Cache window for efficient data retrieval.
-    uintptr_t cache_window_size_ = 100;            ///< Size of the cache window.
+    mutable DatabaseWindow cache_window_;               ///< Cache window for efficient data retrieval.
+    mutable uintptr_t cache_window_size_ = 100;         ///< Size of the cache window.
 
-    uintptr_t rows_ = 0;                           ///< Number of rows in the matrix.
-    std::vector<std::string> column_names_;        ///< Names of columns in the matrix.
+    mutable uintptr_t rows_ = 0;                        ///< Number of rows in the matrix.
+    mutable std::vector<std::string> column_names_;     ///< Names of columns in the matrix.
 
-    std::string last_error_;                       ///< Last error message, if any.
+    mutable std::string last_error_;                    ///< Last error message, if any.
 };
 //-------------------------------------------------------------------
 
@@ -376,7 +389,7 @@ inline DatabaseMatrix::DatabaseMatrix(Poco::Data::Session& session,
 
 
 //-------------------------------------------------------------------
-inline void DatabaseMatrix::count_rows()
+inline void DatabaseMatrix::count_rows()const
 {
     try
     {
@@ -403,7 +416,7 @@ inline void DatabaseMatrix::count_rows()
 
 
 //-------------------------------------------------------------------
-inline void DatabaseMatrix::count_columns()
+inline void DatabaseMatrix::count_columns()const
 {
     try
     {
@@ -462,7 +475,7 @@ inline uintptr_t DatabaseMatrix::columns() const
 
 
 //-------------------------------------------------------------------
-inline DatabaseMatrix::value_type DatabaseMatrix::at_(int64_t row, int64_t column) const
+inline const DatabaseMatrix::value_type& DatabaseMatrix::at_(int64_t row, int64_t column) const
 {
     // Check if the data is in the current cache window
     if (!cache_window_.is_data_found_in_window(row, column))
@@ -524,7 +537,7 @@ inline void DatabaseMatrix::preload_data(int64_t row, int64_t column) const
 
 
 //-------------------------------------------------------------------
-inline void DatabaseMatrix::set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method)
+inline void DatabaseMatrix::set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method)const
 {
     if(row_sorting_method_.get() != row_sorting_method.get())
     {
@@ -538,7 +551,7 @@ inline void DatabaseMatrix::set_row_sorting_method(const SafeRowSortingMethod& r
 
 
 //-------------------------------------------------------------------
-inline void DatabaseMatrix::set_condition(const std::string& condition)
+inline void DatabaseMatrix::set_condition(const std::string& condition)const
 {
     if(condition_ != condition)
     {

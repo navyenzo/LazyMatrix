@@ -31,8 +31,8 @@
 //-------------------------------------------------------------------
 TEST_CASE("LTTB Downsampling test: Forward direction", "[Downsampling]")
 {
-    auto source = LazyMatrix::Iota<double>(10, 1.0); // 10-element vector
-    LazyMatrix::SimpleMatrix<double> destination(5, 1, 0.0); // 5-element vector for downsampled data
+    auto source = LazyMatrix::generate_iota_matrix<double>(10, 1.0); // 10-element vector
+    auto destination = LazyMatrix::MatrixFactory::create_simple_matrix<double>(5, 1, 0.0); // 5-element vector for downsampled data
 
     downsample_lttb(source, destination, 0, 9);
 
@@ -58,8 +58,8 @@ TEST_CASE("LTTB Downsampling test: Forward direction", "[Downsampling]")
 //-------------------------------------------------------------------
 TEST_CASE("LTTB Downsampling test: Reverse direction", "[Downsampling]")
 {
-    auto source = LazyMatrix::Iota<double>(10, 1.0); // 10-element vector
-    LazyMatrix::SimpleMatrix<double> destination(5, 1, 0.0); // 5-element vector for downsampled data
+    auto source = LazyMatrix::generate_iota_matrix<double>(10, 1.0); // 10-element vector
+    auto destination = LazyMatrix::MatrixFactory::create_simple_matrix<double>(5, 1, 0.0); // 5-element vector for downsampled data
 
     downsample_lttb(source, destination, 9, 0);
 
@@ -85,8 +85,8 @@ TEST_CASE("LTTB Downsampling test: Reverse direction", "[Downsampling]")
 //-------------------------------------------------------------------
 TEST_CASE("LTTB Downsampling test: Circular sampling", "[Downsampling]")
 {
-    auto source = LazyMatrix::Iota<double>(10, 1.0); // 10-element vector
-    LazyMatrix::SimpleMatrix<double> destination(5, 1, 0.0); // 5-element vector for downsampled data
+    auto source = LazyMatrix::generate_iota_matrix<double>(10, 1.0); // 10-element vector
+    auto destination = LazyMatrix::MatrixFactory::create_simple_matrix<double>(5, 1, 0.0); // 5-element vector for downsampled data
 
     downsample_lttb(source, destination, 8, -2);
 

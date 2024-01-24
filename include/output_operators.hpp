@@ -31,6 +31,7 @@
 #include "base_matrix3d.hpp"
 #include "image_matrix.hpp"
 #include "polymorphic_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -316,6 +317,48 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixType& expression)
         }
     }
 
+    return os;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Prints a 2d matrix expression reference to an output stream.
+ * 
+ * @param os The output stream we're printing to.
+ * @param expression The 2d matrix reference we're printing.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<LazyMatrix::is_matrix_reference<ReferenceType>{}>* = nullptr>
+
+inline std::ostream& operator<<(std::ostream& os, ReferenceType expression)
+{
+    os << *expression;
+    return os;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Prints a 3d matrix expression reference to an output stream.
+ * 
+ * @param os The output stream we're printing to.
+ * @param expression The 3d matrix reference we're printing.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<LazyMatrix::is_matrix3d_reference<ReferenceType>{}>* = nullptr>
+
+inline std::ostream& operator<<(std::ostream& os, ReferenceType expression)
+{
+    os << *expression;
     return os;
 }
 //-------------------------------------------------------------------

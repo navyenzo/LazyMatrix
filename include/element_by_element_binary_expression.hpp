@@ -28,6 +28,7 @@
 #include <cmath>
 #include <complex>
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -49,63 +50,93 @@ namespace LazyMatrix
  * to be applied element-wise between two matrices. It uses a functional approach to define 
  * the operation that should be applied to corresponding elements of the matrices.
  *
- * @tparam MatrixType1 Type of the first matrix (left operand).
- * @tparam MatrixType2 Type of the second matrix (right operand).
+ * @tparam ReferenceType1 Type of the first matrix (left operand).
+ * @tparam ReferenceType2 Type of the second matrix (right operand).
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2>
+template<typename ReferenceType1,
+         typename ReferenceType2>
 
-struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBinaryExpression<MatrixType1, MatrixType2> >
+struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBinaryExpression<ReferenceType1, ReferenceType2> >
 {
-    // Type of value that is stored in left side expression
-    // - We use that type to return the same type for the
-    //   resulting binary operation (i.e. m1 + m2 returns type of m1(0,0))
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
+    // Type of value that is stored in the matrix
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
     // The operation function type
     using operation_type = std::function<value_type(value_type, value_type)>;
 
-
-
-    ElementByElementBinaryExpression<MatrixType1, MatrixType2>(const MatrixType1& left_side_expression,
-                                                               const MatrixType2& right_side_expression,
-                                                               const operation_type& operation_function)
-    : left_side_expression_(left_side_expression),
-      right_side_expression_(right_side_expression),
-      operation_function_(operation_function)
+    /**
+     * @brief Construct a new Element By Element Binary Expression<Reference Type 1,Reference Type 2> object
+     * 
+     * @param left_side_expression The input left side matrix expression.
+     * @param right_side_expression The input right side matrix expression.
+     * @param operation_function The function that is used to combine
+     *                           values from both input matrices.
+     */
+    ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>(ReferenceType1 left_side_expression,
+                                                                     ReferenceType2 right_side_expression,
+                                                                     const operation_type& operation_function)
     {
+        set_left_side_expression(left_side_expression);
+        set_right_side_expression(right_side_expression);
+        set_operation_function(operation_function);
     }
 
+    /**
+     * @brief Sets the reference to the left side matrix expression
+     * @param left_side_expression Reference to the left side matrix.
+     */
+    void set_left_side_expression(ReferenceType1 left_side_expression)
+    {
+        left_side_expression_ = left_side_expression;
+    }
 
+    /**
+     * @brief Sets the reference to the right side matrix expression
+     * @param right_side_expression Reference to the right side matrix.
+     */
+    void set_right_side_expression(ReferenceType2 right_side_expression)
+    {
+        right_side_expression_ = right_side_expression;
+    }
 
-    // This operation assumes both expressions are the
-    // same size
+    /**
+     * @brief Set the operation function object
+     * 
+     * @param operation_function The function used to calculate the output
+     */
+    void set_operation_function(const operation_type& operation_function)
+    {
+        operation_function_ = operation_function;
+    }
+
+    /**
+     * @brief Returns the number of rows in the resulting matrix.
+     *        - This function assumes both expressions are the same size.
+     * @return The number of rows of the resulting matrix.
+     */
     uintptr_t rows()const
     {
         return this->left_side_expression_.rows();
     }
 
+    /**
+     * @brief Returns the number of columns in the resulting matrix.
+     *        - This function assumes both expressions are the same size.
+     * @return The number of columns of the resulting matrix.
+     */
     uintptr_t columns()const
     {
         return this->left_side_expression_.columns();
     }
 
-
-
-    const MatrixType1& get_left_side_expression()
-    {
-        return left_side_expression_;
-    }
-
-    const MatrixType2& get_right_side_expression()
-    {
-        return right_side_expression_;
-    }
-    
-    
-
-    decltype(auto) at_(int row, int column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int row, int column)const
     {
         return static_cast<value_type>(operation_function_(this->left_side_expression_.at(row,column),
                                                            this->right_side_expression_.at(row,column)));
@@ -115,8 +146,8 @@ struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBin
 
 private:
 
-    const MatrixType1& left_side_expression_;
-    const MatrixType2& right_side_expression_;
+    ReferenceType1 left_side_expression_;
+    ReferenceType2 right_side_expression_;
     operation_type operation_function_;
 };
 //-------------------------------------------------------------------
@@ -126,10 +157,10 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2>
+template<typename ReferenceType1,
+         typename ReferenceType2>
 
-struct is_type_a_matrix< ElementByElementBinaryExpression<MatrixType1, MatrixType2> > : std::true_type
+struct is_type_a_matrix< ElementByElementBinaryExpression<ReferenceType1, ReferenceType2> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -137,168 +168,248 @@ struct is_type_a_matrix< ElementByElementBinaryExpression<MatrixType1, MatrixTyp
 
 
 //-------------------------------------------------------------------
-// Addition -- operator+
+/**
+ * @brief Addition.
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the addition of both
+ *         input matrix expressions.
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-operator+(const MatrixType1& m1,
-          const MatrixType2& m2)
+operator+(ReferenceType1 m1,
+          ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(m1(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(m1,m2,std::plus<value_type>());
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::plus<value_type>());
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Subtraction -- operator-
+/**
+ * @brief Subtraction.
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the subtraction of both
+ *         input matrix expressions.
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-operator-(const MatrixType1& m1,
-          const MatrixType2& m2)
+operator-(ReferenceType1 m1,
+          ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(m1(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(m1,m2,std::minus<value_type>());
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::minus<value_type>());
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// element by element m1 modulus m2 -- operator%
+/**
+ * @brief Modulus (Element by element operator%.
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the modulus of both
+ *         input matrix expressions (m1 % m2).
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-operator%(const MatrixType1& m1,
-          const MatrixType2& m2)
+operator%(ReferenceType1 m1,
+          ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(m1(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(m1,m2,  [](value_type a, value_type b) { return std::fmod(a,b); });
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::fmod<value_type>());
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Element by element multiplication
+/**
+ * @brief Element by element multiplication (m1 .* m2)
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the element by element
+ *         multiplication of both matrix expressions (m1 .* m2).
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-elem_by_elem_multiply(const MatrixType1& m1,
-                      const MatrixType2& m2)
+elem_by_elem_multiply(ReferenceType1 m1,
+                      ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(m1(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(m1,m2,std::multiplies<value_type>());
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::multiplies<value_type>());
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Element by element division
+/**
+ * @brief Element by element division (m1 ./ m2)
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the element by element
+ *         division of both matrix expressions (m1 ./ m2).
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-elem_by_elem_divide(const MatrixType1& m1,
-                    const MatrixType2& m2)
+elem_by_elem_divide(ReferenceType1 m1,
+                    ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(m1(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(m1,m2,std::divides<value_type>());
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::divides<value_type>());
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// element by element pow (m1 is the base, m2 is the exponent)
+/**
+ * @brief Element by element power (m1 .^ m2)
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the element by element
+ *         power of both matrix expressions (m1 .^ m2).
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-elem_by_elem_pow(const MatrixType1& base,
-                 const MatrixType2& exponent)
+elem_by_elem_pow(ReferenceType1 m1,
+                 ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(base(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(base, exponent,  [](value_type a, value_type b) { return std::pow(a,b); });
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::pow(a,b); });
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Carries out an element by element min (i.e. min(m1,m2))
+/**
+ * @brief Element by element minimums
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the element by element
+ *         minimums
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-min(const MatrixType1& m1,
-    const MatrixType2& m2)
+min(ReferenceType1 m1,
+    ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(m1(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(m1, m2,  [](value_type a, value_type b) { return std::min(a,b); });
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::min(a,b); });
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Carries out an element by element max (i.e. max(m1,m2))
+/**
+ * @brief Element by element maximumns
+ * @tparam ReferenceType1 Type of the left side matrix.
+ * @tparam ReferenceType2 Type of the right side matrix.
+ * @param m1 Shared reference to the left side matrix.
+ * @param m2 Shared reference to the right side matrix.
+ * @return Returns a ConstSharedMatrixRef to the element by element
+ *         maximumns
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline auto
 
-max(const MatrixType1& m1,
-    const MatrixType2& m2)
+max(ReferenceType1 m1,
+    ReferenceType2 m2)
 {
-    using value_type = typename std::remove_reference<decltype(m1(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
 
-    return ElementByElementBinaryExpression<MatrixType1,MatrixType2>(m1, m2, [](value_type a, value_type b) { return std::max(a,b); });
+    auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::max(a,b); });
+
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 

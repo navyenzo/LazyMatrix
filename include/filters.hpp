@@ -28,8 +28,9 @@
 #include <cstdint>
 
 #include "numerical_constants.hpp"
-#include "border_functor.hpp"
-#include "matrix.hpp"
+#include "border_functor_view.hpp"
+#include "matrix_factory.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -60,7 +61,7 @@ inline auto create_gaussian_kernel(uintptr_t kernel_size, double sigma)
     uintptr_t actual_kernel_size = (kernel_size / 2) * 2 + 1;
     uintptr_t half_kernel_size = (kernel_size / 2);
 
-    auto kernel = SimpleMatrix<double>(actual_kernel_size, actual_kernel_size, 0);
+    auto kernel = MatrixFactory::create_simple_matrix<double>(actual_kernel_size, actual_kernel_size, 0);
 
     if(sigma <= 0)
         sigma = 0.3*((actual_kernel_size - 1)*0.5 - 1) + 0.8;
@@ -108,7 +109,7 @@ template<typename DataType>
 
 inline auto create_laplacian_kernel()
 {
-    auto laplacian_kernel = SimpleMatrix<DataType>(3,3);
+    auto laplacian_kernel = MatrixFactory::create_simple_matrix<DataType>(3,3,0);
 
     laplacian_kernel(0,1) = DataType(1);
     laplacian_kernel(1,0) = DataType(1);
@@ -125,25 +126,21 @@ inline auto create_laplacian_kernel()
 //-------------------------------------------------------------------
 /**
  * @brief Applies a filter kernel to a source matrix.
- * 
- * This function convolves the source matrix with a filter kernel. 
- * It is commonly used for image filtering operations such as blurring, sharpening, and edge detection.
- * 
  * @tparam MatrixType1 The type of the source matrix.
  * @tparam MatrixType2 The type of the filter kernel.
- * @param source_matrix The matrix to be filtered.
- * @param filter_kernel The filter kernel to be applied.
- * @return Matrix<value_type> The filtered matrix.
+ * @param source_matrix Shared reference to the source matrix.
+ * @param filter_kernel Shared reference to the filter kernel.
+ * @return A SharedMatrixRef to the SimpleMatrix (the filtered matrix).
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1,
-         typename MatrixType2,
-         std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-         std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename MatrixType1, typename MatrixType2,
+            std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
+            std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
 
-inline auto filter(const MatrixType1& source_matrix, const MatrixType2& filter_kernel)
+inline auto filter(const SharedMatrixRef<MatrixType1>& source_matrix,
+                   const SharedMatrixRef<MatrixType2>& filter_kernel)
 {
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
 
     auto source_matrix_with_border = repeated_border(source_matrix);
 
@@ -152,7 +149,7 @@ inline auto filter(const MatrixType1& source_matrix, const MatrixType2& filter_k
     int64_t rows = source_matrix.rows();
     int64_t columns = source_matrix.columns();
 
-    SimpleMatrix<value_type> filtered_output(rows, columns, 0);
+    auto filtered_output = MatrixFactory::create_simple_matrix<value_type>(rows, columns, 0);
 
     for(int i = 0; i < rows; ++i)
     {

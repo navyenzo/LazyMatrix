@@ -38,10 +38,10 @@
 TEST_CASE("Downsampling test: Downsampling a source matrix in forward direction", "[MatrixDownsampling]")
 {
     // Create a source matrix with sequential values using Iota
-    auto source = LazyMatrix::Iota<int>(10, 1, 0, 1); // 10x1 matrix
+    auto source = LazyMatrix::generate_iota_matrix<int>(10, 1, 0, 1); // 10x1 matrix
 
     // Destination matrix for forward sampling
-    LazyMatrix::Matrix<int> destination(5, 1, 0); // 5x1 matrix
+    auto destination = LazyMatrix::MatrixFactory::create_simple_matrix<int>(5, 1, 0); // 5x1 matrix
 
     // Perform forward sampling
     LazyMatrix::simple_downsampling(source, destination, 0, 10, false);
@@ -69,10 +69,10 @@ TEST_CASE("Downsampling test: Downsampling a source matrix in forward direction"
 TEST_CASE("Downsampling test: Downsampling a source matrix in reverse direction", "[MatrixDownsampling]")
 {
     // Create a source matrix with sequential values using Iota
-    auto source = LazyMatrix::Iota<int>(10, 1, 0, 1); // 10x1 matrix
+    auto source = LazyMatrix::generate_iota_matrix<int>(10, 1, 0, 1); // 10x1 matrix
 
     // Destination matrix for reverse sampling
-    LazyMatrix::Matrix<int> destination(5, 1, 0); // 5x1 matrix
+    auto destination = LazyMatrix::MatrixFactory::create_simple_matrix<int>(5, 1, 0); // 5x1 matrix
 
     // Perform reverse sampling
     LazyMatrix::simple_downsampling(source, destination, 9, 0, false);
@@ -100,10 +100,10 @@ TEST_CASE("Downsampling test: Downsampling a source matrix in reverse direction"
 TEST_CASE("Downsampling test: Circular downsampling of a source matrix", "[MatrixDownsampling]")
 {
     // Create a source matrix with sequential values using Iota
-    auto source = LazyMatrix::Iota<int>(10, 1, 0, 1); // 10x1 matrix
+    auto source = LazyMatrix::generate_iota_matrix<int>(10, 1, 0, 1); // 10x1 matrix
 
     // Destination matrix for circular sampling
-    LazyMatrix::Matrix<int> destination(5, 1, 0); // 5x1 matrix
+    auto destination = LazyMatrix::MatrixFactory::create_simple_matrix<int>(5, 1, 0); // 5x1 matrix
 
     // Perform circular forward sampling
     LazyMatrix::simple_downsampling(source, destination, 8, 13, false);

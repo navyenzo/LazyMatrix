@@ -42,6 +42,17 @@ namespace LazyMatrix
 
 //-------------------------------------------------------------------
 /**
+ * @brief Forward declation of the MatrixFactory class which is used
+ *        to create SharedMatrixRef references of matrices.
+ */
+//-------------------------------------------------------------------
+class MatrixFactory;
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
  * @class SimpleMatrix
  * @brief A simple 2D matrix class using std::vector for storage.
  *
@@ -58,6 +69,8 @@ template<typename DataType>
 class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType> >
 {
 public:
+
+    friend class MatrixFactory;
 
     /**
      * Default constructor. Creates a matrix of specified dimensions with all elements initialized to a default value.

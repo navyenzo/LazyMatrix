@@ -48,6 +48,9 @@
 // Base matrix class for 3D matrices
 #include "base_matrix3d.hpp"
 
+// Shared Reference to 2d and 3d Matrix expressions
+#include "shared_references.hpp"
+
 // Wrapper for 2D matrices with simple data storage allowing modification
 #include "simple_data_2d_matrix_wrapper.hpp"
 
@@ -84,58 +87,30 @@
 // Transpose operation view without modifying original data
 #include "transpose_view.hpp"
 
-// Transpose operation for matrices
-#include "transpose.hpp"
-
 // Reverse operation view without modifying original data
 #include "reverse_view.hpp"
-
-// Reverse operation for matrices
-#include "reverse.hpp"
-
-// Operation to augment rows in matrices
-#include "augment_rows.hpp"
 
 // View for row augmentation allowing modification
 #include "augment_rows_view.hpp"
 
-// Operation to augment columns in matrices
-#include "augment_columns.hpp"
-
 // View for column augmentation allowing modification
 #include "augment_columns_view.hpp"
-
-// Functor for applying border conditions
-#include "border_functor.hpp"
 
 // View applying border conditions allowing modification
 #include "border_functor_view.hpp"
 
-// Functor for padding a matrix expression
-#include "padding.hpp"
-
 // View for padding a matrix expression
 #include "padding_view.hpp"
-
-// Region of Interest (ROI) in matrices
-#include "roi.hpp"
 
 // View for ROI allowing modification
 #include "roi_view.hpp"
 
-// Selector operation for matrices
-#include "selector.hpp"
-
 // View for selector operation allowing modification
 #include "selector_view.hpp"
 
-// Sorting operations for matrix elements with some of
-// them allowing modification of the original matrix
-// expression
-#include "sorting.hpp"
-
-// Shuffle operation for matrix elements
-#include "shuffle.hpp"
+// Sorted view of matrix expressions
+// - Sort rows or columns using a user specified row or column
+#include "sorting_view.hpp"
 
 // View for shuffle operation allowing modification
 #include "shuffle_view.hpp"
@@ -169,6 +144,9 @@
 
 // Downsampling algorithms
 #include "downsampling.hpp"
+
+// Factory functions to create 2d and 3d Matrix storage
+#include "matrix_factory.hpp"
 
 // Output operators for matrix serialization
 #include "output_operators.hpp"

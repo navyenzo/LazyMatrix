@@ -35,7 +35,7 @@
 TEST_CASE("Matrix Padding Test", "[MatrixPadding]")
 {
     // Create a small matrix for testing
-    LazyMatrix::Matrix<int> small_matrix(2, 2);
+    auto small_matrix = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
     small_matrix(0, 0) = 1;
     small_matrix(0, 1) = 2;
     small_matrix(1, 0) = 3;
@@ -48,7 +48,7 @@ TEST_CASE("Matrix Padding Test", "[MatrixPadding]")
     SECTION("padded_matrix Test")
     {
         // Apply padding
-        auto padded_matrix = pad_matrix(small_matrix, padded_rows, padded_columns, 0);
+        auto padded_matrix = LazyMatrix::create_padded_matrix_view(small_matrix, padded_rows, padded_columns);
 
         // Check dimensions
         REQUIRE(padded_matrix.rows() == padded_rows);
@@ -66,7 +66,7 @@ TEST_CASE("Matrix Padding Test", "[MatrixPadding]")
     SECTION("padded_matrix_view Test")
     {
         // Apply padding view
-        auto padded_matrix_view = pad_matrix(small_matrix, padded_rows, padded_columns, 0);
+        auto padded_matrix_view = LazyMatrix::create_padded_matrix_view(small_matrix, padded_rows, padded_columns);
 
         // Check dimensions
         REQUIRE(padded_matrix_view.rows() == padded_rows);

@@ -28,6 +28,7 @@
 #include <cmath>
 #include <complex>
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -49,54 +50,74 @@ namespace LazyMatrix
  * to be applied element-wise on a matrix. It uses a functional approach to define 
  * the operation that should be applied to each element of the matrix.
  *
- * @tparam MatrixType Type of the matrix.
+ * @tparam ReferenceType Type of the matrix.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnaryExpression<MatrixType> >
+struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnaryExpression<ReferenceType> >
 {
-    // Type of value that is stored in expression
-    // - We use that type to return the same type for the
-    //   resulting unary operation (i.e. abs(m1(0,0)) returns type of m1(0,0))
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
+    // Type of value that is stored in the matrix
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
     // The operation function type
     using operation_type = std::function<value_type(value_type)>;
 
-
-
-    ElementByElementUnaryExpression<MatrixType>(const MatrixType& expression,
-                                                const operation_type& operation_function)
-    : expression_(expression),
-      operation_function_(operation_function)
+    /**
+     * @brief Construct a new Element By Element Unary Expression< Reference Type> object
+     * 
+     * @param expression The input matrix expression
+     * @param operation_function The function used to calculate the output
+     */
+    ElementByElementUnaryExpression<ReferenceType>(ReferenceType expression,
+                                                   const operation_type& operation_function)
     {
+        set_expression(expression);
+        set_operation_function(operation_function);
     }
 
+    /**
+     * @brief Sets the reference to the input matrix expression
+     * @param left_side_expression Reference to the input matrix.
+     */
+    void set_expression(ReferenceType expression)
+    {
+        expression_ = expression;
+    }
 
+    /**
+     * @brief Set the operation function object
+     * 
+     * @param operation_function The function used to calculate the output
+     */
+    void set_operation_function(const operation_type& operation_function)
+    {
+        operation_function_ = operation_function;
+    }
 
-    // This operation assumes both expressions are the
-    // same size
+    /**
+     * @brief Returns the number of rows in the resulting matrix.
+     */
     uintptr_t rows()const
     {
-        return this->expression_.rows();
+        return expression_.rows();
     }
 
+    /**
+     * @brief Returns the number of columns in the resulting matrix.
+     */
     uintptr_t columns()const
     {
-        return this->expression_.columns();
+        return expression_.columns();
     }
 
-
-
-    const MatrixType& get_expression()
-    {
-        return expression_;
-    }
-    
-    
-
-    decltype(auto) at_(int row, int column)const
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
+     */
+    value_type at_(int row, int column)const
     {
         return static_cast<value_type>(operation_function_(this->expression_.at(row,column)));
     }
@@ -105,7 +126,7 @@ struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnar
 
 private:
 
-    const MatrixType& expression_;
+    ReferenceType expression_;
     operation_type operation_function_;
 };
 //-------------------------------------------------------------------
@@ -115,9 +136,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix< ElementByElementUnaryExpression<MatrixType> > : std::true_type
+struct is_type_a_matrix< ElementByElementUnaryExpression<ReferenceType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -125,114 +146,164 @@ struct is_type_a_matrix< ElementByElementUnaryExpression<MatrixType> > : std::tr
 
 
 //-------------------------------------------------------------------
-// Subtraction -- operator-
+/**
+ * @brief Negation (-m).
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix.
+ * @return Returns a ConstSharedMatrixRef to the negation of the
+ *         input matrix expression (-m)
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-operator-(const MatrixType& m)
+operator-(ReferenceType m)
 {
-    using value_type = typename std::remove_reference<decltype(m(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-    return ElementByElementUnaryExpression<MatrixType>(m,std::negate<value_type>());
+    auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, std::negate<value_type>());
+
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Sign -- return the sign of every element (1 or -1)
+/**
+ * @brief Sign(m).
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix.
+ * @return Returns a ConstSharedMatrixRef to the sign of each element
+ *         from the input expression sign(m).
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-sign(const MatrixType& m)
+sign(ReferenceType m)
 {
-    using value_type = typename std::remove_reference<decltype(m(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-    return ElementByElementUnaryExpression<MatrixType>(m,
+    auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>
+                                                      (
+                                                       m,
                                                        [](value_type number)
                                                        {
                                                             value_type zero = static_cast<value_type>(0);
                                                             return static_cast<decltype(number)>( (zero < number) - (number < zero) );
                                                        }
                                                       );
+
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Absolute value -- return the absolute value of every element
+/**
+ * @brief Absolute value abs(m).
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix.
+ * @return Returns a ConstSharedMatrixRef to the absolute value of
+ *         each element of the input matrix expression
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-abs(const MatrixType& m)
+abs(ReferenceType m)
 {
-    using value_type = typename std::remove_reference<decltype(m(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-    return ElementByElementUnaryExpression<MatrixType>(m, [](const value_type& number){ return std::abs(number); });
+    auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::abs(number); });
+
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// Square root -- return the positive square root value of every element
+/**
+ * @brief Square Root of each element of input matrix sqrt(m)
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix.
+ * @return Returns a ConstSharedMatrixRef to the square root of each
+ *         element of the input matrix expression sqrt(m).
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-sqrt(const MatrixType& m)
+sqrt(ReferenceType m)
 {
-    using value_type = typename std::remove_reference<decltype(m(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-    return ElementByElementUnaryExpression<MatrixType>(m, [](const value_type& number){ return std::sqrt(number); });
+    auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::sqrt(number); });
+
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// e^x -- For every element x, we make the new element e^x
+/**
+ * @brief Exponential of each element of input matrix exp(m).
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix.
+ * @return Returns a ConstSharedMatrixRef to the exponential of each
+ *         element of the input matrix expression exp(m).
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-exp(const MatrixType& m)
+exp(ReferenceType m)
 {
-    using value_type = typename std::remove_reference<decltype(m(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-    return ElementByElementUnaryExpression<MatrixType>(m, [](const value_type& number){ return std::exp(number); });
+    auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::exp(number); });
+
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
 
 
 //-------------------------------------------------------------------
-// 2^x -- For every element x, we make the new element 2^x
+/**
+ * @brief 2^x of each element of input matrix.
+ * @tparam ReferenceType Type of the input matrix expression.
+ * @param m Shared reference to the input matrix.
+ * @return Returns a ConstSharedMatrixRef to the value of 2^x of
+ *         each element of the input matrix expression.
+ */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 inline auto
 
-exp2(const MatrixType& m)
+exp2(ReferenceType m)
 {
-    using value_type = typename std::remove_reference<decltype(m(0,0))>::type;
+    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
 
-    return ElementByElementUnaryExpression<MatrixType>(m, [](const value_type& number){ return std::exp2(number); });
+    auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::exp2(number); });
+
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

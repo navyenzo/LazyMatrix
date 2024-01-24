@@ -38,7 +38,15 @@ namespace LazyMatrix
 
 
 //-------------------------------------------------------------------
-// Trait to determine if a type is a matrix expression.
+/**
+ * @brief Trait to check if a type is a matrix type
+ *
+ * This trait is used to determine if a given type is a matrix type
+ * which is used to define functions that require arguments to be
+ * matrices
+ * 
+ * @tparam T The reference type (templated with MatrixType) to check.
+ */
 //-------------------------------------------------------------------
 template<typename MatrixType>
 struct is_type_a_matrix : std::false_type
