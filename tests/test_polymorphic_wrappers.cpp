@@ -29,7 +29,7 @@
 TEST_CASE("Wrapping a matrix with polymorphic wrapper with non-const access", "[PolymorphicWrapper]")
 {
     // Create a matrix
-    LazyMatrix::Matrix<int> mat(2, 2);
+    auto mat = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
 
     // Populate the matrix
     mat(0,0) = 1; mat(0,1) = 2;

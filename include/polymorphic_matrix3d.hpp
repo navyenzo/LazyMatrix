@@ -29,6 +29,7 @@
 #include <memory>
 #include <type_traits>
 #include "base_matrix3d.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -66,7 +67,7 @@ public:
     
 
 
-    virtual const DataType& at_(int64_t page, int64_t row, int64_t column) const = 0;
+    virtual DataType at_(int64_t page, int64_t row, int64_t column) const = 0;
     virtual DataType& at_(int64_t page, int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
@@ -117,7 +118,7 @@ public:
     
 
 
-    const value_type& at_(int64_t page, int64_t row, int64_t column) const override
+    value_type at_(int64_t page, int64_t row, int64_t column) const override
     {
         return matrix_(page, row, column);
     }

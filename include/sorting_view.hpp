@@ -101,14 +101,15 @@ inline void get_sorted_indices(const ReferenceType& matrix,
  * @tparam Reference The type of the shared matrix reference.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class SortedView : public BaseMatrix< SortedView<ReferenceType> >
 {
 public:
 
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType::value_type;
 
     /**
      * @brief Construct a new Sorted View object

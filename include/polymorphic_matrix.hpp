@@ -28,7 +28,9 @@
 //-------------------------------------------------------------------
 #include <memory>
 #include <type_traits>
+#include "numerical_constants.hpp"
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -63,9 +65,7 @@ public:
     virtual uintptr_t columns() const = 0;
     virtual uintptr_t size() const = 0;
     
-
-
-    virtual const DataType& at_(int64_t row, int64_t column) const = 0;
+    virtual DataType at_(int64_t row, int64_t column) const = 0;
     virtual DataType& at_(int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
@@ -94,41 +94,37 @@ struct is_type_a_matrix< PolymorphicMatrix<DataType> > : std::true_type {};
  * matrix types, allowing for uniform treatment in a polymorphic context.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class PolymorphicMatrixWrapper : public PolymorphicMatrix<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>
+class PolymorphicMatrixWrapper : public PolymorphicMatrix<typename ReferenceType::value_type>
 {
 public:
 
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
-    
+    using value_type = typename ReferenceType::value_type;
 
+    explicit PolymorphicMatrixWrapper(ReferenceType matrix) : matrix_(matrix) {}
 
-    explicit PolymorphicMatrixWrapper(MatrixType& matrix) : matrix_(matrix) {}
-
-    
-    
     uintptr_t rows() const override { return matrix_.rows(); }
     uintptr_t columns() const override { return matrix_.columns(); }
     uintptr_t size() const override { return matrix_.size(); }
     
-
-
-    const value_type& at_(int64_t row, int64_t column) const override
+    value_type at_(int64_t row, int64_t column) const override
     {
         return matrix_(row, column);
     }
     
-    value_type& at_(int64_t row, int64_t column) override 
+    value_type& at_(int64_t row, int64_t column) override
     {
-        if constexpr (std::is_const_v<MatrixType>)
+        if constexpr (has_non_const_access<ReferenceType>{})
         {
-            return zero; // Return default value for const matrix types
+            return matrix_(row, column);
         }
         else
         {
-            return matrix_(row, column); // Non-const matrices allow modification
+            // Return dummy value if non-const access is not allowed
+            return DummyValueHolder<value_type, LazyMatrix::has_non_const_access<ReferenceType>::value>::zero;
         }
     }
 
@@ -136,11 +132,7 @@ public:
 
 private:
 
-    MatrixType& matrix_;
-
-    // Inline static member for zero value for wrapping
-    // matrix objects that don't allow changing entries
-    inline static value_type zero{};
+    ReferenceType matrix_;
 };
 //-------------------------------------------------------------------
 
@@ -174,19 +166,19 @@ using SpecializedData = PolymorphicMatrixWrapper<MatrixType>;
 /**
  * @brief Wraps a matrix in a PolymorphicMatrixWrapper and returns a shared pointer to PolymorphicMatrix.
  * 
- * @tparam MatrixType Type of the matrix to wrap.
+ * @tparam ReferenceType Type of the matrix to wrap.
  * @param matrix The matrix to be wrapped.
  * @return std::shared_ptr<PolymorphicMatrix<value_type>> Shared pointer to the base polymorphic type of the wrapped matrix.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
          
-inline auto wrap_matrix(MatrixType& matrix)
+inline auto wrap_matrix(ReferenceType matrix)
 {
-    using value_type = typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type;
-
-    std::shared_ptr<PolymorphicMatrix<value_type>> wrapped_matrix = std::make_shared<PolymorphicMatrixWrapper<MatrixType>>(matrix);
+    using value_type = typename ReferenceType::value_type;
+    
+    std::shared_ptr<PolymorphicMatrix<value_type>> wrapped_matrix = std::make_shared<PolymorphicMatrixWrapper<ReferenceType>>(matrix);
 
     return wrapped_matrix;
 }
