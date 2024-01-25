@@ -53,12 +53,13 @@ namespace LazyMatrix
  * @tparam ReferenceType Type of the matrix.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnaryExpression<ReferenceType> >
 {
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType::value_type;
 
     // The operation function type
     using operation_type = std::function<value_type(value_type)>;

@@ -75,7 +75,7 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
          
 inline void simple_downsampling(const ReferenceType1& source,
-                                ReferenceType2& destination,
+                                ReferenceType2 destination,
                                 int64_t start_index,
                                 int64_t end_index,
                                 bool sample_rows)
@@ -139,7 +139,7 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline void downsample_lttb(const ReferenceType1& source,
-                            ReferenceType2& destination, 
+                            ReferenceType2 destination, 
                             int64_t source_start_index,
                             int64_t source_end_index)
 {
@@ -249,8 +249,8 @@ template<typename ReferenceType1,
 
 inline void downsample_lttb_xy(const ReferenceType1& x_source,
                                const ReferenceType2& y_source,
-                               ReferenceType3& x_destination,
-                               ReferenceType4& y_destination,
+                               ReferenceType3 x_destination,
+                               ReferenceType4 y_destination,
                                int64_t source_start_index,
                                int64_t source_end_index)
 {
@@ -353,7 +353,7 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 inline void downsample_lttb_matrix(const ReferenceType1& source_matrix,
-                                   ReferenceType2& destination_matrix,
+                                   ReferenceType2 destination_matrix,
                                    int64_t start_index,
                                    int64_t end_index,
                                    bool sample_rows)
@@ -404,7 +404,7 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType1>{} && is_matrix_reference<ReferenceType2>{}>* = nullptr>
          
 inline void downsample_lttb_matrix_xy(const ReferenceType1& source_matrix,
-                                      ReferenceType2& destination_matrix,
+                                      ReferenceType2 destination_matrix,
                                       int64_t x_index,
                                       int64_t start_index,
                                       int64_t end_index,

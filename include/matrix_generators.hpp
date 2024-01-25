@@ -62,6 +62,8 @@ class IotaMatrix : public BaseMatrix< IotaMatrix<DataType> >
 {
 public:
 
+    using value_type = DataType;
+
     IotaMatrix(int rows, int columns, DataType starting_value = static_cast<DataType>(0), DataType step = static_cast<DataType>(1))
     : BaseMatrix< IotaMatrix<DataType> >(),
       rows_(rows),
@@ -127,6 +129,8 @@ template<typename DataType>
 class RandomMatrix : public BaseMatrix< RandomMatrix<DataType> >
 {
 public:
+
+    using value_type = DataType;
 
     RandomMatrix(int rows, int columns, DataType min_value, DataType max_value, int64_t steps = 4294967296)
     : BaseMatrix< RandomMatrix<DataType> >(),
@@ -197,6 +201,8 @@ template<typename DataType>
 class SineWaveMatrix : public BaseMatrix< SineWaveMatrix<DataType> >
 {
 public:
+
+    using value_type = DataType;
 
     SineWaveMatrix(int number_of_data_points,
                    DataType amplitude = 1,

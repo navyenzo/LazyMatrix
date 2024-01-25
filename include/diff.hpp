@@ -69,12 +69,13 @@ enum class DiffDirection : int
  * @tparam ReferenceType The type of the input matrix for which differences are to be calculated.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 struct Diff : public BaseMatrix< Diff<ReferenceType> >
 {
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType::value_type;
 
     /**
      * @brief Construct a new Difference<ReferenceType> object

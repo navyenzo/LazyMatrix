@@ -119,6 +119,9 @@ class ImageMatrix : public BaseMatrix< ImageMatrix<PixelType> >
 {
 public:
 
+    // Type of value that is stored in the matrix
+    using value_type = PixelType;
+
     friend class MatrixFactory;
 
     /**

@@ -25,6 +25,7 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -61,12 +62,13 @@ enum class MovingAverageDirection : int
  * @tparam ReferenceType The type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 struct SimpleMovingAverage : public BaseMatrix< SimpleMovingAverage<ReferenceType> >
 {
     // Type of value that is stored in left side expression
-    using value_type = typename std::remove_reference<decltype(std::declval< BaseMatrix<ReferenceType> >()(0,0))>::type;
+    using value_type = typename ReferenceType::value_type;
 
     /**
      * @brief Construct a new Simple Moving Average Of Rows< Reference Type> object

@@ -81,7 +81,7 @@ public:
 //-------------------------------------------------------------------
 template<typename DataType>
 
-struct is_type_a_matrix3d< PolymorphicMatrix3D<DataType> > : std::true_type {};
+struct is_matrix3d_reference< PolymorphicMatrix3D<DataType> > : std::true_type {};
 //-------------------------------------------------------------------
 
 
@@ -96,18 +96,19 @@ struct is_type_a_matrix3d< PolymorphicMatrix3D<DataType> > : std::true_type {};
  * 3d-matrix types, allowing for uniform treatment in a polymorphic context.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
 
-class PolymorphicMatrixWrapper3D : public PolymorphicMatrix3D<typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type>
+class PolymorphicMatrixWrapper3D : public PolymorphicMatrix3D<typename ReferenceType::value_type>
 {
 public:
 
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type;
+    using value_type = typename ReferenceType::value_type;
     
 
 
-    explicit PolymorphicMatrixWrapper3D(MatrixType& matrix) : matrix_(matrix) {}
+    explicit PolymorphicMatrixWrapper3D(ReferenceType& matrix) : matrix_(matrix) {}
 
     
     
@@ -122,28 +123,17 @@ public:
     {
         return matrix_(page, row, column);
     }
-    
-    value_type& at_(int64_t page, int64_t row, int64_t column) override 
+
+    value_type& at_(int64_t page, int64_t row, int64_t column) override
     {
-        if constexpr (std::is_const_v<MatrixType>)
-        {
-            return zero; // Return default value for const matrix types
-        }
-        else
-        {
-            return matrix_(page, row, column); // Non-const matrices allow modification
-        }
+        return matrix_(page, row, column);
     }
 
 
 
 private:
 
-    MatrixType& matrix_;
-
-    // Inline static member for zero value for wrapping
-    // matrix objects that don't allow changing entries
-    inline static value_type zero{};
+    ReferenceType matrix_;
 };
 //-------------------------------------------------------------------
 
@@ -154,9 +144,9 @@ private:
  * @brief Compile time function to check if the type is a matrix expression type.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-struct is_type_a_matrix3d< PolymorphicMatrixWrapper3D<MatrixType> > : std::true_type {};
+struct is_matrix3d_reference< PolymorphicMatrixWrapper3D<ReferenceType> > : std::true_type {};
 //-------------------------------------------------------------------
 
 
@@ -167,8 +157,8 @@ struct is_type_a_matrix3d< PolymorphicMatrixWrapper3D<MatrixType> > : std::true_
 template<typename DataType>
 using Data3D = PolymorphicMatrix3D<DataType>;
 
-template<typename MatrixType>
-using SpecializedData3D = PolymorphicMatrixWrapper3D<MatrixType>;
+template<typename ReferenceType>
+using SpecializedData3D = PolymorphicMatrixWrapper3D<ReferenceType>;
 //-------------------------------------------------------------------
 
 
@@ -177,19 +167,19 @@ using SpecializedData3D = PolymorphicMatrixWrapper3D<MatrixType>;
 /**
  * @brief Wraps a matrix in a PolymorphicMatrixWrapper3D and returns a shared pointer to PolymorphicMatrix3D.
  * 
- * @tparam MatrixType Type of the 3d-matrix to wrap.
+ * @tparam ReferenceType Type of the 3d-matrix to wrap.
  * @param matrix The matrix to be wrapped.
  * @return std::shared_ptr<PolymorphicMatrix<value_type>> Shared pointer to the base polymorphic type of the wrapped matrix.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix3d<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
          
-inline auto wrap_matrix3d(MatrixType& matrix)
+inline auto wrap_matrix3d(ReferenceType matrix)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type;
-
-    std::shared_ptr<PolymorphicMatrix3D<value_type>> wrapped_matrix3d = std::make_shared<PolymorphicMatrixWrapper3D<MatrixType>>(matrix);
+    using value_type = typename ReferenceType::value_type;
+    
+    std::shared_ptr<PolymorphicMatrix3D<value_type>> wrapped_matrix3d = std::make_shared<PolymorphicMatrixWrapper3D<ReferenceType>>(matrix);
 
     return wrapped_matrix3d;
 }

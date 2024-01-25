@@ -117,15 +117,7 @@ public:
     
     value_type& at_(int64_t row, int64_t column) override
     {
-        if constexpr (has_non_const_access<ReferenceType>{})
-        {
-            return matrix_(row, column);
-        }
-        else
-        {
-            // Return dummy value if non-const access is not allowed
-            return DummyValueHolder<value_type, LazyMatrix::has_non_const_access<ReferenceType>::value>::zero;
-        }
+        return matrix_(row, column);
     }
 
 

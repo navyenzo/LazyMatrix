@@ -70,6 +70,9 @@ class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType> >
 {
 public:
 
+    // Type of value that is stored in the matrix
+    using value_type = DataType;
+
     friend class MatrixFactory;
 
     /**

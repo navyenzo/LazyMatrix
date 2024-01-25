@@ -57,7 +57,7 @@ TEST_CASE("Wrapping a matrix with polymorphic wrapper with non-const access", "[
 TEST_CASE("Wrapping a 3d matrix with polymorphic wrapper with non-const access", "[PolymorphicWrapper3D]")
 {
     // Create a matrix
-    LazyMatrix::SimpleMatrix3D<int> mat(2, 2, 2);
+    auto mat = LazyMatrix::MatrixFactory::create_simple_matrix3d<int>(2,2,2,0);
 
     // Populate the matrix
     mat(0,0,0) = 1; mat(0,0,1) = 2;

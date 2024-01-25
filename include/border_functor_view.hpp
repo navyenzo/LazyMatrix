@@ -49,12 +49,13 @@ namespace LazyMatrix
  * @tparam ReferenceType Type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<ReferenceType> >
 {
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type;
+    using value_type = typename ReferenceType::value_type;
 
     /**
      * @brief Constructs a new matrix view by repeating border values.
@@ -158,12 +159,13 @@ struct is_type_a_matrix< RepeatedBorderView<ReferenceType> > : std::true_type
  * @tparam ReferenceType Type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 struct ConstantBorderView : public BaseMatrix< ConstantBorderView<ReferenceType> >
 {
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type;
+    using value_type = typename ReferenceType::value_type;
     
     /**
      * @brief Constructs a new matrix view that gives a constant border

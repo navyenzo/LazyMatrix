@@ -103,7 +103,7 @@ class SharedMatrixRef
 public:
 
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    using value_type = typename MatrixType::value_type;
 
     /**
      * @brief Constructs a SharedMatrixRef object.
@@ -351,7 +351,7 @@ class ConstSharedMatrixRef
 public:
 
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    using value_type = typename MatrixType::value_type;
 
     /**
      * @brief Constructs a SharedMatrixRef object.
@@ -531,7 +531,7 @@ class SharedMatrix3DRef
 public:
 
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type;
+    using value_type = typename MatrixType::value_type;
 
     /**
      * @brief Constructs a SharedMatrix3DRef object.
@@ -785,7 +785,7 @@ class ConstSharedMatrix3DRef
 public:
 
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0,0))>::type>::type;
+    using value_type = typename MatrixType::value_type;
 
     /**
      * @brief Constructs a SharedMatrix3DRef object.

@@ -128,6 +128,36 @@ public:
         auto matrix_ptr = std::make_shared<DatabaseMatrix>(std::forward<Args>(args)...);
         return ConstSharedMatrixRef<DatabaseMatrix>(matrix_ptr);
     }
+
+    /**
+     * @brief Create a Matrix3D object
+     * 
+     * @tparam DataType 
+     * @tparam Args 
+     * @param args 
+     * @return SharedMatrixRef<Matrix<DataType>> 
+     */
+    template<typename DataType, typename... Args>
+    static SharedMatrix3DRef<Matrix3D<DataType>> create_matrix3d(Args&&... args)
+    {
+        auto matrix3d_ptr = std::make_shared<Matrix3D<DataType>>(std::forward<Args>(args)...);
+        return SharedMatrix3DRef<Matrix3D<DataType>>(matrix3d_ptr);
+    }
+
+    /**
+     * @brief Create a SimpleMatrix3D object
+     * 
+     * @tparam DataType 
+     * @tparam Args 
+     * @param args 
+     * @return SharedMatrixRef<Matrix<DataType>> 
+     */
+    template<typename DataType, typename... Args>
+    static SharedMatrix3DRef<SimpleMatrix3D<DataType>> create_simple_matrix3d(Args&&... args)
+    {
+        auto matrix3d_ptr = std::make_shared<SimpleMatrix3D<DataType>>(std::forward<Args>(args)...);
+        return SharedMatrix3DRef<SimpleMatrix3D<DataType>>(matrix3d_ptr);
+    }
 };
 //-------------------------------------------------------------------
 

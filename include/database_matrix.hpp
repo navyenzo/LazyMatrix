@@ -74,8 +74,6 @@ class MatrixFactory;
 class SafeName
 {
 public:
-
-    friend class MatrixFactory;
  
     /**
      * Constructor for SafeName.
@@ -264,7 +262,10 @@ class DatabaseMatrix : public BaseMatrix<DatabaseMatrix>
 {
 public:
 
+    // Type of value that is stored in the matrix
     using value_type = Poco::Dynamic::Var;
+
+    friend class MatrixFactory;
 
      /**
      * Constructor for DatabaseMatrix.

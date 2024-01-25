@@ -55,12 +55,14 @@ namespace LazyMatrix
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType1,
-         typename ReferenceType2>
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBinaryExpression<ReferenceType1, ReferenceType2> >
 {
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType1::value_type;
 
     // The operation function type
     using operation_type = std::function<value_type(value_type, value_type)>;

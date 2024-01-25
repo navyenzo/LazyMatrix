@@ -91,6 +91,9 @@ class CSVMatrix : public BaseMatrix< CSVMatrix<DataType> >
 {
 public:
 
+    // Type of value that is stored in the matrix
+    using value_type = DataType;
+
     friend class MatrixFactory;
 
     // Default constructor

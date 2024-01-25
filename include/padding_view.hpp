@@ -49,14 +49,15 @@ namespace LazyMatrix
  * @tparam ReferenceType Type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class PaddedMatrixView : public BaseMatrix< PaddedMatrixView<ReferenceType> >
 {
 public:
 
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType::value_type;
 
     /**
      * @brief Construct a new Padded Matrix View< Matrix Type> object.

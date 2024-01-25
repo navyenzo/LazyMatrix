@@ -59,6 +59,8 @@ class SimpleMatrix3D : public BaseMatrix3D<SimpleMatrix3D<DataType> >
 {
 public:
 
+    using value_type = DataType;
+
     /**
      * @brief Constructor for creating a 3D matrix of given dimensions.
      * @param pages The number of pages in the 3D matrix.

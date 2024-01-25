@@ -101,6 +101,9 @@ class Matrix3D : public BaseMatrix3D< Matrix3D<DataType> >
 {
 public:
 
+    // Type of value that is stored in the matrix
+    using value_type = DataType;
+
     // Constructor from an expression
     template<typename MatrixType>
     Matrix3D<DataType>(const BaseMatrix3D<MatrixType>& expression)

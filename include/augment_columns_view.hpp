@@ -57,7 +57,7 @@ class AugmentColumnsView : public BaseMatrix<AugmentColumnsView<ReferenceType1, 
 public:
 
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType1::value_type;
 
     /**
      * @brief Constructs a new matrix by augmenting the columns of two matrices.
