@@ -58,15 +58,19 @@ class PolymorphicMatrix : public BaseMatrix< PolymorphicMatrix<DataType> >
 {
 public:
 
+    friend class BaseMatrix< PolymorphicMatrix<DataType> >;
+
     PolymorphicMatrix() = default;
     virtual ~PolymorphicMatrix() = default;
 
     virtual uintptr_t rows() const = 0;
     virtual uintptr_t columns() const = 0;
     virtual uintptr_t size() const = 0;
+
+private:
     
-    virtual DataType at_(int64_t row, int64_t column) const = 0;
-    virtual DataType& at_(int64_t row, int64_t column) = 0;
+    virtual DataType const_at_(int64_t row, int64_t column) const = 0;
+    virtual DataType& non_const_at_(int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
 
@@ -109,20 +113,22 @@ public:
     uintptr_t rows() const override { return matrix_.rows(); }
     uintptr_t columns() const override { return matrix_.columns(); }
     uintptr_t size() const override { return matrix_.size(); }
+
+private: // Private functions
     
-    value_type at_(int64_t row, int64_t column) const override
+    value_type const_at_(int64_t row, int64_t column) const override
     {
         return matrix_(row, column);
     }
     
-    value_type& at_(int64_t row, int64_t column) override
+    value_type& non_const_at_(int64_t row, int64_t column) override
     {
         return matrix_(row, column);
     }
 
 
 
-private:
+private: // Private variables
 
     ReferenceType matrix_;
 };

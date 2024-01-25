@@ -320,13 +320,17 @@ public:
      */
     std::mutex& get_lock();
 
+
+
+private: // Private functions
+
     /**
      * @brief Access operator for constant access.
      * @param row Row index.
      * @param column Column index.
      * @return Constant reference to the data at the specified index.
      */
-    const DataType& at_(int64_t row, int64_t column)const;
+    DataType const_at_(int64_t row, int64_t column)const;
 
     /**
      * @brief Access operator for mutable access.
@@ -334,11 +338,7 @@ public:
      * @param column Column index.
      * @return Reference to the data at the specified index.
      */
-    DataType& at_(int64_t row, int64_t column);
-
-
-
-private:
+    DataType& non_const_at_(int64_t row, int64_t column);
 
     // Functions used to get the header and footer
     // of the mapped matrix from the mapped file
@@ -362,8 +362,10 @@ private:
     {
         return reinterpret_cast<MatrixFooter*>(mapped_file_.begin() + sizeof(MatrixHeader) + this->size()*sizeof(DataType));
     }
-    
-    
+
+
+
+private: // Private variables
     
     // The mapped file used as the memory
     // for this memory mapped matrix and
@@ -744,7 +746,7 @@ inline std::mutex& Matrix<DataType>::get_lock()
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline const DataType& Matrix<DataType>::at_(int64_t row, int64_t column)const
+inline DataType Matrix<DataType>::const_at_(int64_t row, int64_t column)const
 {
     return reinterpret_cast<const DataType*>(mapped_file_.cbegin() + sizeof(MatrixHeader))[row*columns() + column];
 }
@@ -753,7 +755,7 @@ inline const DataType& Matrix<DataType>::at_(int64_t row, int64_t column)const
 
 template<typename DataType>
 
-inline DataType& Matrix<DataType>::at_(int64_t row, int64_t column)
+inline DataType& Matrix<DataType>::non_const_at_(int64_t row, int64_t column)
 {
     return reinterpret_cast<DataType*>(mapped_file_.begin() + sizeof(MatrixHeader))[row*columns() + column];
 }

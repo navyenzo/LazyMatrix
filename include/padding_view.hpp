@@ -59,6 +59,8 @@ public:
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
+    friend class BaseMatrix< PaddedMatrixView<ReferenceType> >;
+
     /**
      * @brief Construct a new Padded Matrix View< Matrix Type> object.
      * 
@@ -67,10 +69,10 @@ public:
      * @param padded_columns Number of columns after padding.
      * @param constant_value_for_padding value used for the padding (defaulted to zero).
      */
-    PaddedMatrixView<ReferenceType>(ReferenceType expression,
-                                    uintptr_t padded_rows,
-                                    uintptr_t padded_columns,
-                                    value_type constant_value_for_padding = static_cast<value_type>(0))
+    PaddedMatrixView(ReferenceType expression,
+                     uintptr_t padded_rows,
+                     uintptr_t padded_columns,
+                     value_type constant_value_for_padding = static_cast<value_type>(0))
     {
         set_expression(expression);
         set_padded_rows(padded_rows);
@@ -132,6 +134,10 @@ public:
     {
         return padded_columns_;
     }
+
+
+
+private: // Private functions
     
     /**
      * @brief Accesses the element at the specified position.
@@ -139,7 +145,7 @@ public:
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         if(row < 0 || row >= expression_.rows() || column < 0 || column >= expression_.columns())
             return constant_value_for_padding_;
@@ -153,7 +159,7 @@ public:
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         if(row < 0 || row >= expression_.rows() || column < 0 || column >= expression_.columns())
             return constant_value_for_padding_;
@@ -163,7 +169,7 @@ public:
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
     uintptr_t padded_rows_;

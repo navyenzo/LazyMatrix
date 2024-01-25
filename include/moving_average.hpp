@@ -70,15 +70,17 @@ struct SimpleMovingAverage : public BaseMatrix< SimpleMovingAverage<ReferenceTyp
     // Type of value that is stored in left side expression
     using value_type = typename ReferenceType::value_type;
 
+    friend class BaseMatrix< SimpleMovingAverage<ReferenceType> >;
+
     /**
      * @brief Construct a new Simple Moving Average Of Rows< Reference Type> object
      * 
      * @param expression The input matrix expression
      * @param number_of_data_points_to_average The number of data points to average
      */
-    SimpleMovingAverage<ReferenceType>(ReferenceType expression,
-                                             int64_t number_of_data_points_to_average,
-                                             MovingAverageDirection moving_average_direction)
+    SimpleMovingAverage(ReferenceType expression,
+                        int64_t number_of_data_points_to_average,
+                        MovingAverageDirection moving_average_direction)
     {
         set_expression(expression);
         set_number_of_data_points_to_average(number_of_data_points_to_average);
@@ -126,13 +128,17 @@ struct SimpleMovingAverage : public BaseMatrix< SimpleMovingAverage<ReferenceTyp
         return expression_.columns();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         if(moving_average_direction_ == MovingAverageDirection::RowAverage)
         {
@@ -173,14 +179,14 @@ struct SimpleMovingAverage : public BaseMatrix< SimpleMovingAverage<ReferenceTyp
      * @param column Column index.
      * @return A reference to a dummy value since reference access doesn't make sense here.
      */
-    value_type& at_(int row, int column)
+    value_type& non_const_at_(int row, int column)
     {
         return DummyValueHolder<value_type>::zero;
     }
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
     int64_t number_of_data_points_to_average_ = 1;

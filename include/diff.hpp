@@ -26,7 +26,7 @@
 
 
 //-------------------------------------------------------------------
-#include "base_matrix.hpp",
+#include "base_matrix.hpp"
 #include "shared_references.hpp"
 //-------------------------------------------------------------------
 
@@ -85,8 +85,8 @@ struct Diff : public BaseMatrix< Diff<ReferenceType> >
      * @param expression THe input matrix expression to take the diff of
      * @param diff_direction row or column diff
      */
-    Diff<ReferenceType>(ReferenceType expression,
-                        DiffDirection diff_direction)
+    Diff(ReferenceType expression,
+         DiffDirection diff_direction)
     {
         set_diff_direction(diff_direction);
         set_expression(expression);
@@ -218,7 +218,7 @@ inline auto
 diff(ReferenceType m, DiffDirection diff_direction)
 {
     auto view = std::make_shared<Diff<ReferenceType>>(m, diff_direction);
-    return ConstSharedMatrixRef<Diff<ReferenceType>>(view);
+    return SharedMatrixRef<Diff<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

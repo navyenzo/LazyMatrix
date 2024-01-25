@@ -71,7 +71,7 @@ public:
      * 
      * @param expression The input matrix expression.
      */
-    explicit Transpose<ReferenceType>(ReferenceType expression)
+    explicit Transpose(ReferenceType expression)
     {
         set_expression(expression);
     }

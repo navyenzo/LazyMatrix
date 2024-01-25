@@ -60,6 +60,8 @@ public:
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
+    friend class BaseMatrix< SingleVectorSelectorView<ReferenceType> >;
+
     /**
      * @brief Construct a new Single Vector Selector View< Reference Type> object.
      * 
@@ -125,13 +127,17 @@ public:
             return uintptr_t(1);
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         if(are_we_selecting_a_row_)
             return expression_.circ_at(selected_vector_, column);
@@ -145,7 +151,7 @@ public:
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         if(are_we_selecting_a_row_)
             return expression_.circ_at(selected_vector_, column);
@@ -155,7 +161,7 @@ public:
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
     int64_t selected_vector_ = 0;
@@ -196,6 +202,8 @@ public:
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
+    friend class BaseMatrix< MultipleVectorSelectorView<ReferenceType> >;
+
     /**
      * @brief Construct a new Multiple Vector Selector View< Reference Type> object
      * 
@@ -203,9 +211,9 @@ public:
      * @param selected_vectors The vector containing the indeces of the vectors to select.
      * @param are_we_selecting_rows Whether we need to select rows or columns.
      */
-    MultipleVectorSelectorView<ReferenceType>(ReferenceType expression,
-                                              const std::vector<int64_t>& selected_vectors,
-                                              bool are_we_selecting_rows)
+    MultipleVectorSelectorView(ReferenceType expression,
+                               const std::vector<int64_t>& selected_vectors,
+                               bool are_we_selecting_rows)
     {
         set_expression(expression);
         set_selected_vectors(selected_vectors);
@@ -263,13 +271,17 @@ public:
             return selected_vectors_.size();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         if(are_we_selecting_rows_)
             return expression_.circ_at(selected_vectors_[row], column);
@@ -283,7 +295,7 @@ public:
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         if(are_we_selecting_rows_)
             return expression_.circ_at(selected_vectors_[row], column);
@@ -293,7 +305,7 @@ public:
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
     std::vector<int64_t> selected_vectors_;
@@ -342,9 +354,9 @@ public:
      * @param selected_rows The vector containing the indeces of the selected rows.
      * @param selected_columns The vector containing the indeces of the selected columns.
      */
-    RowAndColumnSelectorView<ReferenceType>(ReferenceType expression,
-                                            const std::vector<int64_t>& selected_rows,
-                                            const std::vector<int64_t>& selected_columns)
+    RowAndColumnSelectorView(ReferenceType expression,
+                             const std::vector<int64_t>& selected_rows,
+                             const std::vector<int64_t>& selected_columns)
     {
         set_expression(expression);
         set_selected_rows(selected_rows);

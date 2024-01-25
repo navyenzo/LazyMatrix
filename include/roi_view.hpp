@@ -68,8 +68,8 @@ public:
      * @param row2 The ending row index of the ROI.
      * @param column2 The ending column index of the ROI.
      */
-    ROIView<ReferenceType>(ReferenceType& expression,
-                           int64_t row1, int64_t column1, int64_t row2, int64_t column2)
+    ROIView(ReferenceType& expression,
+            int64_t row1, int64_t column1, int64_t row2, int64_t column2)
     {
         set_expression(expression);
         set_roi_bounds(row1, column1, row2, column2);

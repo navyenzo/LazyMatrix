@@ -323,22 +323,20 @@ public:
     {
         return filename_of_memory_mapped_file_;
     }
-    
-    
 
-    const DataType& at_(int64_t page, int64_t row, int64_t column)const
+
+
+private: // Private functions
+
+    DataType const_at_(int64_t page, int64_t row, int64_t column)const
     {
         return reinterpret_cast<const DataType*>(mapped_file_.cbegin() + sizeof(Matrix3DHeader))[page*rows()*columns() + row*columns() + column];
     }
 
-    DataType& at_(int64_t page, int64_t row, int64_t column)
+    DataType& non_const_at_(int64_t page, int64_t row, int64_t column)
     {
         return reinterpret_cast<DataType*>(mapped_file_.begin() + sizeof(Matrix3DHeader))[page*rows()*columns() + row*columns() + column];
     }
-
-
-
-private:
 
     // Functions used to get the header and footer
     // of the mapped matrix from the mapped file
@@ -362,8 +360,10 @@ private:
     {
         return reinterpret_cast<Matrix3DFooter*>(mapped_file_.begin() + sizeof(Matrix3DHeader) + this->size()*sizeof(DataType));
     }
-    
-    
+
+
+
+private: // Private variables
     
     // The mapped file used as the memory
     // for this memory mapped matrix and

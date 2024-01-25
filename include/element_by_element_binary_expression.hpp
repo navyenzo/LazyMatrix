@@ -77,9 +77,9 @@ struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBin
      * @param operation_function The function that is used to combine
      *                           values from both input matrices.
      */
-    ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>(ReferenceType1 left_side_expression,
-                                                                     ReferenceType2 right_side_expression,
-                                                                     const operation_type& operation_function)
+    ElementByElementBinaryExpression(ReferenceType1 left_side_expression,
+                                     ReferenceType2 right_side_expression,
+                                     const operation_type& operation_function)
     {
         set_left_side_expression(left_side_expression);
         set_right_side_expression(right_side_expression);

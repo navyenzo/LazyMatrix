@@ -64,6 +64,8 @@ public:
 
     using value_type = DataType;
 
+    friend class BaseMatrix< IotaMatrix<DataType> >;
+
     /**
      * @brief Construct a new Iota Matrix object
      * 
@@ -97,13 +99,17 @@ public:
         return columns_;
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Return the generated value at the (row,column) position
      * @param row 
      * @param column 
      * @return DataType 
      */
-    DataType at_(int64_t row, int64_t column)const
+    DataType const_at_(int64_t row, int64_t column)const
     {
         return static_cast<DataType>(row * this->columns() + column) * step_ + starting_value_;
     }
@@ -115,14 +121,14 @@ public:
      * @param column Column index.
      * @return A reference to a dummy value since reference access doesn't make sense here.
      */
-    value_type& at_(int row, int column)
+    value_type& non_const_at_(int row, int column)
     {
         return DummyValueHolder<value_type>::zero;
     }
 
 
 
-private:
+private: // Private variables
 
     uintptr_t rows_ = 0;
     uintptr_t columns_ = 0;
@@ -162,6 +168,8 @@ public:
 
     using value_type = DataType;
 
+    friend class BaseMatrix< RandomMatrix<DataType> >;
+
     /**
      * @brief Construct a new Random Matrix object
      * 
@@ -197,13 +205,17 @@ public:
         return columns_;
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Return the generated value at the (row,column) position
      * @param row 
      * @param column 
      * @return DataType 
      */
-    DataType at_(int64_t row, int64_t column)const
+    DataType const_at_(int64_t row, int64_t column)const
     {
         static XoshiroCpp::Xoshiro256PlusPlus rng(time(NULL));
 
@@ -217,14 +229,14 @@ public:
      * @param column Column index.
      * @return A reference to a dummy value since reference access doesn't make sense here.
      */
-    value_type& at_(int row, int column)
+    value_type& non_const_at_(int row, int column)
     {
         return DummyValueHolder<value_type>::zero;
     }
 
 
 
-private:
+private: // Private variables
 
     uintptr_t rows_ = 0;
     uintptr_t columns_ = 0;
@@ -264,6 +276,8 @@ class SineWaveMatrix : public BaseMatrix< SineWaveMatrix<DataType> >
 public:
 
     using value_type = DataType;
+
+    friend class BaseMatrix< SineWaveMatrix<DataType> >;
 
     /**
      * @brief Construct a new Sine Wave Matrix object
@@ -311,13 +325,17 @@ public:
         return columns_;
     }
 
+
+
+private: // Private function
+
     /**
      * @brief Return the generated value at the (row,column) position
      * @param row 
      * @param column 
      * @return DataType 
      */
-    DataType at_(int64_t row, int64_t column)const
+    DataType const_at_(int64_t row, int64_t column)const
     {
         DataType time = initial_time_ + DataType(row * this->columns() + column) * delta_time_;
 
@@ -333,14 +351,14 @@ public:
      * @param column Column index.
      * @return A reference to a dummy value since reference access doesn't make sense here.
      */
-    value_type& at_(int row, int column)
+    value_type& non_const_at_(int row, int column)
     {
         return DummyValueHolder<value_type>::zero;
     }
 
 
 
-private:
+private: // Private variables
 
     uintptr_t rows_ = 0;
     uintptr_t columns_ = 0;

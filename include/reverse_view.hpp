@@ -71,7 +71,7 @@ public:
      * @param should_rows_be_reversed Whether rows should be reversed
      * @param should_columns_be_reversed Whether columns should be reversed
      */
-    ReverseView<ReferenceType>(ReferenceType expression, bool should_rows_be_reversed, bool should_columns_be_reversed)
+    ReverseView(ReferenceType expression, bool should_rows_be_reversed, bool should_columns_be_reversed)
     {
         set_expression(expression);
         set_should_rows_be_reversed(should_rows_be_reversed);

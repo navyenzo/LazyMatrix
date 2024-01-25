@@ -72,8 +72,8 @@ struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnar
      * @param expression The input matrix expression
      * @param operation_function The function used to calculate the output
      */
-    ElementByElementUnaryExpression<ReferenceType>(ReferenceType expression,
-                                                   const operation_type& operation_function)
+    ElementByElementUnaryExpression(ReferenceType expression,
+                                    const operation_type& operation_function)
     {
         set_expression(expression);
         set_operation_function(operation_function);
