@@ -57,6 +57,8 @@ class PolymorphicMatrix3D : public BaseMatrix3D< PolymorphicMatrix3D<DataType> >
 {
 public:
 
+    friend class BaseMatrix3D< PolymorphicMatrix3D<DataType> >;
+
     PolymorphicMatrix3D() = default;
     virtual ~PolymorphicMatrix3D() = default;
 
@@ -65,10 +67,10 @@ public:
     virtual uintptr_t columns() const = 0;
     virtual uintptr_t size() const = 0;
     
+private:
 
-
-    virtual DataType at_(int64_t page, int64_t row, int64_t column) const = 0;
-    virtual DataType& at_(int64_t page, int64_t row, int64_t column) = 0;
+    virtual DataType const_at_(int64_t page, int64_t row, int64_t column) const = 0;
+    virtual DataType& non_const_at_(int64_t page, int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
 
@@ -106,32 +108,26 @@ public:
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
     
-
-
     explicit PolymorphicMatrixWrapper3D(ReferenceType& matrix) : matrix_(matrix) {}
 
-    
-    
     uintptr_t pages() const override { return matrix_.pages(); }
     uintptr_t rows() const override { return matrix_.rows(); }
     uintptr_t columns() const override { return matrix_.columns(); }
     uintptr_t size() const override { return matrix_.size(); }
-    
 
+private: // Private functions
 
-    value_type at_(int64_t page, int64_t row, int64_t column) const override
+    value_type const_at_(int64_t page, int64_t row, int64_t column) const override
     {
         return matrix_(page, row, column);
     }
 
-    value_type& at_(int64_t page, int64_t row, int64_t column) override
+    value_type& non_const_at_(int64_t page, int64_t row, int64_t column) override
     {
         return matrix_(page, row, column);
     }
 
-
-
-private:
+private: // Private variables
 
     ReferenceType matrix_;
 };
