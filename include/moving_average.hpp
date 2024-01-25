@@ -166,6 +166,18 @@ struct SimpleMovingAverage : public BaseMatrix< SimpleMovingAverage<ReferenceTyp
         }
     }
 
+    /**
+     * @brief Reference access doesn't make sense for this type of matrix operation
+     *        expression, so we just return a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to a dummy value since reference access doesn't make sense here.
+     */
+    value_type& at_(int row, int column)
+    {
+        return DummyValueHolder<value_type>::zero;
+    }
+
 
 
 private:
@@ -196,7 +208,7 @@ struct is_type_a_matrix< SimpleMovingAverage<ReferenceType> > : std::true_type
  *        either the rows or columns of the input matrix expression.
  * @tparam ReferenceType Type of the input matrix.
  * @param m Shared reference to the input matrix.
- * @return A ConstSharedMatrixRef to the SimpleMovingAverage matrix object.
+ * @return A SharedMatrixRef to the SimpleMovingAverage matrix object.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -209,7 +221,7 @@ simple_moving_average(ReferenceType m,
                       MovingAverageDirection moving_average_direction)
 {
     auto view = std::make_shared<SimpleMovingAverage<ReferenceType>>(m, number_of_data_points_to_average, moving_average_direction);
-    return ConstSharedMatrixRef<SimpleMovingAverage<ReferenceType>>(view);
+    return SharedMatrixRef<SimpleMovingAverage<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

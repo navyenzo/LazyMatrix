@@ -54,14 +54,17 @@ namespace LazyMatrix
  * @tparam ReferenceType The type of the underlying matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class Transpose : public BaseMatrix< Transpose<ReferenceType> >
 {
 public:
 
     // Type of value that is stored in the matrix
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType::value_type;
+
+    friend class BaseMatrix< Transpose<ReferenceType> >;
 
     /**
      * @brief Construct a new Transpose View< Reference Type> object
@@ -98,13 +101,17 @@ public:
         return this->expression_.rows();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         return expression_(column, row);
     }
@@ -115,15 +122,14 @@ public:
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
-    at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         return expression_(column, row);
     }
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
 };
@@ -148,8 +154,8 @@ struct is_type_a_matrix< Transpose<ReferenceType> > : std::true_type
  * @brief Returns the transpose of the input matrix expression.
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix expression
- * @return A SharedMatrixRef or ConstSharedMatrixRef to the
- *         transpose view of the input matrix expression
+ * @return A SharedMatrixRef to the transpose view of the input
+ *         matrix expression
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -158,19 +164,7 @@ template<typename ReferenceType,
 inline auto transpose(ReferenceType m)
 {
     auto view = std::make_shared<Transpose<ReferenceType>>(m);
-
-    // Use the trait to determine if non-const access is available
-    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
-
-    // Conditionally selecting the return type
-    using ReturnType = std::conditional_t
-    <
-        hasNonConstAccess,
-        SharedMatrixRef<Transpose<ReferenceType>>,
-        ConstSharedMatrixRef<Transpose<ReferenceType>>
-    >;
-
-    return ReturnType(view);
+    return SharedMatrixRef<Transpose<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

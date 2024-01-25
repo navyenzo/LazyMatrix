@@ -64,6 +64,8 @@ struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnar
     // The operation function type
     using operation_type = std::function<value_type(value_type)>;
 
+    friend class BaseMatrix< ElementByElementUnaryExpression<ReferenceType> >;
+
     /**
      * @brief Construct a new Element By Element Unary Expression< Reference Type> object
      * 
@@ -112,20 +114,36 @@ struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnar
         return expression_.columns();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int row, int column)const
+    value_type const_at_(int row, int column)const
     {
         return static_cast<value_type>(operation_function_(this->expression_.at(row,column)));
     }
 
+    /**
+     * @brief Reference access doesn't make sense for this type of matrix operation
+     *        expression, so we just return a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to a dummy value since reference access doesn't make sense here.
+     */
+    value_type& non_const_at_(int row, int column)
+    {
+        return DummyValueHolder<value_type>::zero;
+    }
 
 
-private:
+
+private: // Private variables
 
     ReferenceType expression_;
     operation_type operation_function_;
@@ -151,7 +169,7 @@ struct is_type_a_matrix< ElementByElementUnaryExpression<ReferenceType> > : std:
  * @brief Negation (-m).
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix.
- * @return Returns a ConstSharedMatrixRef to the negation of the
+ * @return Returns a SharedMatrixRef to the negation of the
  *         input matrix expression (-m)
  */
 //-------------------------------------------------------------------
@@ -166,7 +184,7 @@ operator-(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, std::negate<value_type>());
 
-    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -177,7 +195,7 @@ operator-(ReferenceType m)
  * @brief Sign(m).
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix.
- * @return Returns a ConstSharedMatrixRef to the sign of each element
+ * @return Returns a SharedMatrixRef to the sign of each element
  *         from the input expression sign(m).
  */
 //-------------------------------------------------------------------
@@ -200,7 +218,7 @@ sign(ReferenceType m)
                                                        }
                                                       );
 
-    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -211,7 +229,7 @@ sign(ReferenceType m)
  * @brief Absolute value abs(m).
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix.
- * @return Returns a ConstSharedMatrixRef to the absolute value of
+ * @return Returns a SharedMatrixRef to the absolute value of
  *         each element of the input matrix expression
  */
 //-------------------------------------------------------------------
@@ -226,7 +244,7 @@ abs(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::abs(number); });
 
-    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -237,7 +255,7 @@ abs(ReferenceType m)
  * @brief Square Root of each element of input matrix sqrt(m)
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix.
- * @return Returns a ConstSharedMatrixRef to the square root of each
+ * @return Returns a SharedMatrixRef to the square root of each
  *         element of the input matrix expression sqrt(m).
  */
 //-------------------------------------------------------------------
@@ -252,7 +270,7 @@ sqrt(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::sqrt(number); });
 
-    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -263,7 +281,7 @@ sqrt(ReferenceType m)
  * @brief Exponential of each element of input matrix exp(m).
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix.
- * @return Returns a ConstSharedMatrixRef to the exponential of each
+ * @return Returns a SharedMatrixRef to the exponential of each
  *         element of the input matrix expression exp(m).
  */
 //-------------------------------------------------------------------
@@ -278,7 +296,7 @@ exp(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::exp(number); });
 
-    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -289,7 +307,7 @@ exp(ReferenceType m)
  * @brief 2^x of each element of input matrix.
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix.
- * @return Returns a ConstSharedMatrixRef to the value of 2^x of
+ * @return Returns a SharedMatrixRef to the value of 2^x of
  *         each element of the input matrix expression.
  */
 //-------------------------------------------------------------------
@@ -304,7 +322,7 @@ exp2(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::exp2(number); });
 
-    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

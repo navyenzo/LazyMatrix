@@ -126,21 +126,21 @@ inline auto create_laplacian_kernel()
 //-------------------------------------------------------------------
 /**
  * @brief Applies a filter kernel to a source matrix.
- * @tparam MatrixType1 The type of the source matrix.
- * @tparam MatrixType2 The type of the filter kernel.
+ * @tparam ReferenceType1 The type of the source matrix.
+ * @tparam ReferenceType2 The type of the filter kernel.
  * @param source_matrix Shared reference to the source matrix.
  * @param filter_kernel Shared reference to the filter kernel.
  * @return A SharedMatrixRef to the SimpleMatrix (the filtered matrix).
  */
 //-------------------------------------------------------------------
-template<typename MatrixType1, typename MatrixType2,
-            std::enable_if_t<is_type_a_matrix<MatrixType1>{}>* = nullptr,
-            std::enable_if_t<is_type_a_matrix<MatrixType2>{}>* = nullptr>
+template<typename ReferenceType1, typename ReferenceType2,
+            std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+            std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
-inline auto filter(const SharedMatrixRef<MatrixType1>& source_matrix,
-                   const SharedMatrixRef<MatrixType2>& filter_kernel)
+inline auto filter(ReferenceType1 source_matrix,
+                   ReferenceType2 filter_kernel)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType1>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType1::value_type;
 
     auto source_matrix_with_border = repeated_border(source_matrix);
 

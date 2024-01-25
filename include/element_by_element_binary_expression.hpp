@@ -67,6 +67,8 @@ struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBin
     // The operation function type
     using operation_type = std::function<value_type(value_type, value_type)>;
 
+    friend class BaseMatrix< ElementByElementBinaryExpression<ReferenceType1, ReferenceType2> >;
+
     /**
      * @brief Construct a new Element By Element Binary Expression<Reference Type 1,Reference Type 2> object
      * 
@@ -132,21 +134,37 @@ struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBin
         return this->left_side_expression_.columns();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int row, int column)const
+    value_type const_at_(int row, int column)const
     {
         return static_cast<value_type>(operation_function_(this->left_side_expression_.at(row,column),
                                                            this->right_side_expression_.at(row,column)));
     }
 
+    /**
+     * @brief Reference access doesn't make sense for this type of matrix operation
+     *        expression, so we just return a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to a dummy value since reference access doesn't make sense here.
+     */
+    value_type& non_const_at_(int row, int column)
+    {
+        return DummyValueHolder<value_type>::zero;
+    }
 
 
-private:
+
+private: // Private variables
 
     ReferenceType1 left_side_expression_;
     ReferenceType2 right_side_expression_;
@@ -176,7 +194,7 @@ struct is_type_a_matrix< ElementByElementBinaryExpression<ReferenceType1, Refere
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the addition of both
+ * @return Returns a SharedMatrixRef to the addition of both
  *         input matrix expressions.
  */
 //-------------------------------------------------------------------
@@ -194,7 +212,7 @@ operator+(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::plus<value_type>());
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -207,7 +225,7 @@ operator+(ReferenceType1 m1,
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the subtraction of both
+ * @return Returns a SharedMatrixRef to the subtraction of both
  *         input matrix expressions.
  */
 //-------------------------------------------------------------------
@@ -225,7 +243,7 @@ operator-(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::minus<value_type>());
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -238,7 +256,7 @@ operator-(ReferenceType1 m1,
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the modulus of both
+ * @return Returns a SharedMatrixRef to the modulus of both
  *         input matrix expressions (m1 % m2).
  */
 //-------------------------------------------------------------------
@@ -256,7 +274,7 @@ operator%(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::fmod<value_type>());
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -269,7 +287,7 @@ operator%(ReferenceType1 m1,
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the element by element
+ * @return Returns a SharedMatrixRef to the element by element
  *         multiplication of both matrix expressions (m1 .* m2).
  */
 //-------------------------------------------------------------------
@@ -287,7 +305,7 @@ elem_by_elem_multiply(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::multiplies<value_type>());
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -300,7 +318,7 @@ elem_by_elem_multiply(ReferenceType1 m1,
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the element by element
+ * @return Returns a SharedMatrixRef to the element by element
  *         division of both matrix expressions (m1 ./ m2).
  */
 //-------------------------------------------------------------------
@@ -318,7 +336,7 @@ elem_by_elem_divide(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::divides<value_type>());
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -331,7 +349,7 @@ elem_by_elem_divide(ReferenceType1 m1,
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the element by element
+ * @return Returns a SharedMatrixRef to the element by element
  *         power of both matrix expressions (m1 .^ m2).
  */
 //-------------------------------------------------------------------
@@ -349,7 +367,7 @@ elem_by_elem_pow(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::pow(a,b); });
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -362,7 +380,7 @@ elem_by_elem_pow(ReferenceType1 m1,
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the element by element
+ * @return Returns a SharedMatrixRef to the element by element
  *         minimums
  */
 //-------------------------------------------------------------------
@@ -380,7 +398,7 @@ min(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::min(a,b); });
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -393,7 +411,7 @@ min(ReferenceType1 m1,
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return Returns a ConstSharedMatrixRef to the element by element
+ * @return Returns a SharedMatrixRef to the element by element
  *         maximumns
  */
 //-------------------------------------------------------------------
@@ -411,7 +429,7 @@ max(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::max(a,b); });
 
-    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 

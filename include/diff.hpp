@@ -77,6 +77,8 @@ struct Diff : public BaseMatrix< Diff<ReferenceType> >
     // Type of value that is stored in the matrix
     using value_type = typename ReferenceType::value_type;
 
+    friend class BaseMatrix< Diff<ReferenceType> >;
+
     /**
      * @brief Construct a new Difference<ReferenceType> object
      * 
@@ -139,6 +141,10 @@ struct Diff : public BaseMatrix< Diff<ReferenceType> >
                 return (expression_.columns() > 0) ? (expression_.columns() - 1) : 0;
         }
     }
+
+
+
+private: // Private functions
     
     /**
      * @brief Accesses the element at the specified position.
@@ -146,7 +152,7 @@ struct Diff : public BaseMatrix< Diff<ReferenceType> >
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         switch(diff_direction_)
         {
@@ -159,9 +165,21 @@ struct Diff : public BaseMatrix< Diff<ReferenceType> >
         }
     }
 
+    /**
+     * @brief Reference access doesn't make sense for this type of matrix operation
+     *        expression, so we just return a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to a dummy value since reference access doesn't make sense here.
+     */
+    value_type& non_const_at_(int row, int column)
+    {
+        return DummyValueHolder<value_type>::zero;
+    }
 
 
-private:
+
+private: // Private variables
 
     ReferenceType expression_;
     DiffDirection diff_direction_ = DiffDirection::RowDiff;

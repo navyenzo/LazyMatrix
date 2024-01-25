@@ -57,6 +57,8 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<ReferenceType>
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
+    friend class BaseMatrix< RepeatedBorderView<ReferenceType> >;
+
     /**
      * @brief Constructs a new matrix view by repeating border values.
      *
@@ -94,13 +96,17 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<ReferenceType>
         return expression_.columns();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         row = std::max(row, int64_t(0));
         row = std::min(this->rows() - 1, row);
@@ -117,8 +123,7 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<ReferenceType>
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
-    at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         row = std::max(row, int64_t(0));
         row = std::min(this->rows() - 1, row);
@@ -131,7 +136,7 @@ struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<ReferenceType>
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
 };
@@ -166,6 +171,8 @@ struct ConstantBorderView : public BaseMatrix< ConstantBorderView<ReferenceType>
 {
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
+
+    friend class BaseMatrix< ConstantBorderView<ReferenceType> >;
     
     /**
      * @brief Constructs a new matrix view that gives a constant border
@@ -218,13 +225,17 @@ struct ConstantBorderView : public BaseMatrix< ConstantBorderView<ReferenceType>
         return expression_.columns();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
             return constant_value_;
@@ -238,8 +249,7 @@ struct ConstantBorderView : public BaseMatrix< ConstantBorderView<ReferenceType>
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
-    at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
             return constant_value_;
@@ -249,7 +259,7 @@ struct ConstantBorderView : public BaseMatrix< ConstantBorderView<ReferenceType>
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
     mutable value_type constant_value_ = static_cast<value_type>(0);
@@ -277,8 +287,7 @@ struct is_type_a_matrix< ConstantBorderView<ReferenceType> > : std::true_type
  *        matrix, they will get the border value closest to it.
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix expression.
- * @return A SharedMatrixRef or ConstSharedMatrixRef to the
- *         RepeatedBorderView matrix object.
+ * @return A SharedMatrixRef to the RepeatedBorderView matrix object.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -289,19 +298,7 @@ inline auto
 repeated_border_view(ReferenceType m)
 {
     auto view = std::make_shared<RepeatedBorderView<ReferenceType>>(m);
-    
-    // Use the trait to determine if non-const access is available
-    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
-
-    // Conditionally selecting the return type
-    using ReturnType = std::conditional_t
-    <
-        hasNonConstAccess,
-        SharedMatrixRef<RepeatedBorderView<ReferenceType>>,
-        ConstSharedMatrixRef<RepeatedBorderView<ReferenceType>>
-    >;
-
-    return ReturnType(view);
+    return SharedMatrixRef<RepeatedBorderView<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -315,8 +312,7 @@ repeated_border_view(ReferenceType m)
  *        to Zero.
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m Shared reference to the input matrix expression.
- * @return A SharedMatrixRef or ConstSharedMatrixRef to the
- *         ConstantBorderView matrix object.
+ * @return A SharedMatrixRef to the ConstantBorderView matrix object.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -327,19 +323,7 @@ inline auto
 constant_border_view(ReferenceType m)
 {
     auto view = std::make_shared<ConstantBorderView<ReferenceType>>(m);
-    
-    // Use the trait to determine if non-const access is available
-    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
-
-    // Conditionally selecting the return type
-    using ReturnType = std::conditional_t
-    <
-        hasNonConstAccess,
-        SharedMatrixRef<ConstantBorderView<ReferenceType>>,
-        ConstSharedMatrixRef<ConstantBorderView<ReferenceType>>
-    >;
-
-    return ReturnType(view);
+    return SharedMatrixRef<ConstantBorderView<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

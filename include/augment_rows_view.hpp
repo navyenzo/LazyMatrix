@@ -64,7 +64,7 @@ struct AugmentRowsView : public BaseMatrix< AugmentRowsView<ReferenceType1, Refe
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType1::value_type;
 
-
+    friend class BaseMatrix< AugmentRowsView<ReferenceType1, ReferenceType2> >;
 
     /**
      * @brief Constructs a new matrix view by augmenting the rows of two matrices.
@@ -115,27 +115,31 @@ struct AugmentRowsView : public BaseMatrix< AugmentRowsView<ReferenceType1, Refe
         return std::max(this->top_side_expression_.columns(), this->bottom_side_expression_.columns());
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         if(row < this->top_side_expression_.rows())
         {
             if(column < this->top_side_expression_.columns())
                 return this->top_side_expression_.at(row, column);
             else
-                return zero_;
+                return DummyValueHolder<value_type>::zero;
         }
         else
         {
             if(column < this->bottom_side_expression_.columns())
                 return this->bottom_side_expression_.at(row - this->top_side_expression_.rows(), column);
             else
-                return zero_;
+                return DummyValueHolder<value_type>::zero;
         }
     }
 
@@ -145,32 +149,30 @@ struct AugmentRowsView : public BaseMatrix< AugmentRowsView<ReferenceType1, Refe
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType1>{} && has_non_const_access<ReferenceType2>{}, value_type&>
-    at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         if(row < this->top_side_expression_.rows())
         {
             if(column < this->top_side_expression_.columns())
                 return this->top_side_expression_.at(row, column);
             else
-                return zero_;
+                return DummyValueHolder<value_type>::zero;
         }
         else
         {
             if(column < this->bottom_side_expression_.columns())
                 return this->bottom_side_expression_.at(row - this->top_side_expression_.rows(), column);
             else
-                return zero_;
+                return DummyValueHolder<value_type>::zero;
         }
     }
 
 
 
-private:
+private: // Private variables
 
     ReferenceType1 top_side_expression_;
     ReferenceType2 bottom_side_expression_;
-    mutable value_type zero_ = static_cast<value_type>(0);
 };
 //-------------------------------------------------------------------
 
@@ -196,8 +198,7 @@ struct is_type_a_matrix< AugmentRowsView<ReferenceType1, ReferenceType2> > : std
  * @tparam ReferenceType2 Type of the bottom side matrix.
  * @param m1 Shared reference to the top side matrix.
  * @param m2 Shared reference to the bottom side matrix.
- * @return A SharedMatrixRef or ConstSharedMatrixRef to the
- *         AugmentRowsView combining both matrices.
+ * @return A SharedMatrixRef to the AugmentRowsView combining both matrices.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType1,
@@ -211,20 +212,7 @@ augment_by_rows_view(ReferenceType1 m1,
                      ReferenceType2 m2)
 {
     auto view = std::make_shared<AugmentRowsView<ReferenceType1, ReferenceType2>>(m1, m2);
-    
-    // Use the trait to determine if non-const access is available
-    constexpr bool hasNonConstAccess1 = has_non_const_access<ReferenceType1>::value;
-    constexpr bool hasNonConstAccess2 = has_non_const_access<ReferenceType2>::value;
-
-    // Conditionally selecting the return type
-    using ReturnType = std::conditional_t
-    <
-        hasNonConstAccess1 && hasNonConstAccess2,
-        SharedMatrixRef<AugmentRowsView<ReferenceType1, ReferenceType2>>,
-        ConstSharedMatrixRef<AugmentRowsView<ReferenceType1, ReferenceType2>>
-    >;
-
-    return ReturnType(view);
+    return SharedMatrixRef<AugmentRowsView<ReferenceType1, ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 

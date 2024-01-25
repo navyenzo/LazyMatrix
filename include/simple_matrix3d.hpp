@@ -61,6 +61,8 @@ public:
 
     using value_type = DataType;
 
+    friend class BaseMatrix3D<SimpleMatrix3D<DataType> >;
+
     /**
      * @brief Constructor for creating a 3D matrix of given dimensions.
      * @param pages The number of pages in the 3D matrix.
@@ -101,30 +103,6 @@ public:
     }
 
     /**
-     * @brief Accesses the element at the specified position (const version).
-     * @param page Page index of the element.
-     * @param row Row index of the element.
-     * @param column Column index of the element.
-     * @return The element at the specified position.
-     */
-    const DataType& at_(int64_t page, int64_t row, int64_t column) const
-    {
-        return data_[page*rows()*columns() + row*columns() + column];
-    }
-
-    /**
-     * @brief Accesses the element at the specified position (modifiable version).
-     * @param page Page index of the element.
-     * @param row Row index of the element.
-     * @param column Column index of the element.
-     * @return A reference to the element at the specified position.
-     */
-    DataType& at_(int64_t page, int64_t row, int64_t column)
-    {
-        return data_[page*rows()*columns() + row*columns() + column];
-    }
-
-    /**
      * @brief Resizes the matrix to new dimensions and initializes to a specified value.
      * @param pages New number of pages.
      * @param rows New number of rows.
@@ -155,7 +133,35 @@ public:
 
 
 
-private:
+private: // Private functions
+
+    /**
+     * @brief Accesses the element at the specified position (const version).
+     * @param page Page index of the element.
+     * @param row Row index of the element.
+     * @param column Column index of the element.
+     * @return The element at the specified position.
+     */
+    const DataType& const_at_(int64_t page, int64_t row, int64_t column) const
+    {
+        return data_[page*rows()*columns() + row*columns() + column];
+    }
+
+    /**
+     * @brief Accesses the element at the specified position (modifiable version).
+     * @param page Page index of the element.
+     * @param row Row index of the element.
+     * @param column Column index of the element.
+     * @return A reference to the element at the specified position.
+     */
+    DataType& non_const_at_(int64_t page, int64_t row, int64_t column)
+    {
+        return data_[page*rows()*columns() + row*columns() + column];
+    }
+
+
+
+private: // Private variables
 
     uintptr_t pages_ = 0;                ///< Number of pages in the matrix.
     uintptr_t rows_ = 0;                 ///< Number of rows in the matrix.

@@ -75,42 +75,42 @@ public:
     uintptr_t size()const { return this->rows() * this->columns(); }
 
     // Accessors for matrix elements.
-    decltype(auto) at(int64_t row, int64_t column)const { return this->at_(row, column); }
-    decltype(auto) at(int64_t row, int64_t column) { return this->at_(row, column); }
-    decltype(auto) at(int64_t index)const { return this->at_(index / this->columns(), index % this->columns()); }
-    decltype(auto) at(int64_t index) { return this->at_(index / this->columns(), index % this->columns()); }
+    decltype(auto) at(int64_t row, int64_t column)const { return (*this)(row, column); }
+    decltype(auto) at(int64_t row, int64_t column) { return (*this)(row, column); }
+    decltype(auto) at(int64_t index)const { return (*this)(index / this->columns(), index % this->columns()); }
+    decltype(auto) at(int64_t index) { return (*this)(index / this->columns(), index % this->columns()); }
 
     // Operator overloads for element access.
-    decltype(auto) operator()(int64_t row, int64_t column)const { return this->at_(row, column); }
-    decltype(auto) operator()(int64_t row, int64_t column) { return this->at_(row, column); }
-    decltype(auto) operator()(int64_t index)const { return this->at_(index / this->columns(), index % this->columns()); }
-    decltype(auto) operator()(int64_t index) { return this->at_(index / this->columns(), index % this->columns()); }
+    decltype(auto) operator()(int64_t row, int64_t column)const { return this->const_at_(row, column); }
+    decltype(auto) operator()(int64_t row, int64_t column) { return this->non_const_at_(row, column); }
+    decltype(auto) operator()(int64_t index)const { return (*this)(index / this->columns(), index % this->columns()); }
+    decltype(auto) operator()(int64_t index) { return (*this)(index / this->columns(), index % this->columns()); }
 
     // Circular accessors for matrix elements.
     decltype(auto) circ_at(int64_t row, int64_t column)const
     {
         int64_t circ_row = ( int64_t(this->rows()) + row % int64_t(this->rows()) ) % int64_t(this->rows());
         int64_t circ_column = ( int64_t(this->columns()) + column % int64_t(this->columns()) ) % int64_t(this->columns());
-        return this->at_(circ_row, circ_column);
+        return (*this)(circ_row, circ_column);
     }
 
     decltype(auto) circ_at(int64_t row, int64_t column)
     {
         int64_t circ_row = ( int64_t(this->rows()) + row % int64_t(this->rows()) ) % int64_t(this->rows());
         int64_t circ_column = ( int64_t(this->columns()) + column % int64_t(this->columns()) ) % int64_t(this->columns());
-        return this->at_(circ_row, circ_column);
+        return (*this)(circ_row, circ_column);
     }
 
     decltype(auto) circ_at(int64_t index)const
     {
         int64_t circ_index = ( int64_t(this->size()) + index % int64_t(this->size()) ) % int64_t(this->size());
-        return this->at(circ_index);
+        return (*this)(circ_index);
     }
 
     decltype(auto) circ_at(int64_t index)
     {
         int64_t circ_index = ( int64_t(this->size()) + index % int64_t(this->size()) ) % int64_t(this->size());
-        return this->at(circ_index);
+        return (*this)(circ_index);
     }
 
 
@@ -118,12 +118,6 @@ public:
     // Setter methods defined here to help define python/c++ interface
     template<typename ValueType>
     void set_circ_at(int64_t row, int64_t column, const ValueType& value) { this->circ_at(row, column) = value; }
-
-
-
-    // Implementation for element access, to be provided by derived classes.
-    decltype(auto) at_(int64_t row, int64_t column)const { return underlying().at_(row, column); }
-    decltype(auto) at_(int64_t row, int64_t column) { return underlying().at_(row, column); }
 
 
 
@@ -136,6 +130,10 @@ private:
     // Accessors for the derived type.
     const MatrixType& underlying()const { return static_cast<const MatrixType&>(*this); }
     MatrixType& underlying() { return static_cast<MatrixType&>(*this); }
+
+    // Implementation for element access, to be provided by derived classes.
+    decltype(auto) const_at_(int64_t row, int64_t column)const { return underlying().const_at_(row, column); }
+    decltype(auto) non_const_at_(int64_t row, int64_t column) { return underlying().non_const_at_(row, column); }
 };
 //-------------------------------------------------------------------
 

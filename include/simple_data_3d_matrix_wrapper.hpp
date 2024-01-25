@@ -56,6 +56,8 @@ class SimpleData3DMatrixWrapper : public BaseMatrix3D<SimpleData3DMatrixWrapper<
 {
 public:
 
+    friend class BaseMatrix3D<SimpleData3DMatrixWrapper<SimpleDataType> >;
+
     
     SimpleData3DMatrixWrapper(const SimpleDataType& value) : value_(value)
     {

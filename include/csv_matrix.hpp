@@ -95,6 +95,7 @@ public:
     using value_type = DataType;
 
     friend class MatrixFactory;
+    friend class BaseMatrix< CSVMatrix<DataType> >;
 
     // Default constructor
     CSVMatrix(char string_delimiter = '\"',
@@ -117,9 +118,6 @@ public:
     uintptr_t columns()const { return columns_; }
 
     std::string_view string_at(int64_t row, int64_t column)const;
-    decltype(auto) at_(int64_t row, int64_t column)const;
-    
-
 
     const std::string& get_row_header(uintptr_t index)const;
     const std::string& get_column_header(uintptr_t index)const;
@@ -134,6 +132,10 @@ public:
 
 
 private: // Private functions
+
+
+    decltype(auto) const_at_(int64_t row, int64_t column)const;
+    DataType& non_const_at_(int64_t row, int64_t column);
     
     uintptr_t find_end_of_current_row(uintptr_t current_position_in_csv_string)const;
     uintptr_t find_end_of_current_column(uintptr_t current_position_in_csv_string, uintptr_t end_of_row)const;
@@ -232,7 +234,7 @@ inline CSVMatrix<DataType>::CSVMatrix(char string_delimiter,
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline decltype(auto) CSVMatrix<DataType>::at_(int64_t row, int64_t column)const
+inline decltype(auto) CSVMatrix<DataType>::const_at_(int64_t row, int64_t column)const
 {
     auto [begin,end] = find_begin_end_indeces_of_csv_entry(row, column);
     
@@ -243,18 +245,33 @@ inline decltype(auto) CSVMatrix<DataType>::at_(int64_t row, int64_t column)const
     return value;
 }
 
-// String specializations
 
+
+// String specializations
 template<>
-inline decltype(auto) CSVMatrix<std::string>::at_(int64_t row, int64_t column)const
+inline decltype(auto) CSVMatrix<std::string>::const_at_(int64_t row, int64_t column)const
 {
     return this->string_at(row, column);
 }
 
 template<>
-inline decltype(auto) CSVMatrix<std::string_view>::at_(int64_t row, int64_t column)const
+inline decltype(auto) CSVMatrix<std::string_view>::const_at_(int64_t row, int64_t column)const
 {
     return this->string_at(row, column);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Since allowing reference access doesn't make sense, in this case
+// we just return a dummy value
+//-------------------------------------------------------------------
+template<typename DataType>
+
+inline DataType& CSVMatrix<DataType>::non_const_at_(int64_t row, int64_t column)
+{
+    return DummyValueHolder<DataType>::zero;
 }
 //-------------------------------------------------------------------
 

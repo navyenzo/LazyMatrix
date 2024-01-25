@@ -59,6 +59,8 @@ public:
     // Type of value that is stored in the matrix
     using value_type = typename ReferenceType1::value_type;
 
+    friend class BaseMatrix<AugmentColumnsView<ReferenceType1, ReferenceType2>>;
+
     /**
      * @brief Constructs a new matrix by augmenting the columns of two matrices.
      * @param left_side_expression Reference to the left side matrix.
@@ -107,18 +109,22 @@ public:
         return left_side_expression_.columns() + right_side_expression_.columns();
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column) const
+    value_type const_at_(int64_t row, int64_t column) const
     {
         if(column < left_side_expression_.columns())
-            return row < left_side_expression_.rows() ? left_side_expression_.at(row, column) : zero_;
+            return row < left_side_expression_.rows() ? left_side_expression_.at(row, column) : DummyValueHolder<value_type>::zero;
         else
-            return row < right_side_expression_.rows() ? right_side_expression_.at(row, column - left_side_expression_.columns()) : zero_;
+            return row < right_side_expression_.rows() ? right_side_expression_.at(row, column - left_side_expression_.columns()) : DummyValueHolder<value_type>::zero;
     }
 
     /**
@@ -127,22 +133,20 @@ public:
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType1>{} && has_non_const_access<ReferenceType2>{}, value_type&>
-    at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         if(column < left_side_expression_.columns())
-            return row < left_side_expression_.rows() ? left_side_expression_.at(row, column) : zero_;
+            return row < left_side_expression_.rows() ? left_side_expression_.at(row, column) : DummyValueHolder<value_type>::zero;
         else
-            return row < right_side_expression_.rows() ? right_side_expression_.at(row, column - left_side_expression_.columns()) : zero_;
+            return row < right_side_expression_.rows() ? right_side_expression_.at(row, column - left_side_expression_.columns()) : DummyValueHolder<value_type>::zero;
     }
 
 
 
-private:
+private: // Private variables
 
     ReferenceType1 left_side_expression_;
     ReferenceType2 right_side_expression_;
-    mutable value_type zero_ = static_cast<value_type>(0);
 };
 //-------------------------------------------------------------------
 
@@ -155,8 +159,7 @@ private:
  * @tparam ReferenceType2 Type of the right side matrix.
  * @param m1 Shared reference to the left side matrix.
  * @param m2 Shared reference to the right side matrix.
- * @return A SharedMatrixRef or ConstSharedMatrixRef to the
- *         AugmentColumnsView combining both matrices.
+ * @return A SharedMatrixRef to the AugmentColumnsView combining both matrices.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType1,
@@ -170,20 +173,7 @@ augment_by_columns_view(ReferenceType1 m1,
                         ReferenceType2 m2)
 {
     auto view = std::make_shared<AugmentColumnsView<ReferenceType1, ReferenceType2>>(m1, m2);
-    
-    // Use the trait to determine if non-const access is available
-    constexpr bool hasNonConstAccess1 = has_non_const_access<ReferenceType1>::value;
-    constexpr bool hasNonConstAccess2 = has_non_const_access<ReferenceType2>::value;
-
-    // Conditionally selecting the return type
-    using ReturnType = std::conditional_t
-    <
-        hasNonConstAccess1 && hasNonConstAccess2,
-        SharedMatrixRef<AugmentColumnsView<ReferenceType1, ReferenceType2>>,
-        ConstSharedMatrixRef<AugmentColumnsView<ReferenceType1, ReferenceType2>>
-    >;
-
-    return ReturnType(view);
+    return SharedMatrixRef<AugmentColumnsView<ReferenceType1, ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 

@@ -266,10 +266,11 @@ public:
     using value_type = Poco::Dynamic::Var;
 
     friend class MatrixFactory;
+    friend class BaseMatrix<DatabaseMatrix>;
 
      /**
-     * Constructor for DatabaseMatrix.
-     * Initializes the matrix with the given database session and table information.
+     * @brief Constructor for DatabaseMatrix.
+     *        Initializes the matrix with the given database session and table information.
      * @param session Database session for connectivity.
      * @param table_name SafeName object representing the sanitized table name.
      * @param condition SQL condition for data retrieval (default is empty).
@@ -283,16 +284,36 @@ public:
                    const SafeRowSortingMethod& row_sorting_method = SafeRowSortingMethod("", ""));
 
     /**
-     * Gets the number of rows in the matrix.
-     * @return Number of rows.
+     * @brief Gets the number of rows in the matrix.
      */
     uintptr_t rows() const;
 
     /**
-     * Gets the number of columns in the matrix.
-     * @return Number of columns.
+     * @brief Gets the number of columns in the matrix.
      */
     uintptr_t columns() const;
+
+    /**
+     * @brief Sets the row sorting method for the matrix.
+     * @param row_sorting_method The new sorting method.
+     */
+    void set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method)const;
+
+    /**
+     * @brief Sets the SQL condition for data retrieval.
+     * @param condition The new SQL condition.
+     */
+    void set_condition(const std::string& condition)const;
+
+    /**
+     * @brief Retrieves the last error message, if any.
+     * @return The last error message.
+     */
+    const std::string& get_last_error() const;
+
+
+
+private: // Private functions
 
     /**
      * Accesses an element of the matrix at the specified row and column.
@@ -300,46 +321,38 @@ public:
      * @param column Column index.
      * @return The value at the specified position in the matrix.
      */
-    const value_type& at_(int64_t row, int64_t column) const;
+    value_type const_at_(int64_t row, int64_t column) const;
 
     /**
-     * Sets the row sorting method for the matrix.
-     * @param row_sorting_method The new sorting method.
+     * @brief Since reference access in this context doesn't make sense, this
+     *        function returns a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return Since reference access in this context doesn't make sense, this
+     *         function returns a dummy value.
      */
-    void set_row_sorting_method(const SafeRowSortingMethod& row_sorting_method)const;
+    value_type& non_const_at_(int64_t row, int64_t column);
 
     /**
-     * Sets the SQL condition for data retrieval.
-     * @param condition The new SQL condition.
-     */
-    void set_condition(const std::string& condition)const;
-
-    /**
-     * Retrieves the last error message, if any.
-     * @return The last error message.
-     */
-    const std::string& get_last_error() const;
-
-
-
-private:
-
-    /**
-     * Counts the number of rows in the matrix.
+     * @brief Counts the number of rows in the matrix.
      */
     void count_rows()const;
 
     /**
-     * Counts the number of columns in the matrix.
+     * @brief Counts the number of columns in the matrix.
      */
     void count_columns()const;
 
     /**
-     * Preloads data into the cache for the specified row and column.
+     * @brief Preloads data into the cache for the specified row and column.
      * @param row Row index around which to preload data.
      * @param column Column index around which to preload data.
      */
     void preload_data(int64_t row, int64_t column) const;
+
+
+
+private: // Private variables
 
     Poco::Data::Session& session_;                      ///< Database session for connectivity.
     SafeName table_name_;                               ///< Sanitized table name.
@@ -476,7 +489,7 @@ inline uintptr_t DatabaseMatrix::columns() const
 
 
 //-------------------------------------------------------------------
-inline const DatabaseMatrix::value_type& DatabaseMatrix::at_(int64_t row, int64_t column) const
+inline DatabaseMatrix::value_type DatabaseMatrix::const_at_(int64_t row, int64_t column) const
 {
     // Check if the data is in the current cache window
     if (!cache_window_.is_data_found_in_window(row, column))
@@ -490,6 +503,15 @@ inline const DatabaseMatrix::value_type& DatabaseMatrix::at_(int64_t row, int64_
 
     // Return the data from the cache
     return cache_window_.cache[cache_index];
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+inline DatabaseMatrix::value_type& DatabaseMatrix::non_const_at_(int64_t row, int64_t column)
+{
+    return DummyValueHolder<DatabaseMatrix::value_type>::zero;
 }
 //-------------------------------------------------------------------
 

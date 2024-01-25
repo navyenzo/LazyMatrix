@@ -111,6 +111,8 @@ public:
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
+    friend class BaseMatrix<SortedView<ReferenceType> >;
+
     /**
      * @brief Construct a new Sorted View object
      * 
@@ -185,13 +187,17 @@ public:
         return index_of_row_or_column_to_use_to_sort_;
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         if(sort_by_rows_)
             return expression_.circ_at(row, sorted_indeces_[column]);
@@ -205,8 +211,7 @@ public:
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
-    at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         if(sort_by_rows_)
             return expression_.circ_at(row, sorted_indeces_[column]);
@@ -216,7 +221,7 @@ public:
 
 
 
-private:
+private: // Private variables
 
     ReferenceType expression_;
 
@@ -255,8 +260,7 @@ struct is_type_a_matrix< SortedView<ReferenceType> > : std::true_type
  * @param m Shared reference to the input matrix expression
  * @param index_of_row_or_column_to_use_to_sort Index of the row or column to use for sorting.
  * @param sort_by_rows Flag to indicate whether to sort by rows.
- * @return A SharedMatrixRef or ConstSharedMatrixRef to the
- *         SortedView matrix object.
+ * @return A SharedMatrixRef to the SortedView matrix object.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -269,19 +273,7 @@ create_sorted_matrix_view(ReferenceType m,
                           bool sort_by_rows)
 {
     auto view = std::make_shared<SortedView<ReferenceType>>(m, index_of_row_or_column_to_use_to_sort, sort_by_rows);
-
-    // Use the trait to determine if non-const access is available
-    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
-
-    // Conditionally selecting the return type
-    using ReturnType = std::conditional_t
-    <
-        hasNonConstAccess,
-        SharedMatrixRef<SortedView<ReferenceType>>,
-        ConstSharedMatrixRef<SortedView<ReferenceType>>
-    >;
-
-    return ReturnType(view);
+    return SharedMatrixRef<SortedView<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

@@ -47,14 +47,17 @@ namespace LazyMatrix
  * @tparam ReferenceType The type of the matrix expression.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class ROIView : public BaseMatrix< ROIView<ReferenceType> >
 {
 public:
 
     // Type of value that is stored in the expression
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType::value_type;
+
+    friend class BaseMatrix< ROIView<ReferenceType> >;
 
     /**
      * @brief Constructs a ROIView object from a matrix expression and coordinates.
@@ -113,13 +116,17 @@ public:
         return std::abs(column2_ - column1_) + 1;
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
      * @return A copy of the value of the element at the specified position.
      */
-    value_type at_(int64_t row, int64_t column)const
+    value_type const_at_(int64_t row, int64_t column)const
     {
         int64_t actual_row = row1_;
         int64_t actual_column = column1_;
@@ -149,8 +156,7 @@ public:
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>{}, value_type&>
-    at_(int64_t row, int64_t column)
+    value_type& non_const_at_(int64_t row, int64_t column)
     {
         int64_t actual_row = row1_;
         int64_t actual_column = column1_;
@@ -176,7 +182,7 @@ public:
 
 
 
-private:
+private: // private variables
 
     ReferenceType expression_;
     
@@ -210,8 +216,7 @@ struct is_type_a_matrix< ROIView<ReferenceType> > : std::true_type
  * @param column1 first column of the ROI.
  * @param row2 second row of the ROI.
  * @param column2 second column of the ROI.
- * @return A SharedMatrixRef or ConstSharedMatrixRef to the
- *         ROI matrix object.
+ * @return A SharedMatrixRef to the ROI matrix object.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -223,19 +228,7 @@ create_roi_view(ReferenceType m,
                           int64_t row1, int64_t column1, int64_t row2, int64_t column2)
 {
     auto view = std::make_shared<ROIView<ReferenceType>>(m, row1, column1, row2, column2);
-
-    // Use the trait to determine if non-const access is available
-    constexpr bool hasNonConstAccess = has_non_const_access<ReferenceType>::value;
-
-    // Conditionally selecting the return type
-    using ReturnType = std::conditional_t
-    <
-        hasNonConstAccess,
-        SharedMatrixRef<ROIView<ReferenceType>>,
-        ConstSharedMatrixRef<ROIView<ReferenceType>>
-    >;
-
-    return ReturnType(view);
+    return SharedMatrixRef<ROIView<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

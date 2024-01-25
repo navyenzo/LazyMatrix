@@ -72,7 +72,7 @@ inline auto
 operator*(ReferenceType1 m1,
           ReferenceType2 m2)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType1>()(0,0))>::type>::type;
+    using value_type = typename ReferenceType1::value_type;
     
     if(m1.size() > 0 && m2.size() > 0 && (m1.columns() == m2.rows()))
     {

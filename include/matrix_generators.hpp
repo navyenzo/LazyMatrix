@@ -64,6 +64,14 @@ public:
 
     using value_type = DataType;
 
+    /**
+     * @brief Construct a new Iota Matrix object
+     * 
+     * @param rows 
+     * @param columns 
+     * @param starting_value 
+     * @param step 
+     */
     IotaMatrix(int rows, int columns, DataType starting_value = static_cast<DataType>(0), DataType step = static_cast<DataType>(1))
     : BaseMatrix< IotaMatrix<DataType> >(),
       rows_(rows),
@@ -73,21 +81,43 @@ public:
     {
     }
 
+    /**
+     * @brief Return the number of rows
+     */
     uintptr_t rows()const
     {
         return rows_;
     }
 
+    /**
+     * @brief Return the number of columns
+     */
     uintptr_t columns()const
     {
         return columns_;
     }
-    
 
-
+    /**
+     * @brief Return the generated value at the (row,column) position
+     * @param row 
+     * @param column 
+     * @return DataType 
+     */
     DataType at_(int64_t row, int64_t column)const
     {
         return static_cast<DataType>(row * this->columns() + column) * step_ + starting_value_;
+    }
+
+    /**
+     * @brief Reference access doesn't make sense for this type of matrix operation
+     *        expression, so we just return a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to a dummy value since reference access doesn't make sense here.
+     */
+    value_type& at_(int row, int column)
+    {
+        return DummyValueHolder<value_type>::zero;
     }
 
 
@@ -132,6 +162,15 @@ public:
 
     using value_type = DataType;
 
+    /**
+     * @brief Construct a new Random Matrix object
+     * 
+     * @param rows 
+     * @param columns 
+     * @param min_value 
+     * @param max_value 
+     * @param steps 
+     */
     RandomMatrix(int rows, int columns, DataType min_value, DataType max_value, int64_t steps = 4294967296)
     : BaseMatrix< RandomMatrix<DataType> >(),
       rows_(rows),
@@ -142,23 +181,45 @@ public:
     {
     }
 
+    /**
+     * @brief Return the number of rows
+     */
     uintptr_t rows()const
     {
         return rows_;
     }
 
+    /**
+     * @brief Return the number of columns
+     */
     uintptr_t columns()const
     {
         return columns_;
     }
-    
 
-
+    /**
+     * @brief Return the generated value at the (row,column) position
+     * @param row 
+     * @param column 
+     * @return DataType 
+     */
     DataType at_(int64_t row, int64_t column)const
     {
         static XoshiroCpp::Xoshiro256PlusPlus rng(time(NULL));
 
         return min_value_ + (double(rng() % (steps_ + 1)) / double(steps_)) * double(max_value_ - min_value_);
+    }
+
+    /**
+     * @brief Reference access doesn't make sense for this type of matrix operation
+     *        expression, so we just return a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to a dummy value since reference access doesn't make sense here.
+     */
+    value_type& at_(int row, int column)
+    {
+        return DummyValueHolder<value_type>::zero;
     }
 
 
@@ -204,6 +265,17 @@ public:
 
     using value_type = DataType;
 
+    /**
+     * @brief Construct a new Sine Wave Matrix object
+     * 
+     * @param number_of_data_points 
+     * @param amplitude 
+     * @param frequency 
+     * @param phase_offset_in_radians 
+     * @param y_offset 
+     * @param delta_time 
+     * @param initial_time 
+     */
     SineWaveMatrix(int number_of_data_points,
                    DataType amplitude = 1,
                    DataType frequency = 1,
@@ -223,18 +295,28 @@ public:
     {
     }
 
+    /**
+     * @brief Return the number of rows
+     */
     uintptr_t rows()const
     {
         return rows_;
     }
 
+    /**
+     * @brief Return the number of columns
+     */
     uintptr_t columns()const
     {
         return columns_;
     }
-    
 
-
+    /**
+     * @brief Return the generated value at the (row,column) position
+     * @param row 
+     * @param column 
+     * @return DataType 
+     */
     DataType at_(int64_t row, int64_t column)const
     {
         DataType time = initial_time_ + DataType(row * this->columns() + column) * delta_time_;
@@ -242,6 +324,18 @@ public:
         DataType value = amplitude_ * std::sin(DataType(2) * LazyMatrix::PI * frequency_ * time + phase_offset_in_radians_) + y_offset_;
 
         return value;
+    }
+
+    /**
+     * @brief Reference access doesn't make sense for this type of matrix operation
+     *        expression, so we just return a dummy value.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to a dummy value since reference access doesn't make sense here.
+     */
+    value_type& at_(int row, int column)
+    {
+        return DummyValueHolder<value_type>::zero;
     }
 
 
@@ -282,7 +376,7 @@ struct is_type_a_matrix< SineWaveMatrix<DataType> > : std::true_type
  * @param columns The number of columns the generated matrix is supposed to have.
  * @param starting_value The starting value for the iota formula.
  * @param step The change between two consecutive values in the generated matrix.
- * @return A ConstSharedMatrixRef to the IotaMatrix object.
+ * @return A SharedMatrixRef to the IotaMatrix object.
  */
 //-------------------------------------------------------------------
 template<typename DataType>
@@ -295,7 +389,7 @@ generate_iota_matrix(int rows,
                      DataType step = static_cast<DataType>(1))
 {
     auto view = std::make_shared<IotaMatrix<DataType>>(rows, columns, starting_value, step);
-    return ConstSharedMatrixRef<IotaMatrix<DataType>>(view);
+    return SharedMatrixRef<IotaMatrix<DataType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -312,7 +406,7 @@ generate_iota_matrix(int rows,
  * @param min_value The minimum bound of the generated random values.
  * @param max_value The maximum bound of the generated random values.
  * @param steps The value used in the generation of the random values.
- * @return A ConstSharedMatrixRef to the RandomMatrix object.
+ * @return A SharedMatrixRef to the RandomMatrix object.
  */
 //-------------------------------------------------------------------
 template<typename DataType>
@@ -326,7 +420,7 @@ generate_random_matrix(int rows,
                        int64_t steps = 4294967296)
 {
     auto view = std::make_shared<RandomMatrix<DataType>>(rows, columns, min_value, max_value, steps);
-    return ConstSharedMatrixRef<RandomMatrix<DataType>>(view);
+    return SharedMatrixRef<RandomMatrix<DataType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -343,7 +437,7 @@ generate_random_matrix(int rows,
  * @param y_offset The y-offset (move wave up and down).
  * @param delta_time The sampling period.
  * @param initial_time Initial time used to generate sine wave.
- * @return A ConstSharedMatrixRef to the SineWaveMatrix object.
+ * @return A SharedMatrixRef to the SineWaveMatrix object.
  */
 //-------------------------------------------------------------------
 template<typename DataType>
@@ -366,7 +460,7 @@ generate_sine_wave_matrix(int number_of_data_points,
                                                            delta_time,
                                                            initial_time);
                                                           
-    return ConstSharedMatrixRef<SineWaveMatrix<DataType>>(view);
+    return SharedMatrixRef<SineWaveMatrix<DataType>>(view);
 }
 //-------------------------------------------------------------------
 

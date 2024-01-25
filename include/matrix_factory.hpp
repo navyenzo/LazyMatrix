@@ -123,10 +123,10 @@ public:
      * @return SharedMatrixRef<DatabaseMatrix> 
      */
     template<typename... Args>
-    static ConstSharedMatrixRef<DatabaseMatrix> create_database_matrix(Args&&... args)
+    static SharedMatrixRef<DatabaseMatrix> create_database_matrix(Args&&... args)
     {
         auto matrix_ptr = std::make_shared<DatabaseMatrix>(std::forward<Args>(args)...);
-        return ConstSharedMatrixRef<DatabaseMatrix>(matrix_ptr);
+        return SharedMatrixRef<DatabaseMatrix>(matrix_ptr);
     }
 
     /**

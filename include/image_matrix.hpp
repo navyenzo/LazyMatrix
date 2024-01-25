@@ -124,6 +124,8 @@ public:
 
     friend class MatrixFactory;
 
+    friend BaseMatrix< ImageMatrix<PixelType> >;
+
     /**
      * @brief Static assertion to ensure the pixel type is valid.
      *
@@ -163,8 +165,10 @@ public:
     {
         return image_data_.nc();
     }
-    
-    
+
+
+
+private: // Private functions
 
     /**
      * @brief Gets the pixel at the specified row and column.
@@ -173,14 +177,26 @@ public:
      * @param column The column index.
      * @return PixelType The pixel at the specified location.
      */
-    PixelType at_(int64_t row, int64_t column) const
+    PixelType const_at_(int64_t row, int64_t column) const
+    {
+        return image_data_(row, column);
+    }
+
+    /**
+     * @brief Gets a reference to the pixel at the specified row and column.
+     * 
+     * @param row The row index.
+     * @param column The column index.
+     * @return PixelType The pixel at the specified location.
+     */
+    PixelType& non_const_at_(int64_t row, int64_t column)
     {
         return image_data_(row, column);
     }
 
 
 
-private:
+private: // Private variables
 
     dlib::matrix<PixelType> image_data_;  ///< The underlying dlib matrix storing the image data.
 };

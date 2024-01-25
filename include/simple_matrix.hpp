@@ -74,6 +74,7 @@ public:
     using value_type = DataType;
 
     friend class MatrixFactory;
+    friend class BaseMatrix<SimpleMatrix<DataType> >;
 
     /**
      * Default constructor. Creates a matrix of specified dimensions with all elements initialized to a default value.
@@ -175,28 +176,6 @@ public:
     }
 
     /**
-     * Accesses the element at the specified position (const version).
-     * @param row The row index of the element.
-     * @param column The column index of the element.
-     * @return The element at the specified position.
-     */
-    const DataType& at_(int64_t row, int64_t column) const
-    {
-        return data_[(row * columns_) + column];
-    }
-
-    /**
-     * Accesses the element at the specified position (modifiable version).
-     * @param row The row index of the element.
-     * @param column The column index of the element.
-     * @return A reference to the element at the specified position.
-     */
-    DataType& at_(int64_t row, int64_t column)
-    {
-        return data_[(row * columns_) + column];
-    }
-
-    /**
      * Resizes the matrix to new dimensions, initializing new elements to a specified value.
      * @param rows The new number of rows.
      * @param columns The new number of columns.
@@ -224,7 +203,33 @@ public:
 
 
 
-private:
+private: // Private functions
+
+    /**
+     * Accesses the element at the specified position (const version).
+     * @param row The row index of the element.
+     * @param column The column index of the element.
+     * @return The element at the specified position.
+     */
+    const DataType& const_at_(int64_t row, int64_t column) const
+    {
+        return data_[(row * columns_) + column];
+    }
+
+    /**
+     * Accesses the element at the specified position (modifiable version).
+     * @param row The row index of the element.
+     * @param column The column index of the element.
+     * @return A reference to the element at the specified position.
+     */
+    DataType& non_const_at_(int64_t row, int64_t column)
+    {
+        return data_[(row * columns_) + column];
+    }
+
+
+
+private: // Private variables
 
     uintptr_t rows_ = 0;                 ///< The number of rows in the matrix.
     uintptr_t columns_ = 0;              ///< The number of columns in the matrix.
