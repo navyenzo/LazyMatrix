@@ -104,13 +104,15 @@ public:
     // Type of value that is stored in the matrix
     using value_type = DataType;
 
+    friend class BaseMatrix3D< Matrix3D<DataType> >;
+
     // Constructor from an expression
     template<typename MatrixType>
     Matrix3D<DataType>(const BaseMatrix3D<MatrixType>& expression)
     : BaseMatrix3D< Matrix3D<DataType> >()
     {
         // First we create and initialize the matrix
-        this->resize(expression.pages(), expression.rows(), expression.columns());
+        this->resize_(expression.pages(), expression.rows(), expression.columns());
 
         // We then copy the values from the expression
         for(int64_t i = 0; i < this->pages(); ++i)
@@ -135,7 +137,7 @@ public:
     Matrix3D<DataType>(uintptr_t pages = 0, uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     : BaseMatrix3D< Matrix3D<DataType> >()
     {
-        this->resize(pages, rows, columns, initial_value);
+        this->resize_(pages, rows, columns, initial_value);
     }
 
     // Constructor to memory map a matrix from file
@@ -150,7 +152,7 @@ public:
     Matrix3D<DataType>& operator=(const BaseMatrix3D<MatrixType>& matrix)
     {
         // First we create and initialize the matrix
-        this->resize(matrix.pages(), matrix.rows(), matrix.columns());
+        this->resize_(matrix.pages(), matrix.rows(), matrix.columns());
 
         // We then copy the values from the expression
         for(int64_t i = 0; i < this->pages(); ++i)
@@ -210,7 +212,7 @@ public:
     {
         std::error_code error;
 
-        error = this->resize(matrix_to_copy.pages(), matrix_to_copy.rows(), matrix_to_copy.columns());
+        error = this->resize_(matrix_to_copy.pages(), matrix_to_copy.rows(), matrix_to_copy.columns());
 
         for(int64_t i = 0; i < this->pages(); ++i)
         {
@@ -292,16 +294,6 @@ public:
 
 
 
-    std::error_code resize(uintptr_t pages,
-                           uintptr_t rows,
-                           uintptr_t columns,
-                           const DataType& initial_value = static_cast<DataType>(0))
-    {
-        return this->create_matrix(pages, rows, columns, initial_value);
-    }
-
-
-
     std::error_code create_matrix(uintptr_t pages,
                                   uintptr_t rows,
                                   uintptr_t columns,
@@ -327,6 +319,14 @@ public:
 
 
 private: // Private functions
+
+    std::error_code resize_(uintptr_t pages,
+                            uintptr_t rows,
+                            uintptr_t columns,
+                            const DataType& initial_value = static_cast<DataType>(0))
+    {
+        return this->create_matrix(pages, rows, columns, initial_value);
+    }
 
     DataType const_at_(int64_t page, int64_t row, int64_t column)const
     {

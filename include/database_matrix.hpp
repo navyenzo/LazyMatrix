@@ -316,6 +316,19 @@ public:
 private: // Private functions
 
     /**
+     * @brief Dummy "resize" function needed for the matrix interface, but
+     *        here it doesn't do anything
+     * 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    std::error_code resize_(uintptr_t rows, uintptr_t columns)
+    {
+        return std::error_code();
+    }
+
+    /**
      * Accesses an element of the matrix at the specified row and column.
      * @param row Row index.
      * @param column Column index.

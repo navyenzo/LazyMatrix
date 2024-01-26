@@ -98,7 +98,7 @@ public:
     // Circular accessors for matrix elements.
     decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)const
     {
-        int64_t circ_page = (this->pages() + page % this->pages) % this->pages();
+        int64_t circ_page = (this->pages() + page % this->pages()) % this->pages();
         int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
         int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
         return (*this)(circ_page, circ_row, circ_column);
@@ -106,7 +106,7 @@ public:
     
     decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)
     {
-        int64_t circ_page = (this->pages() + page % this->pages) % this->pages();
+        int64_t circ_page = (this->pages() + page % this->pages()) % this->pages();
         int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
         int64_t circ_column = (this->columns() + column % this->columns()) % this->columns();
         return (*this)(circ_page, circ_row, circ_column);
@@ -123,6 +123,18 @@ public:
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return (*this)(circ_index);
     }
+    
+    // Function used to resize the underlying matrix
+    std::error_code resize(uintptr_t pages,
+                           uintptr_t rows,
+                           uintptr_t columns)
+    {
+        return this->resize_(pages, rows, columns);
+    }
+
+    // Setter methods defined here to help define python/c++ interface
+    template<typename ValueType>
+    void set_circ_at(int64_t page, int64_t row, int64_t column, ValueType value) { this->circ_at(page, row, column) = value; }
 
 
 
@@ -152,6 +164,12 @@ private:
     decltype(auto) non_const_at_(int64_t page, int64_t row, int64_t column)
     {
         return underlying().non_const_at_(page, row, column);
+    }
+
+    // Implementation for resize function
+    std::error_code resize_(uintptr_t pages, uintptr_t rows, uintptr_t columns)
+    {
+        return underlying().resize_(pages, rows, columns);
     }
 };
 //-------------------------------------------------------------------

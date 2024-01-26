@@ -72,7 +72,7 @@ public:
      */
     SimpleMatrix3D(uintptr_t pages, uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
     {
-        this->resize(pages, rows, columns, initial_value);
+        this->resize_(pages, rows, columns, initial_value);
     }
 
     /**
@@ -102,6 +102,10 @@ public:
         return columns_;
     }
 
+
+
+private: // Private functions
+
     /**
      * @brief Resizes the matrix to new dimensions and initializes to a specified value.
      * @param pages New number of pages.
@@ -109,7 +113,7 @@ public:
      * @param columns New number of columns.
      * @param initial_value Value to initialize new elements (default = 0).
      */
-    void resize(uintptr_t pages, uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
+    std::error_code resize_(uintptr_t pages, uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
     {
         // In case of failed memory allocation, we just
         // set the matrix size to zero
@@ -119,6 +123,7 @@ public:
             rows_ = rows;
             columns_ = columns;
             data_.resize(pages * rows * columns, initial_value);
+            return std::error_code();
         }
         catch (const std::bad_alloc& e)
         {
@@ -128,12 +133,9 @@ public:
             rows_ = 0;
             columns_ = 0;
             data_.clear();
+            return std::make_error_code(std::errc::not_enough_memory);
         }
     }
-
-
-
-private: // Private functions
 
     /**
      * @brief Accesses the element at the specified position (const version).

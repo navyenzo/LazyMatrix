@@ -24,6 +24,7 @@
 
 //-------------------------------------------------------------------
 #include <iostream>
+#include <cstdint>
 //-------------------------------------------------------------------
 
 
@@ -113,11 +114,15 @@ public:
         return (*this)(circ_index);
     }
 
-
+    // Function used to resize the underlying matrix storage
+    std::error_code resize(uintptr_t rows, uintptr_t columns)
+    {
+        return this->resize_(rows, columns);
+    }
 
     // Setter methods defined here to help define python/c++ interface
     template<typename ValueType>
-    void set_circ_at(int64_t row, int64_t column, const ValueType& value) { this->circ_at(row, column) = value; }
+    void set_circ_at(int64_t row, int64_t column, ValueType value) { this->circ_at(row, column) = value; }
 
 
 
@@ -134,6 +139,9 @@ private:
     // Implementation for element access, to be provided by derived classes.
     decltype(auto) const_at_(int64_t row, int64_t column)const { return underlying().const_at_(row, column); }
     decltype(auto) non_const_at_(int64_t row, int64_t column) { return underlying().non_const_at_(row, column); }
+
+    // Implementation for resize function
+    std::error_code resize_(uintptr_t rows, uintptr_t columns) { return underlying().resize_(rows, columns); }
 };
 //-------------------------------------------------------------------
 

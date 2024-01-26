@@ -29,6 +29,7 @@
 #include <algorithm>
 
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 
 // xoshiro-cpp library for random number generators
 #include "XoshiroCpp.hpp"
@@ -110,6 +111,19 @@ public:
 
 
 private: // Private functions
+
+    /**
+     * @brief Dummy "resize" function needed for the matrix interface, but
+     *        here it doesn't do anything
+     * 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    std::error_code resize_(uintptr_t rows, uintptr_t columns)
+    {
+        return std::error_code();
+    }
 
     /**
      * @brief Accesses the element at the specified position.

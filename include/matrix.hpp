@@ -162,6 +162,7 @@ public:
     using value_type = DataType;
 
     friend class MatrixFactory;
+    friend class BaseMatrix< Matrix<DataType> >;
 
     /**
      * @brief Default constructor. Initializes a matrix with given rows and columns.
@@ -290,15 +291,6 @@ public:
     void initialize(const DataType& initial_value);
 
     /**
-     * @brief Resizes the matrix to a specified size.
-     * @param rows The new number of rows.
-     * @param columns The new number of columns.
-     * @param initial_value The initial value to fill new elements with.
-     * @return Error code indicating success or failure of the operation.
-     */
-    std::error_code resize(int64_t rows, int64_t columns, const DataType& initial_value = static_cast<DataType>(0));
-
-    /**
      * @brief Creates a matrix with a given size.
      * @param rows The number of rows for the new matrix.
      * @param columns The number of columns for the new matrix.
@@ -323,6 +315,15 @@ public:
 
 
 private: // Private functions
+
+    /**
+     * @brief Resizes the matrix to a specified size.
+     * @param rows The new number of rows.
+     * @param columns The new number of columns.
+     * @param initial_value The initial value to fill new elements with.
+     * @return Error code indicating success or failure of the operation.
+     */
+    std::error_code resize_(int64_t rows, int64_t columns, const DataType& initial_value = static_cast<DataType>(0));
 
     /**
      * @brief Access operator for constant access.
@@ -397,7 +398,7 @@ template<typename DataType>
 inline Matrix<DataType>::Matrix(int64_t rows, int64_t columns, const DataType& initial_value)
                                 : BaseMatrix< Matrix<DataType> >()
 {
-    resize(rows, columns, initial_value);
+    this->resize_(rows, columns, initial_value);
 }
 //-------------------------------------------------------------------
 
@@ -414,7 +415,7 @@ inline Matrix<DataType>::Matrix(const MatrixType& matrix)
                                 : BaseMatrix< Matrix<DataType> >()
 {
     // First we create and initialize the matrix
-    this->resize(matrix.rows(), matrix.columns());
+    this->resize_(matrix.rows(), matrix.columns());
 
     // We then copy the values from the matrix
     for(int64_t i = 0; i < this->rows(); ++i)
@@ -467,7 +468,7 @@ template<typename DataType2, long NR, long NC, typename mem_manager, typename la
 inline Matrix<DataType>::Matrix(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix)
                                 : BaseMatrix< Matrix<DataType> >()
 {
-    this->resize(dlib_matrix.nr(), dlib_matrix.nc());
+    this->resize_(dlib_matrix.nr(), dlib_matrix.nc());
 
     for(int64_t i = 0; i < this->rows(); ++i)
     {
@@ -506,7 +507,7 @@ template <typename Derived>
 inline Matrix<DataType>& Matrix<DataType>::from_eigen_matrix(const Eigen::MatrixBase<Derived>& m)
 {
     if(this->rows() != m.rows() || this->columns() != m.cols())
-        this->resize(m.rows(),m.cols());
+        this->resize_(m.rows(),m.cols());
 
     for(int64_t i = 0; i < m.rows(); ++i)
     {
@@ -531,7 +532,7 @@ template<typename DataType2, long NR, long NC, typename mem_manager, typename la
 
 inline Matrix<DataType>& Matrix<DataType>::operator=(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix)
 {
-    this->resize(dlib_matrix.nr(), dlib_matrix.nc());
+    this->resize_(dlib_matrix.nr(), dlib_matrix.nc());
 
     for(int64_t i = 0; i < this->rows(); ++i)
     {
@@ -556,7 +557,7 @@ template<typename MatrixType>
 
 inline Matrix<DataType>& Matrix<DataType>::operator=(const BaseMatrix<MatrixType>& matrix)
 {
-    this->resize(matrix.rows(), matrix.columns());
+    this->resize_(matrix.rows(), matrix.columns());
     
     for(int i = 0; i < this->rows(); ++i)
     {
@@ -635,7 +636,7 @@ inline std::error_code Matrix<DataType>::deep_copy(const Matrix<DataType>& matri
 {
     std::error_code error;
 
-    error = this->resize(matrix_to_copy.rows(), matrix_to_copy.columns());
+    error = this->resize_(matrix_to_copy.rows(), matrix_to_copy.columns());
 
     if(error)
         return error;
@@ -787,7 +788,7 @@ inline void Matrix<DataType>::initialize(const DataType& initial_value)
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::error_code Matrix<DataType>::resize(int64_t rows, int64_t columns, const DataType& initial_value)
+inline std::error_code Matrix<DataType>::resize_(int64_t rows, int64_t columns, const DataType& initial_value)
 {
     return this->create_matrix(rows, columns, initial_value);
 }

@@ -31,8 +31,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
 
-#include "base_matrix.hpp"
+#include "shared_references.hpp"
+#include "matrix_factory.hpp"
 #include "output_operators.hpp"
+
+namespace py = pybind11;
 //-------------------------------------------------------------------
 
 
@@ -44,31 +47,153 @@ namespace LazyMatrix
 
 
 
+
 //-------------------------------------------------------------------
 /**
- * @brief Bind matrix class for view access in Python.
- * @tparam MatrixType The matrix type to bind.
- * @param m The pybind11 module.
- * @param name The name of the matrix in Python.
+ * @brief Binds the MatrixFactory class and its static factory methods to a Python module.
+ * 
+ * This function is used to bind the MatrixFactory class from the LazyMatrix library to a Python module.
+ * It exposes various static factory methods to Python, allowing for the creation of different types of matrices.
+ * These include regular matrices, CSV matrices, image matrices, simple matrices, database matrices,
+ * as well as their 3D counterparts.
+ * 
+ * @param m The Python module to which the class and methods are bound.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
-
-void bind_matrix_view(pybind11::module &m, const char* name)
+inline void bind_factory_functions(pybind11::module_& m)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    using namespace py::literals; // For _a literal used in pybind11 function arguments
 
-    pybind11::class_<MatrixType>(m, name)
-        .def("rows", &MatrixType::rows)
-        .def("columns", &MatrixType::columns)
-        .def("size", &MatrixType::size)
-        .def("at", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::at)
-        .def("at", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::at)
-        .def("circ_at", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::circ_at)
-        .def("circ_at", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::circ_at)
-        .def("__call__", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::operator())
-        .def("__call__", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::operator());
+    // Wrappers for MatrixFactory::create_matrix function
+    auto create_matrix_char = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix<char>(rows, columns);
+    };
+    
+    auto create_matrix_int = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix<int>(rows, columns);
+    };
+    
+    auto create_matrix_float = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix<float>(rows, columns);
+    };
+    
+    auto create_matrix_double = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix<double>(rows, columns);
+    };
+    
+    auto create_matrix_string = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix<std::string>(rows, columns);
+    };
+
+    // Wrappers for MatrixFactory::create_matrix3d function
+    auto create_matrix3d_char = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix3d<char>(pages, rows, columns);
+    };
+
+    auto create_matrix3d_int = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix3d<int>(pages, rows, columns);
+    };
+
+    auto create_matrix3d_float = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix3d<float>(pages, rows, columns);
+    };
+
+    auto create_matrix3d_double = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix3d<double>(pages, rows, columns);
+    };
+
+    auto create_matrix3d_string = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_matrix3d<std::string>(pages, rows, columns);
+    };
+
+    // Wrappers for MatrixFactory::create_simple_matrix function
+    auto create_simple_matrix_char = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix<char>(rows, columns);
+    };
+    
+    auto create_simple_matrix_int = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix<int>(rows, columns);
+    };
+    
+    auto create_simple_matrix_float = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix<float>(rows, columns);
+    };
+    
+    auto create_simple_matrix_double = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix<double>(rows, columns);
+    };
+    
+    auto create_simple_matrix_string = [](int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix<std::string>(rows, columns);
+    };
+
+    // Wrappers for MatrixFactory::create_simple_matrix3d function
+    auto create_simple_matrix3d_char = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix3d<char>(pages, rows, columns);
+    };
+
+    auto create_simple_matrix3d_int = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix3d<int>(pages, rows, columns);
+    };
+
+    auto create_simple_matrix3d_float = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix3d<float>(pages, rows, columns);
+    };
+
+    auto create_simple_matrix3d_double = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix3d<double>(pages, rows, columns);
+    };
+
+    auto create_simple_matrix3d_string = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return MatrixFactory::create_simple_matrix3d<std::string>(pages, rows, columns);
+    };
+
+    // Binding the wrapper functions
+    pybind11::class_<MatrixFactory>(m, "MatrixFactory")
+        // create_matrix functions
+        .def_static("create_matrix_char", create_matrix_char, "rows"_a, "columns"_a)
+        .def_static("create_matrix_int", create_matrix_int, "rows"_a, "columns"_a)
+        .def_static("create_matrix_float", create_matrix_float, "rows"_a, "columns"_a)
+        .def_static("create_matrix_double", create_matrix_double, "rows"_a, "columns"_a)
+        .def_static("create_matrix_string", create_matrix_string, "rows"_a, "columns"_a)
+        // create_matrix3d functions
+        .def_static("create_matrix3d_char", create_matrix3d_char, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_matrix3d_int", create_matrix3d_int, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_matrix3d_float", create_matrix3d_float, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_matrix3d_double", create_matrix3d_double, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_matrix3d_string", create_matrix3d_string, "pages"_a, "rows"_a, "columns"_a)
+        // create_simple_matrix functions
+        .def_static("create_simple_matrix_char", create_simple_matrix_char, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix_int", create_simple_matrix_int, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix_float", create_simple_matrix_float, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix_double", create_simple_matrix_double, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix_string", create_simple_matrix_string, "rows"_a, "columns"_a)
+        // create_simple_matrix3d functions
+        .def_static("create_simple_matrix3d_char", create_simple_matrix3d_char, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix3d_int", create_simple_matrix3d_int, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix3d_float", create_simple_matrix3d_float, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix3d_double", create_simple_matrix3d_double, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix3d_string", create_simple_matrix3d_string, "pages"_a, "rows"_a, "columns"_a);
 }
 //-------------------------------------------------------------------
 
@@ -76,30 +201,37 @@ void bind_matrix_view(pybind11::module &m, const char* name)
 
 //-------------------------------------------------------------------
 /**
- * @brief Bind matrix class for const access in Python.
- * @tparam MatrixType The matrix type to bind.
- * @param m The pybind11 module.
- * @param name The name of the matrix in Python.
+ * @brief Bind a SharedMatrixRef class to Python.
+ *
+ * This template function binds a SharedMatrixRef to a Python class, allowing the
+ * Python side to interact with the C++ SharedMatrixRef objects. The binding includes the 
+ * member functions of the SharedMatrixRef class. This function is specialized for types
+ * recognized as matrix references.
+ *
+ * @tparam ReferenceType The shared matrix reference type.
+ * @param m Reference to the Pybind11 module.
+ * @param name The name of the class in the Python module.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-inline void bind_matrix(pybind11::module &m, const char* name)
+inline void bind_matrix_ref(py::module &m, const char* name)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    using ValueType = typename ReferenceType::value_type;
 
-    pybind11::class_<MatrixType>(m, name)
-        .def("rows", &MatrixType::rows)
-        .def("columns", &MatrixType::columns)
-        .def("size", &MatrixType::size)
-        .def("at", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::at)
-        .def("at", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::at)
-        .def("circ_at", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::circ_at)
-        .def("circ_at", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::circ_at)
-        .def("__call__", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::operator())
-        .def("__call__", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::operator())
-        .def("set_circ_at", (void (MatrixType::*)(int64_t, int64_t, const value_type&)) &MatrixType::set_circ_at);
+    py::class_<ReferenceType>(m, name)
+        .def("rows", &ReferenceType::rows)
+        .def("columns", &ReferenceType::columns)
+        .def("size", &ReferenceType::size)
+        .def("at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t) const>(&ReferenceType::at))
+        .def("at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t)>(&ReferenceType::at))
+        .def("__call__", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t) const>(&ReferenceType::operator()))
+        .def("__call__", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t)>(&ReferenceType::operator()))
+        .def("circ_at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t) const>(&ReferenceType::circ_at))
+        .def("circ_at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t)>(&ReferenceType::circ_at))
+        .def("set_circ_at", &ReferenceType::set_circ_at)
+        .def("resize", &ReferenceType::resize);
 }
 //-------------------------------------------------------------------
 
@@ -107,32 +239,38 @@ inline void bind_matrix(pybind11::module &m, const char* name)
 
 //-------------------------------------------------------------------
 /**
- * @brief Bind matrix class with storage constructor in Python.
- * @tparam MatrixType The matrix type to bind.
- * @param m The pybind11 module.
- * @param name The name of the matrix in Python.
+ * @brief Bind a SharedMatrix3DRef class to Python.
+ *
+ * This template function binds a SharedMatrix3DRef to a Python class, allowing the
+ * Python side to interact with the C++ SharedMatrix3DRef objects. The binding includes the 
+ * member functions of the SharedMatrix3DRef class. This function is specialized for types
+ * recognized as 3D matrix references.
+ *
+ * @tparam ReferenceType The shared 3D matrix reference type.
+ * @param m Reference to the Pybind11 module.
+ * @param name The name of the class in the Python module.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
 
-inline void bind_matrix_storage(pybind11::module &m, const char* name)
+inline void bind_matrix3d_ref(py::module &m, const char* name)
 {
-    using value_type = typename std::remove_const<typename std::remove_reference<decltype(std::declval<MatrixType>()(0,0))>::type>::type;
+    using ValueType = typename ReferenceType::value_type;
 
-    pybind11::class_<MatrixType>(m, name)
-        .def(pybind11::init<uintptr_t, uintptr_t, const value_type&>())
-        .def("resize", (void (MatrixType::*)(int64_t, int64_t, const value_type&)) &MatrixType::resize)
-        .def("rows", &MatrixType::rows)
-        .def("columns", &MatrixType::columns)
-        .def("size", &MatrixType::size)
-        .def("at", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::at)
-        .def("at", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::at)
-        .def("circ_at", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::circ_at)
-        .def("circ_at", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::circ_at)
-        .def("__call__", (const value_type& (MatrixType::*)(int64_t, int64_t) const) &MatrixType::operator())
-        .def("__call__", (const value_type& (MatrixType::*)(int64_t) const) &MatrixType::operator())
-        .def("set_circ_at", (void (MatrixType::*)(int64_t, int64_t, const value_type&)) &MatrixType::set_circ_at);
+    py::class_<ReferenceType>(m, name)
+        .def("pages", &ReferenceType::pages)
+        .def("rows", &ReferenceType::rows)
+        .def("columns", &ReferenceType::columns)
+        .def("size", &ReferenceType::size)
+        .def("at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t, int64_t) const>(&ReferenceType::at))
+        .def("at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t, int64_t)>(&ReferenceType::at))
+        .def("__call__", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t, int64_t) const>(&ReferenceType::operator()))
+        .def("__call__", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t, int64_t)>(&ReferenceType::operator()))
+        .def("circ_at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t, int64_t) const>(&ReferenceType::circ_at))
+        .def("circ_at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t, int64_t)>(&ReferenceType::circ_at))
+        .def("set_circ_at", &ReferenceType::set_circ_at)
+        .def("resize", &ReferenceType::resize);
 }
 //-------------------------------------------------------------------
 
@@ -307,7 +445,7 @@ private:
  * a vector containing pairs of matrix names and references. The names are automatically 
  * assigned based on the provided prefix followed by a sequential index.
  *
- * \tparam MatrixType The type of the matrices, ensuring that only matrix types are used.
+ * \tparam ReferenceType The type of the matrices, ensuring that only matrix types are used.
  * \tparam Matrices Variadic template to handle multiple matrix references.
  * \param prefix A string prefix for naming the matrices (e.g., "in" for input matrices).
  * \param first The first matrix reference.
@@ -315,13 +453,13 @@ private:
  * \return A vector of pairs of matrix names and matrix references.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType, typename... Matrices>
-std::vector<std::pair<std::string, MatrixType&>> create_named_matrix_vector(const std::string& prefix, MatrixType& first, Matrices&... rest)
+template<typename ReferenceType, typename... Matrices>
+std::vector<std::pair<std::string, ReferenceType&>> create_named_matrix_vector(const std::string& prefix, ReferenceType& first, Matrices&... rest)
 {
-    std::vector<std::pair<std::string, MatrixType&>> named_matrices;
+    std::vector<std::pair<std::string, ReferenceType&>> named_matrices;
     int index = 0;
 
-    auto add_matrix = [&](MatrixType& matrix)
+    auto add_matrix = [&](ReferenceType& matrix)
     {
         named_matrices.emplace_back(prefix + std::to_string(index++), matrix);
     };
@@ -342,13 +480,13 @@ std::vector<std::pair<std::string, MatrixType&>> create_named_matrix_vector(cons
  * This overloaded function handles cases where no matrices are provided. It simply returns an empty vector.
  * This is useful when you need to provide an empty vector of matrix references to a function or process.
  *
- * \tparam MatrixType The type of the matrices, ensuring that only matrix types are used.
+ * \tparam ReferenceType The type of the matrices, ensuring that only matrix types are used.
  * \param prefix A string prefix for naming the matrices. This is not used but is kept for function signature consistency.
  * \return An empty vector of pairs of matrix names and matrix references.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
-std::vector<std::pair<std::string, MatrixType&>> create_named_matrix_vector(const std::string& prefix)
+template<typename ReferenceType>
+std::vector<std::pair<std::string, ReferenceType&>> create_named_matrix_vector(const std::string& prefix)
 {
     return {}; // Return an empty vector
 }
@@ -360,7 +498,7 @@ std::vector<std::pair<std::string, MatrixType&>> create_named_matrix_vector(cons
 /**
  * \brief Executes a Python script with given input and output matrices.
  *
- * \tparam MatrixType The type of the matrices, which must be a matrix type.
+ * \tparam ReferenceType The type of the matrices, which must be a matrix type.
  * \param input_matrices Vector of pairs of matrix names and references to matrix objects for input.
  * \param output_matrices Vector of pairs of matrix names and references to matrix objects for output.
  * \param script The Python script to execute.
@@ -368,11 +506,11 @@ std::vector<std::pair<std::string, MatrixType&>> create_named_matrix_vector(cons
  * \return The standard output captured from the Python script.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-std::string execute_python_script(const std::vector<MatrixType>& input_matrices,
-                                  const std::vector<MatrixType>& output_matrices,
+std::string execute_python_script(const std::vector<ReferenceType>& input_matrices,
+                                  const std::vector<ReferenceType>& output_matrices,
                                   const std::string& script,
                                   const std::string& module_name)
 {

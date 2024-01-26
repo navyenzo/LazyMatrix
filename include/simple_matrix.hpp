@@ -84,7 +84,7 @@ public:
      */
     SimpleMatrix(uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     {
-        this->resize(rows, columns, initial_value);
+        this->resize_(rows, columns, initial_value);
     }
 
     /**
@@ -93,7 +93,7 @@ public:
      */
     SimpleMatrix(const SimpleMatrix<DataType>& matrix)
     {
-        this->resize(matrix.rows(), matrix.columns());
+        this->resize_(matrix.rows(), matrix.columns());
 
         for(int i = 0; i < matrix.rows(); ++i)
             for(int j = 0; j < matrix.columns(); ++j)
@@ -112,7 +112,7 @@ public:
         auto rows = matrix.rows();
         auto columns = matrix.columns();
 
-        this->resize(matrix.rows(), matrix.columns());
+        this->resize_(matrix.rows(), matrix.columns());
 
         for(int i = 0; i < rows; ++i)
             for(int j = 0; j < columns; ++j)
@@ -126,7 +126,7 @@ public:
      */
     SimpleMatrix<DataType>& operator=(const SimpleMatrix<DataType>& matrix)
     {
-        this->resize(matrix.rows(), matrix.columns());
+        this->resize_(matrix.rows(), matrix.columns());
 
         for(int i = 0; i < matrix.rows(); ++i)
             for(int j = 0; j < matrix.columns(); ++j)
@@ -148,7 +148,7 @@ public:
         auto rows = matrix.rows();
         auto columns = matrix.columns();
 
-        this->resize(rows, columns);
+        this->resize_(rows, columns);
 
         for(int i = 0; i < rows; ++i)
             for(int j = 0; j < columns; ++j)
@@ -175,13 +175,17 @@ public:
         return columns_;
     }
 
+
+
+private: // Private functions
+
     /**
      * Resizes the matrix to new dimensions, initializing new elements to a specified value.
      * @param rows The new number of rows.
      * @param columns The new number of columns.
      * @param initial_value The value to initialize new elements to. Default is static_cast<DataType>(0).
      */
-    void resize(uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
+    std::error_code resize_(uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0))
     {
         // In case of failed memory allocation, we just
         // set the matrix size to zero
@@ -190,6 +194,7 @@ public:
             rows_ = rows;
             columns_ = columns;
             data_.resize(rows * columns, initial_value);
+            return std::error_code();
         }
         catch (const std::bad_alloc& e)
         {
@@ -198,12 +203,9 @@ public:
             rows_ = 0;
             columns_ = 0;
             data_.clear();
+            return std::make_error_code(std::errc::not_enough_memory);
         }
     }
-
-
-
-private: // Private functions
 
     /**
      * Accesses the element at the specified position (const version).

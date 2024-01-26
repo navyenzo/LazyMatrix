@@ -275,6 +275,32 @@ public:
     {
         return ptr_->circ_at(index);
     }
+    
+    /**
+     * @brief This function is used for python bindings, it sets the value at
+     *        the specified position (using circular indexing).
+     * 
+     * @tparam ValueType 
+     * @param row 
+     * @param column 
+     * @param value 
+     */
+    void set_circ_at(int64_t row, int64_t column, value_type value)
+    {
+        ptr_->set_circ_at(row, column, value);
+    }
+
+    /**
+     * @brief Resizes the underlying matrix expression (if possible).
+     * 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    std::error_code resize(uintptr_t rows, uintptr_t columns)
+    {
+        return ptr_->resize(rows, columns);
+    }
 
 
 
@@ -500,6 +526,35 @@ public:
     value_type& circ_at(int64_t index)
     {
         return ptr_->circ_at(index);
+    }
+
+    /**
+     * @brief This function is used for python bindings, it sets the value at
+     *        the specified position (using circular indexing).
+     * 
+     * @tparam ValueType 
+     * @param page
+     * @param row 
+     * @param column 
+     * @param value 
+     */
+    void set_circ_at(int64_t page, int64_t row, int64_t column, value_type value)
+    {
+        ptr_->set_circ_at(page, row, column, value);
+    }
+
+    /**
+     * @brief Resizes underlying matrix expression (if possible).
+     * 
+     * @param pages 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    
+    std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns)
+    {
+        return ptr_->resize(pages, rows, columns);
     }
 
 
