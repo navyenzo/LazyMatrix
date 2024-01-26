@@ -52,14 +52,18 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class PaddedMatrixView : public BaseMatrix< PaddedMatrixView<ReferenceType> >
+class PaddedMatrixView : public BaseMatrix<PaddedMatrixView<ReferenceType>,
+                                           typename ReferenceType::value_type,
+                                           has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< PaddedMatrixView<ReferenceType> >;
+    friend class BaseMatrix<PaddedMatrixView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Padded Matrix View< Matrix Type> object.
@@ -172,7 +176,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         if(row < 0 || row >= expression_.rows() || column < 0 || column >= expression_.columns())
             return constant_value_for_padding_;
@@ -227,7 +232,15 @@ create_padded_matrix_view(ReferenceType m,
                           typename std::remove_const<typename std::remove_reference<decltype(std::declval<ReferenceType>()(0,0))>::type>::type constant_value_for_padding = 0)
 {
     auto view = std::make_shared<PaddedMatrixView<ReferenceType>>(m, padded_rows, padded_columns);
-    return SharedMatrixRef<PaddedMatrixView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<PaddedMatrixView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<PaddedMatrixView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

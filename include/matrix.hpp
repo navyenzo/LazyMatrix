@@ -154,7 +154,9 @@ class MatrixFactory;
  */
 //-------------------------------------------------------------------
 template<typename DataType>
-class Matrix : public BaseMatrix< Matrix<DataType> >
+class Matrix : public BaseMatrix<Matrix<DataType>,
+                                 DataType,
+                                 true>
 {
 public:
 
@@ -162,7 +164,10 @@ public:
     using value_type = DataType;
 
     friend class MatrixFactory;
-    friend class BaseMatrix< Matrix<DataType> >;
+
+    friend class BaseMatrix<Matrix<DataType>,
+                            DataType,
+                            true>;
 
     /**
      * @brief Default constructor. Initializes a matrix with given rows and columns.
@@ -171,14 +176,6 @@ public:
      * @param initial_value The initial value to fill the matrix. Default is 0.
      */
     Matrix<DataType>(int64_t rows = 0, int64_t columns = 0, const DataType& initial_value = static_cast<DataType>(0));
-
-    /**
-     * @brief Copy constructor for creating a matrix from another matrix expression.
-     * @tparam MatrixType Type of the source matrix. Must satisfy is_type_a_matrix.
-     * @param matrix The source matrix to be copied.
-     */
-    template<typename MatrixType, std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
-    Matrix<DataType>(const MatrixType& matrix);
 
     /**
      * @brief Shallow copy constructor. Copies the matrix structure but not the data.
@@ -233,15 +230,6 @@ public:
      */
     template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
     Matrix<DataType>& operator=(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix);
-
-    /**
-     * @brief Assignment operator from a generic matrix expression.
-     * @tparam MatrixType The type of the source matrix.
-     * @param matrix The source matrix for assignment.
-     * @return Reference to this matrix after assignment.
-     */
-    template<typename MatrixType>
-    Matrix<DataType>& operator=(const BaseMatrix<MatrixType>& matrix);
 
     /**
      * @brief Assignment operator for shallow copying from another matrix.
@@ -396,35 +384,8 @@ struct is_type_a_matrix< Matrix<DataType> > : std::true_type
 template<typename DataType>
 
 inline Matrix<DataType>::Matrix(int64_t rows, int64_t columns, const DataType& initial_value)
-                                : BaseMatrix< Matrix<DataType> >()
 {
     this->resize_(rows, columns, initial_value);
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Copy Constructor from a generic matrix expression
-//-------------------------------------------------------------------
-template<typename DataType>
-
-template<typename MatrixType, std::enable_if_t<is_type_a_matrix<MatrixType>{}>*>
-
-inline Matrix<DataType>::Matrix(const MatrixType& matrix)
-                                : BaseMatrix< Matrix<DataType> >()
-{
-    // First we create and initialize the matrix
-    this->resize_(matrix.rows(), matrix.columns());
-
-    // We then copy the values from the matrix
-    for(int64_t i = 0; i < this->rows(); ++i)
-    {
-        for(int64_t j = 0; j < this->columns(); ++j)
-        {
-            (*this)(i,j) = matrix(i,j);
-        }
-    }
 }
 //-------------------------------------------------------------------
 
@@ -436,7 +397,6 @@ inline Matrix<DataType>::Matrix(const MatrixType& matrix)
 template<typename DataType>
 
 inline Matrix<DataType>::Matrix(const Matrix<DataType>& matrix)
-                                : BaseMatrix< Matrix<DataType> >()
 {
     this->shallow_copy(matrix);
 }
@@ -450,7 +410,6 @@ inline Matrix<DataType>::Matrix(const Matrix<DataType>& matrix)
 template<typename DataType>
 
 inline Matrix<DataType>::Matrix(const std::string& file_to_load_matrix_from)
-                                : BaseMatrix< Matrix<DataType> >()
 {
     this->load_matrix(file_to_load_matrix_from);
 }
@@ -466,7 +425,6 @@ template<typename DataType>
 template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
 
 inline Matrix<DataType>::Matrix(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix)
-                                : BaseMatrix< Matrix<DataType> >()
 {
     this->resize_(dlib_matrix.nr(), dlib_matrix.nc());
 
@@ -542,31 +500,6 @@ inline Matrix<DataType>& Matrix<DataType>::operator=(const dlib::matrix<DataType
         }
     }
 
-    return (*this);
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Assignment from a generic matrix expression
-//-------------------------------------------------------------------
-template<typename DataType>
-
-template<typename MatrixType>
-
-inline Matrix<DataType>& Matrix<DataType>::operator=(const BaseMatrix<MatrixType>& matrix)
-{
-    this->resize_(matrix.rows(), matrix.columns());
-    
-    for(int i = 0; i < this->rows(); ++i)
-    {
-        for(int j = 0; j < this->columns(); ++j)
-        {
-            (*this)(i,j) = matrix(i,j);
-        }
-    }
-    
     return (*this);
 }
 //-------------------------------------------------------------------

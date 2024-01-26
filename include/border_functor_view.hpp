@@ -52,12 +52,16 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-struct RepeatedBorderView : public BaseMatrix< RepeatedBorderView<ReferenceType> >
+struct RepeatedBorderView : public BaseMatrix<RepeatedBorderView<ReferenceType>,
+                                              typename ReferenceType::value_type,
+                                              has_non_const_access<ReferenceType>::value>
 {
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< RepeatedBorderView<ReferenceType> >;
+    friend class BaseMatrix<RepeatedBorderView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Constructs a new matrix view by repeating border values.
@@ -180,12 +184,18 @@ struct is_type_a_matrix< RepeatedBorderView<ReferenceType> > : std::true_type
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-struct ConstantBorderView : public BaseMatrix< ConstantBorderView<ReferenceType> >
+class ConstantBorderView : public BaseMatrix<ConstantBorderView<ReferenceType>,
+                                             typename ReferenceType::value_type,
+                                             has_non_const_access<ReferenceType>::value>
 {
+public:
+
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< ConstantBorderView<ReferenceType> >;
+    friend class BaseMatrix<ConstantBorderView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
     
     /**
      * @brief Constructs a new matrix view that gives a constant border
@@ -262,7 +272,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())
             return constant_value_;
@@ -311,7 +322,15 @@ inline auto
 repeated_border_view(ReferenceType m)
 {
     auto view = std::make_shared<RepeatedBorderView<ReferenceType>>(m);
-    return SharedMatrixRef<RepeatedBorderView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<RepeatedBorderView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<RepeatedBorderView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 
@@ -336,7 +355,15 @@ inline auto
 constant_border_view(ReferenceType m)
 {
     auto view = std::make_shared<ConstantBorderView<ReferenceType>>(m);
-    return SharedMatrixRef<ConstantBorderView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<ConstantBorderView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<ConstantBorderView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

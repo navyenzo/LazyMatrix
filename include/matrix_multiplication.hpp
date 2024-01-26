@@ -69,8 +69,8 @@ template<typename ReferenceType1,
 
 inline auto
 
-operator*(ReferenceType1 m1,
-          ReferenceType2 m2)
+operator*(const ReferenceType1& m1,
+          const ReferenceType2& m2)
 {
     using value_type = typename ReferenceType1::value_type;
     

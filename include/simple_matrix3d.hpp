@@ -55,13 +55,17 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class SimpleMatrix3D : public BaseMatrix3D<SimpleMatrix3D<DataType> >
+class SimpleMatrix3D : public BaseMatrix3D<SimpleMatrix3D<DataType>,
+                                           DataType,
+                                           true>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix3D<SimpleMatrix3D<DataType> >;
+    friend class BaseMatrix3D<SimpleMatrix3D<DataType>,
+                              DataType,
+                              true>;
 
     /**
      * @brief Constructor for creating a 3D matrix of given dimensions.

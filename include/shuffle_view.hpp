@@ -57,14 +57,18 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class ShuffledView : public BaseMatrix< ShuffledView<ReferenceType> >
+class ShuffledView : public BaseMatrix<ShuffledView<ReferenceType>,
+                                       typename ReferenceType::value_type,
+                                       has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< ShuffledView<ReferenceType> >;
+    friend class BaseMatrix<ShuffledView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Shuffle object
@@ -142,7 +146,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(row_indeces_[row], column_indeces_[column]);
     }
@@ -201,7 +206,15 @@ create_shuffled_matrix_view(ReferenceType m,
                             bool should_columns_be_shuffled)
 {
     auto view = std::make_shared<ShuffledView<ReferenceType>>(m, should_rows_be_shuffled, should_columns_be_shuffled);
-    return SharedMatrixRef<ShuffledView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<ShuffledView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<ShuffledView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

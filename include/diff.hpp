@@ -72,12 +72,18 @@ enum class DiffDirection : int
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-struct Diff : public BaseMatrix< Diff<ReferenceType> >
+class Diff : public BaseMatrix<Diff<ReferenceType>,
+                               typename ReferenceType::valuae_type,
+                               has_non_const_access<ReferenceType>::value>
 {
+public:
+
     // Type of value that is stored in the matrix
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< Diff<ReferenceType> >;
+    friend class BaseMatrix<Diff<ReferenceType>,
+                            typename ReferenceType::valuae_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Difference<ReferenceType> object
@@ -178,18 +184,6 @@ private: // Private functions
         }
     }
 
-    /**
-     * @brief Reference access doesn't make sense for this type of matrix operation
-     *        expression, so we just return a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return A reference to a dummy value since reference access doesn't make sense here.
-     */
-    value_type& non_const_at_(int row, int column)
-    {
-        return DummyValueHolder<value_type>::zero;
-    }
-
 
 
 private: // Private variables
@@ -231,7 +225,7 @@ inline auto
 diff(ReferenceType m, DiffDirection diff_direction)
 {
     auto view = std::make_shared<Diff<ReferenceType>>(m, diff_direction);
-    return SharedMatrixRef<Diff<ReferenceType>>(view);
+    return ConstSharedMatrixRef<Diff<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

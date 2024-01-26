@@ -137,7 +137,7 @@ template<typename ReferenceType1, typename ReferenceType2,
             std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
             std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
-inline auto filter(ReferenceType1 source_matrix,
+inline auto filter(const ReferenceType1& source_matrix,
                    ReferenceType2 filter_kernel)
 {
     using value_type = typename ReferenceType1::value_type;

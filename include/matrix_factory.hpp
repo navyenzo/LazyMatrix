@@ -79,10 +79,10 @@ public:
      * @return SharedMatrixRef<CSVMatrix<DataType>> 
      */
     template<typename DataType, typename... Args>
-    static SharedMatrixRef<CSVMatrix<DataType>> create_csv_matrix(Args&&... args)
+    static ConstSharedMatrixRef<CSVMatrix<DataType>> create_csv_matrix(Args&&... args)
     {
         auto matrix_ptr = std::make_shared<CSVMatrix<DataType>>(std::forward<Args>(args)...);
-        return SharedMatrixRef<CSVMatrix<DataType>>(matrix_ptr);
+        return ConstSharedMatrixRef<CSVMatrix<DataType>>(matrix_ptr);
     }
 
     /**
@@ -123,10 +123,10 @@ public:
      * @return SharedMatrixRef<DatabaseMatrix> 
      */
     template<typename... Args>
-    static SharedMatrixRef<DatabaseMatrix> create_database_matrix(Args&&... args)
+    static ConstSharedMatrixRef<DatabaseMatrix> create_database_matrix(Args&&... args)
     {
         auto matrix_ptr = std::make_shared<DatabaseMatrix>(std::forward<Args>(args)...);
-        return SharedMatrixRef<DatabaseMatrix>(matrix_ptr);
+        return ConstSharedMatrixRef<DatabaseMatrix>(matrix_ptr);
     }
 
     /**

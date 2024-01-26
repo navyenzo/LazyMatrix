@@ -25,6 +25,7 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -50,9 +51,17 @@ namespace LazyMatrix
  */
 //-------------------------------------------------------------------
 template<typename SimpleDataType>
-class SimpleData2DMatrixWrapper : public BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType> >
+class SimpleData2DMatrixWrapper : public BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,
+                                                    SimpleDataType,
+                                                    true>
 {
 public:
+
+    using value_type = SimpleDataType;
+
+    friend class BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,
+                            SimpleDataType,
+                            true>;
 
     /**
      * @brief Construct a new Simple Data 2D Matrix Wrapper object.

@@ -56,15 +56,21 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-struct ElementByElementUnaryExpression : public BaseMatrix< ElementByElementUnaryExpression<ReferenceType> >
+class ElementByElementUnaryExpression : public BaseMatrix<ElementByElementUnaryExpression<ReferenceType>,
+                                                          typename ReferenceType::value_type,
+                                                          false>
 {
+public:
+
     // Type of value that is stored in the matrix
     using value_type = typename ReferenceType::value_type;
 
     // The operation function type
     using operation_type = std::function<value_type(value_type)>;
 
-    friend class BaseMatrix< ElementByElementUnaryExpression<ReferenceType> >;
+    friend class BaseMatrix<ElementByElementUnaryExpression<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            false>;
 
     /**
      * @brief Construct a new Element By Element Unary Expression< Reference Type> object
@@ -142,18 +148,6 @@ private: // Private functions
         return static_cast<value_type>(operation_function_(this->expression_.at(row,column)));
     }
 
-    /**
-     * @brief Reference access doesn't make sense for this type of matrix operation
-     *        expression, so we just return a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return A reference to a dummy value since reference access doesn't make sense here.
-     */
-    value_type& non_const_at_(int row, int column)
-    {
-        return DummyValueHolder<value_type>::zero;
-    }
-
 
 
 private: // Private variables
@@ -197,7 +191,7 @@ operator-(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, std::negate<value_type>());
 
-    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -231,7 +225,7 @@ sign(ReferenceType m)
                                                        }
                                                       );
 
-    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -257,7 +251,7 @@ abs(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::abs(number); });
 
-    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -283,7 +277,7 @@ sqrt(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::sqrt(number); });
 
-    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -309,7 +303,7 @@ exp(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::exp(number); });
 
-    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -335,7 +329,7 @@ exp2(ReferenceType m)
 
     auto view = std::make_shared<ElementByElementUnaryExpression<ReferenceType>>(m, [](const value_type& number){ return std::exp2(number); });
 
-    return SharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
+    return ConstSharedMatrixRef<ElementByElementUnaryExpression<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

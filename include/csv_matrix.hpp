@@ -87,15 +87,20 @@ class MatrixFactory;
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class CSVMatrix : public BaseMatrix< CSVMatrix<DataType> >
+class CSVMatrix : public BaseMatrix<CSVMatrix<DataType>,
+                                    DataType,
+                                    false>
 {
 public:
 
-    // Type of value that is stored in the matrix
+    // Type of value that is stored in the expression
     using value_type = DataType;
 
+    friend class BaseMatrix<CSVMatrix<DataType>,
+                            DataType,
+                            false>;
+
     friend class MatrixFactory;
-    friend class BaseMatrix< CSVMatrix<DataType> >;
 
     // Default constructor
     CSVMatrix(char string_delimiter = '\"',
@@ -216,7 +221,6 @@ inline CSVMatrix<DataType>::CSVMatrix(char string_delimiter,
                                       const std::string& row_delimiters,
                                       const std::string& column_delimiters,
                                       char decimal_point_delimiter)
-: BaseMatrix< CSVMatrix<DataType> >()
 {
     set_string_delimiter(string_delimiter);
     set_row_delimiters(row_delimiters);

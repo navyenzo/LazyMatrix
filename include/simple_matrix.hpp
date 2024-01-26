@@ -66,7 +66,9 @@ class MatrixFactory;
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType> >
+class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType>,
+                                       DataType,
+                                       true>
 {
 public:
 
@@ -74,7 +76,9 @@ public:
     using value_type = DataType;
 
     friend class MatrixFactory;
-    friend class BaseMatrix<SimpleMatrix<DataType> >;
+    friend class BaseMatrix<SimpleMatrix<DataType>,
+                            DataType,
+                            true>;
 
     /**
      * Default constructor. Creates a matrix of specified dimensions with all elements initialized to a default value.

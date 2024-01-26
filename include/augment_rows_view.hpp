@@ -59,12 +59,18 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
          std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
-struct AugmentRowsView : public BaseMatrix< AugmentRowsView<ReferenceType1, ReferenceType2> >
+class AugmentRowsView : public BaseMatrix<AugmentRowsView<ReferenceType1, ReferenceType2>,
+                                          typename ReferenceType1::value_type,
+                                          has_non_const_access<ReferenceType1>::value && has_non_const_access<ReferenceType2>::value>
 {
+public:
+
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType1::value_type;
 
-    friend class BaseMatrix< AugmentRowsView<ReferenceType1, ReferenceType2> >;
+    friend class BaseMatrix<AugmentRowsView<ReferenceType1, ReferenceType2>,
+                            typename ReferenceType1::value_type,
+                            has_non_const_access<ReferenceType1>::value && has_non_const_access<ReferenceType2>::value>;
 
     /**
      * @brief Constructs a new matrix view by augmenting the rows of two matrices.
@@ -162,7 +168,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType1>::value && has_non_const_access<ReferenceType2>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         if(row < this->top_side_expression_.rows())
         {
@@ -225,7 +232,15 @@ augment_by_rows_view(ReferenceType1 m1,
                      ReferenceType2 m2)
 {
     auto view = std::make_shared<AugmentRowsView<ReferenceType1, ReferenceType2>>(m1, m2);
-    return SharedMatrixRef<AugmentRowsView<ReferenceType1, ReferenceType2>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType1>::value && has_non_const_access<ReferenceType2>::value)
+    {
+        return SharedMatrixRef<AugmentRowsView<ReferenceType1, ReferenceType2>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<AugmentRowsView<ReferenceType1, ReferenceType2>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

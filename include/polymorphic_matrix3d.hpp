@@ -53,11 +53,15 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class PolymorphicMatrix3D : public BaseMatrix3D< PolymorphicMatrix3D<DataType> >
+class PolymorphicMatrix3D : public BaseMatrix3D<PolymorphicMatrix3D<DataType>,
+                                                DataType,
+                                                true>
 {
 public:
 
-    friend class BaseMatrix3D< PolymorphicMatrix3D<DataType> >;
+    friend class BaseMatrix3D<PolymorphicMatrix3D<DataType>,
+                              DataType,
+                              true>;
 
     PolymorphicMatrix3D() = default;
     virtual ~PolymorphicMatrix3D() = default;
@@ -67,25 +71,13 @@ public:
     virtual uintptr_t columns() const = 0;
     virtual uintptr_t size() const = 0;
 
-    // Accessors for matrix elements.
-    virtual DataType at(int64_t page, int64_t row, int64_t column)const = 0;
-    virtual DataType& at(int64_t page, int64_t row, int64_t column) = 0;
-    virtual DataType at(int64_t index)const = 0;
-    virtual DataType& at(int64_t index) = 0;
-
-    // Operator overloads for element access.
-    virtual DataType operator()(int64_t page, int64_t row, int64_t column)const = 0;
-    virtual DataType& operator()(int64_t page, int64_t row, int64_t column) = 0;
-    virtual DataType operator()(int64_t index)const = 0;
-    virtual DataType& operator()(int64_t index) = 0;
-
-    // Circular accessors for matrix elements.
-    virtual DataType circ_at(int64_t page, int64_t row, int64_t column)const = 0;
-    virtual DataType& circ_at(int64_t page, int64_t row, int64_t column) = 0;
-    virtual DataType circ_at(int64_t index)const = 0;
-    virtual DataType& circ_at(int64_t index) = 0;
-
     virtual std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns) = 0;
+
+private:
+
+    // Accessors for matrix elements.
+    virtual DataType const_at_(int64_t page, int64_t row, int64_t column)const = 0;
+    virtual DataType& non_const_at_(int64_t page, int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
 
@@ -131,25 +123,13 @@ public:
     uintptr_t columns() const override { return matrix_.columns(); }
     uintptr_t size() const override { return matrix_.size(); }
 
-    // Accessors for matrix elements.
-    DataType at(int64_t page, int64_t row, int64_t column)const override { return matrix_.at(page, row, column); }
-    DataType& at(int64_t page, int64_t row, int64_t column) override { return matrix_.at(page, row, column); }
-    DataType at(int64_t index)const override { return matrix_.at(index); }
-    DataType& at(int64_t index) override { return matrix_.at(index); }
-
-    // Operator overloads for element access.
-    DataType operator()(int64_t page, int64_t row, int64_t column)const override { return matrix_(page, row, column); }
-    DataType& operator()(int64_t page, int64_t row, int64_t column) override { return matrix_(page, row, column); }
-    DataType operator()(int64_t index)const override { return matrix_(index); }
-    DataType& operator()(int64_t index) override { return matrix_(index); }
-
-    // Circular accessors for matrix elements.
-    DataType circ_at(int64_t page, int64_t row, int64_t column)const override { return matrix_.circ_at(page, row, column); }
-    DataType& circ_at(int64_t page, int64_t row, int64_t column) override { return matrix_.circ_at(page, row, column); }
-    DataType circ_at(int64_t index)const override { return matrix_.circ_at(index); }
-    DataType& circ_at(int64_t index) override { return matrix_.circ_at(index); }
-
     std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns) override { return matrix_.resize(pages, rows, columns); }
+
+private: // Private functions
+
+    // Accessors for matrix elements.
+    DataType const_at_(int64_t page, int64_t row, int64_t column)const override { return matrix_.at(page, row, column); }
+    DataType& non_const_at_(int64_t page, int64_t row, int64_t column) override { return matrix_.at(page, row, column); }
 
 private: // Private variables
 

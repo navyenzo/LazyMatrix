@@ -57,14 +57,18 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class Transpose : public BaseMatrix< Transpose<ReferenceType> >
+class Transpose : public BaseMatrix<Transpose<ReferenceType>,
+                                    typename ReferenceType::value_type,
+                                    has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the matrix
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< Transpose<ReferenceType> >;
+    friend class BaseMatrix<Transpose<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Transpose View< Reference Type> object
@@ -135,7 +139,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         return expression_(column, row);
     }
@@ -177,7 +182,15 @@ template<typename ReferenceType,
 inline auto transpose(ReferenceType m)
 {
     auto view = std::make_shared<Transpose<ReferenceType>>(m);
-    return SharedMatrixRef<Transpose<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<Transpose<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<Transpose<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

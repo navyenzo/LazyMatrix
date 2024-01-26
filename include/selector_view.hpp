@@ -53,14 +53,18 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class SingleVectorSelectorView : public BaseMatrix< SingleVectorSelectorView<ReferenceType> >
+class SingleVectorSelectorView : public BaseMatrix< SingleVectorSelectorView<ReferenceType>,
+                                                    typename ReferenceType::value_type,
+                                                    has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< SingleVectorSelectorView<ReferenceType> >;
+    friend class BaseMatrix<SingleVectorSelectorView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Single Vector Selector View< Reference Type> object.
@@ -164,7 +168,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         if(are_we_selecting_a_row_)
             return expression_.circ_at(selected_vector_, column);
@@ -208,14 +213,18 @@ struct is_type_a_matrix< SingleVectorSelectorView<ReferenceType> > : std::true_t
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class MultipleVectorSelectorView : public BaseMatrix< MultipleVectorSelectorView<ReferenceType> >
+class MultipleVectorSelectorView : public BaseMatrix<MultipleVectorSelectorView<ReferenceType>,
+                                                     typename ReferenceType::value_type,
+                                                     has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< MultipleVectorSelectorView<ReferenceType> >;
+    friend class BaseMatrix<MultipleVectorSelectorView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Multiple Vector Selector View< Reference Type> object
@@ -289,6 +298,19 @@ public:
 private: // Private functions
 
     /**
+     * @brief Dummy "resize" function needed for the matrix interface, but
+     *        here it doesn't do anything
+     * 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    std::error_code resize_(uintptr_t rows, uintptr_t columns)
+    {
+        return std::error_code();
+    }
+
+    /**
      * @brief Accesses the element at the specified position.
      * @param row Row index.
      * @param column Column index.
@@ -308,7 +330,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         if(are_we_selecting_rows_)
             return expression_.circ_at(selected_vectors_[row], column);
@@ -351,14 +374,18 @@ struct is_type_a_matrix< MultipleVectorSelectorView<ReferenceType> > : std::true
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class RowAndColumnSelectorView : public BaseMatrix< RowAndColumnSelectorView<ReferenceType> >
+class RowAndColumnSelectorView : public BaseMatrix<RowAndColumnSelectorView<ReferenceType>,
+                                                   typename ReferenceType::value_type,
+                                                   has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< RowAndColumnSelectorView<ReferenceType> >;
+    friend class BaseMatrix<RowAndColumnSelectorView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Row And Column Selector View< Reference Type> object.
@@ -430,6 +457,19 @@ public:
 
 
 private: // Private functions
+
+    /**
+     * @brief Dummy "resize" function needed for the matrix interface, but
+     *        here it doesn't do anything
+     * 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    std::error_code resize_(uintptr_t rows, uintptr_t columns)
+    {
+        return std::error_code();
+    }
     
     /**
      * @brief Accesses the element at the specified position.
@@ -448,7 +488,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
     }
@@ -504,7 +545,15 @@ create_single_vector_selector_view(ReferenceType m,
                                    bool are_we_selecting_a_row)
 {
     auto view = std::make_shared<SingleVectorSelectorView<ReferenceType>>(m, selected_vector, are_we_selecting_a_row);
-    return SharedMatrixRef<SingleVectorSelectorView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<SingleVectorSelectorView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<SingleVectorSelectorView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 
@@ -531,7 +580,15 @@ create_multiple_vector_selector_view(ReferenceType m,
                                      bool are_we_selecting_rows)
 {
     auto view = std::make_shared<MultipleVectorSelectorView<ReferenceType>>(m, selected_vectors, are_we_selecting_rows);
-    return SharedMatrixRef<MultipleVectorSelectorView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<MultipleVectorSelectorView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<MultipleVectorSelectorView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 
@@ -558,7 +615,15 @@ create_multiple_vector_selector_view(ReferenceType m,
                                      const std::vector<int64_t>& selected_columns)
 {
     auto view = std::make_shared<RowAndColumnSelectorView<ReferenceType>>(m, selected_rows, selected_columns);
-    return SharedMatrixRef<RowAndColumnSelectorView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<RowAndColumnSelectorView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<RowAndColumnSelectorView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

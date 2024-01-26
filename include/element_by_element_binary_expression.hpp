@@ -59,15 +59,21 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
          std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
-struct ElementByElementBinaryExpression : public BaseMatrix< ElementByElementBinaryExpression<ReferenceType1, ReferenceType2> >
+class ElementByElementBinaryExpression : public BaseMatrix<ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>,
+                                                           typename ReferenceType1::value_type,
+                                                           false>
 {
+public:
+
     // Type of value that is stored in the matrix
     using value_type = typename ReferenceType1::value_type;
 
     // The operation function type
     using operation_type = std::function<value_type(value_type, value_type)>;
 
-    friend class BaseMatrix< ElementByElementBinaryExpression<ReferenceType1, ReferenceType2> >;
+    friend class BaseMatrix<ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>,
+                            typename ReferenceType1::value_type,
+                            false>;
 
     /**
      * @brief Construct a new Element By Element Binary Expression<Reference Type 1,Reference Type 2> object
@@ -163,18 +169,6 @@ private: // Private functions
                                                            this->right_side_expression_.at(row,column)));
     }
 
-    /**
-     * @brief Reference access doesn't make sense for this type of matrix operation
-     *        expression, so we just return a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return A reference to a dummy value since reference access doesn't make sense here.
-     */
-    value_type& non_const_at_(int row, int column)
-    {
-        return DummyValueHolder<value_type>::zero;
-    }
-
 
 
 private: // Private variables
@@ -225,7 +219,7 @@ operator+(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::plus<value_type>());
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -256,7 +250,7 @@ operator-(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::minus<value_type>());
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -287,7 +281,7 @@ operator%(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::fmod<value_type>());
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -318,7 +312,7 @@ elem_by_elem_multiply(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::multiplies<value_type>());
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -349,7 +343,7 @@ elem_by_elem_divide(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, std::divides<value_type>());
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -380,7 +374,7 @@ elem_by_elem_pow(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::pow(a,b); });
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -411,7 +405,7 @@ min(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::min(a,b); });
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -442,7 +436,7 @@ max(ReferenceType1 m1,
 
     auto view = std::make_shared<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(m1, m2, [](value_type a, value_type b) { return std::max(a,b); });
 
-    return SharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
+    return ConstSharedMatrixRef<ElementByElementBinaryExpression<ReferenceType1,ReferenceType2>>(view);
 }
 //-------------------------------------------------------------------
 

@@ -50,14 +50,18 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class ROIView : public BaseMatrix< ROIView<ReferenceType> >
+class ROIView : public BaseMatrix<ROIView<ReferenceType>,
+                                  typename ReferenceType::value_type,
+                                  has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< ROIView<ReferenceType> >;
+    friend class BaseMatrix<ROIView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Constructs a ROIView object from a matrix expression and coordinates.
@@ -169,7 +173,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         int64_t actual_row = row1_;
         int64_t actual_column = column1_;
@@ -241,7 +246,15 @@ create_roi_view(ReferenceType m,
                           int64_t row1, int64_t column1, int64_t row2, int64_t column2)
 {
     auto view = std::make_shared<ROIView<ReferenceType>>(m, row1, column1, row2, column2);
-    return SharedMatrixRef<ROIView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<ROIView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<ROIView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

@@ -65,12 +65,18 @@ enum class MovingAverageDirection : int
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-struct SimpleMovingAverage : public BaseMatrix< SimpleMovingAverage<ReferenceType> >
+class SimpleMovingAverage : public BaseMatrix<SimpleMovingAverage<ReferenceType>,
+                                              typename ReferenceType::value_type,
+                                              has_non_const_access<ReferenceType>::value>
 {
+public:
+
     // Type of value that is stored in left side expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< SimpleMovingAverage<ReferenceType> >;
+    friend class BaseMatrix<SimpleMovingAverage<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Simple Moving Average Of Rows< Reference Type> object
@@ -185,18 +191,6 @@ private: // Private functions
         }
     }
 
-    /**
-     * @brief Reference access doesn't make sense for this type of matrix operation
-     *        expression, so we just return a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return A reference to a dummy value since reference access doesn't make sense here.
-     */
-    value_type& non_const_at_(int row, int column)
-    {
-        return DummyValueHolder<value_type>::zero;
-    }
-
 
 
 private: // Private variables
@@ -240,7 +234,7 @@ simple_moving_average(ReferenceType m,
                       MovingAverageDirection moving_average_direction)
 {
     auto view = std::make_shared<SimpleMovingAverage<ReferenceType>>(m, number_of_data_points_to_average, moving_average_direction);
-    return SharedMatrixRef<SimpleMovingAverage<ReferenceType>>(view);
+    return ConstSharedMatrixRef<SimpleMovingAverage<ReferenceType>>(view);
 }
 //-------------------------------------------------------------------
 

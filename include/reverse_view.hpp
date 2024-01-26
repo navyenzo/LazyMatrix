@@ -55,14 +55,18 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class ReverseView : public BaseMatrix< ReverseView<ReferenceType> >
+class ReverseView : public BaseMatrix<ReverseView<ReferenceType>,
+                                      typename ReferenceType::value_type,
+                                      has_non_const_access<ReferenceType>::value>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
-    friend class BaseMatrix< ReverseView<ReferenceType> >;
+    friend class BaseMatrix<ReverseView<ReferenceType>,
+                            typename ReferenceType::value_type,
+                            has_non_const_access<ReferenceType>::value>;
 
     /**
      * @brief Construct a new Reverse View< Matrix Type> object
@@ -166,7 +170,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row,int64_t column)
+    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    non_const_at_(int64_t row,int64_t column)
     {
         int64_t actual_row = row;
         int64_t actual_column = column;
@@ -225,7 +230,15 @@ create_reversed_matrix_view(ReferenceType m,
                             bool should_columns_be_reversed)
 {
     auto view = std::make_shared<ReverseView<ReferenceType>>(m, should_rows_be_reversed, should_columns_be_reversed);
-    return SharedMatrixRef<ReverseView<ReferenceType>>(view);
+
+    if constexpr (has_non_const_access<ReferenceType>::value)
+    {
+        return SharedMatrixRef<ReverseView<ReferenceType>>(view);
+    }
+    else
+    {
+        return ConstSharedMatrixRef<ReverseView<ReferenceType>>(view);
+    }
 }
 //-------------------------------------------------------------------
 

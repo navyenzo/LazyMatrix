@@ -97,76 +97,37 @@ inline bool does_memory_contain_mapped_matrix3d(const char* memory_mapped_matrix
 // be evaluated
 //-------------------------------------------------------------------
 template<typename DataType>
-class Matrix3D : public BaseMatrix3D< Matrix3D<DataType> >
+class Matrix3D : public BaseMatrix3D<Matrix3D<DataType>,
+                                     DataType,
+                                     true>
 {
 public:
 
     // Type of value that is stored in the matrix
     using value_type = DataType;
 
-    friend class BaseMatrix3D< Matrix3D<DataType> >;
+    friend class MatrixFactory;
 
-    // Constructor from an expression
-    template<typename MatrixType>
-    Matrix3D<DataType>(const BaseMatrix3D<MatrixType>& expression)
-    : BaseMatrix3D< Matrix3D<DataType> >()
-    {
-        // First we create and initialize the matrix
-        this->resize_(expression.pages(), expression.rows(), expression.columns());
-
-        // We then copy the values from the expression
-        for(int64_t i = 0; i < this->pages(); ++i)
-        {
-            for(int64_t j = 0; j < this->rows(); ++j)
-            {
-                for(int64_t k = 0; k < this->columns(); ++k)
-                {
-                    (*this)(i,j,k) = expression(i,j,k);
-                }
-            }
-        }
-    }
+    friend class BaseMatrix3D<Matrix3D<DataType>,
+                              DataType,
+                              true>;
 
     // Copy constructor (We do shallow copy)
-    Matrix3D<DataType>(const Matrix3D<DataType>& matrix)
+    Matrix3D(const Matrix3D<DataType>& matrix)
     {
         this->shallow_copy(matrix);
     }
 
     // Constructor from rows, columns and initial value
-    Matrix3D<DataType>(uintptr_t pages = 0, uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
-    : BaseMatrix3D< Matrix3D<DataType> >()
+    Matrix3D(uintptr_t pages = 0, uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     {
         this->resize_(pages, rows, columns, initial_value);
     }
 
     // Constructor to memory map a matrix from file
-    Matrix3D<DataType>(const std::string& file_to_load_matrix_from)
-    : BaseMatrix3D< Matrix3D<DataType> >()
+    Matrix3D(const std::string& file_to_load_matrix_from)
     {
         this->load_matrix(file_to_load_matrix_from);
-    }
-
-    // Assignment from an expression
-    template<typename MatrixType>
-    Matrix3D<DataType>& operator=(const BaseMatrix3D<MatrixType>& matrix)
-    {
-        // First we create and initialize the matrix
-        this->resize_(matrix.pages(), matrix.rows(), matrix.columns());
-
-        // We then copy the values from the expression
-        for(int64_t i = 0; i < this->pages(); ++i)
-        {
-            for(int64_t j = 0; j < this->rows(); ++j)
-            {
-                for(int64_t k = 0; k < this->columns(); ++k)
-                {
-                    (*this)(i,j,k) = matrix(i,j,k);
-                }
-            }
-        }
-
-        return (*this);
     }
 
     // Assignment operator (does shallow copy)

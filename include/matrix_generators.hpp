@@ -58,13 +58,17 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class IotaMatrix : public BaseMatrix< IotaMatrix<DataType> >
+class IotaMatrix : public BaseMatrix<IotaMatrix<DataType>,
+                                     DataType,
+                                     false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix< IotaMatrix<DataType> >;
+    friend class BaseMatrix<IotaMatrix<DataType>,
+                            DataType,
+                            false>;
 
     /**
      * @brief Construct a new Iota Matrix object
@@ -75,8 +79,7 @@ public:
      * @param step 
      */
     IotaMatrix(int rows, int columns, DataType starting_value = static_cast<DataType>(0), DataType step = static_cast<DataType>(1))
-    : BaseMatrix< IotaMatrix<DataType> >(),
-      rows_(rows),
+    : rows_(rows),
       columns_(columns),
       starting_value_(starting_value),
       step_(step)
@@ -127,18 +130,6 @@ private: // Private functions
         return static_cast<DataType>(row * this->columns() + column) * step_ + starting_value_;
     }
 
-    /**
-     * @brief Reference access doesn't make sense for this type of matrix operation
-     *        expression, so we just return a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return A reference to a dummy value since reference access doesn't make sense here.
-     */
-    value_type& non_const_at_(int row, int column)
-    {
-        return DummyValueHolder<value_type>::zero;
-    }
-
 
 
 private: // Private variables
@@ -175,13 +166,17 @@ struct is_type_a_matrix< IotaMatrix<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class RandomMatrix : public BaseMatrix< RandomMatrix<DataType> >
+class RandomMatrix : public BaseMatrix<RandomMatrix<DataType>,
+                                       DataType,
+                                       false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix< RandomMatrix<DataType> >;
+    friend class BaseMatrix<RandomMatrix<DataType>,
+                            DataType,
+                            false>;
 
     /**
      * @brief Construct a new Random Matrix object
@@ -193,8 +188,7 @@ public:
      * @param steps 
      */
     RandomMatrix(int rows, int columns, DataType min_value, DataType max_value, int64_t steps = 4294967296)
-    : BaseMatrix< RandomMatrix<DataType> >(),
-      rows_(rows),
+    : rows_(rows),
       columns_(columns),
       min_value_(min_value),
       max_value_(max_value),
@@ -248,18 +242,6 @@ private: // Private functions
         return min_value_ + (double(rng() % (steps_ + 1)) / double(steps_)) * double(max_value_ - min_value_);
     }
 
-    /**
-     * @brief Reference access doesn't make sense for this type of matrix operation
-     *        expression, so we just return a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return A reference to a dummy value since reference access doesn't make sense here.
-     */
-    value_type& non_const_at_(int row, int column)
-    {
-        return DummyValueHolder<value_type>::zero;
-    }
-
 
 
 private: // Private variables
@@ -297,13 +279,17 @@ struct is_type_a_matrix< RandomMatrix<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class SineWaveMatrix : public BaseMatrix< SineWaveMatrix<DataType> >
+class SineWaveMatrix : public BaseMatrix<SineWaveMatrix<DataType>,
+                                         DataType,
+                                         false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix< SineWaveMatrix<DataType> >;
+    friend class BaseMatrix<SineWaveMatrix<DataType>,
+                            DataType,
+                            false>;
 
     /**
      * @brief Construct a new Sine Wave Matrix object
@@ -323,8 +309,7 @@ public:
                    DataType y_offset = 0,
                    DataType delta_time = 0.1,
                    DataType initial_time = 0)
-    : BaseMatrix< SineWaveMatrix<DataType> >(),
-      rows_(number_of_data_points),
+    : rows_(number_of_data_points),
       columns_(1),
       amplitude_(amplitude),
       frequency_(frequency),
@@ -383,18 +368,6 @@ private: // Private function
         return value;
     }
 
-    /**
-     * @brief Reference access doesn't make sense for this type of matrix operation
-     *        expression, so we just return a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return A reference to a dummy value since reference access doesn't make sense here.
-     */
-    value_type& non_const_at_(int row, int column)
-    {
-        return DummyValueHolder<value_type>::zero;
-    }
-
 
 
 private: // Private variables
@@ -446,7 +419,7 @@ generate_iota_matrix(int rows,
                      DataType step = static_cast<DataType>(1))
 {
     auto view = std::make_shared<IotaMatrix<DataType>>(rows, columns, starting_value, step);
-    return SharedMatrixRef<IotaMatrix<DataType>>(view);
+    return ConstSharedMatrixRef<IotaMatrix<DataType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -477,7 +450,7 @@ generate_random_matrix(int rows,
                        int64_t steps = 4294967296)
 {
     auto view = std::make_shared<RandomMatrix<DataType>>(rows, columns, min_value, max_value, steps);
-    return SharedMatrixRef<RandomMatrix<DataType>>(view);
+    return ConstSharedMatrixRef<RandomMatrix<DataType>>(view);
 }
 //-------------------------------------------------------------------
 
@@ -517,7 +490,7 @@ generate_sine_wave_matrix(int number_of_data_points,
                                                            delta_time,
                                                            initial_time);
                                                           
-    return SharedMatrixRef<SineWaveMatrix<DataType>>(view);
+    return ConstSharedMatrixRef<SineWaveMatrix<DataType>>(view);
 }
 //-------------------------------------------------------------------
 
