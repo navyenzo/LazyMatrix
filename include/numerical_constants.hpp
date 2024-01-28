@@ -38,7 +38,7 @@ namespace LazyMatrix
  * geometry, and various calculations involving circles and periodic functions.
  */
 //-------------------------------------------------------------------
-const static double PI = 3.14159265358979323846;
+const inline static double PI = 3.14159265358979323846;
 //-------------------------------------------------------------------
 
 
@@ -53,7 +53,7 @@ const static double PI = 3.14159265358979323846;
  * and physical contexts.
  */
 //-------------------------------------------------------------------
-const static double e = 2.71828182845904523536;
+const inline static double e = 2.71828182845904523536;
 //-------------------------------------------------------------------
 
 
@@ -68,10 +68,9 @@ const static double e = 2.71828182845904523536;
  * @tparam T The data type for which the dummy value is needed.
  */
 //-------------------------------------------------------------------
-template<typename T>
+template <typename T>
 struct DummyValueHolder
 {
-    // Define a static dummy value, default-initialized
     inline static T zero{};
 };
 //-------------------------------------------------------------------

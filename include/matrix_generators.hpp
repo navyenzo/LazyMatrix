@@ -58,17 +58,13 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class IotaMatrix : public BaseMatrix<IotaMatrix<DataType>,
-                                     DataType,
-                                     false>
+class IotaMatrix : public BaseMatrix<IotaMatrix<DataType>,false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix<IotaMatrix<DataType>,
-                            DataType,
-                            false>;
+    friend class BaseMatrix<IotaMatrix<DataType>,false>;
 
     /**
      * @brief Construct a new Iota Matrix object
@@ -166,17 +162,13 @@ struct is_type_a_matrix< IotaMatrix<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class RandomMatrix : public BaseMatrix<RandomMatrix<DataType>,
-                                       DataType,
-                                       false>
+class RandomMatrix : public BaseMatrix<RandomMatrix<DataType>,false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix<RandomMatrix<DataType>,
-                            DataType,
-                            false>;
+    friend class BaseMatrix<RandomMatrix<DataType>,false>;
 
     /**
      * @brief Construct a new Random Matrix object
@@ -279,17 +271,13 @@ struct is_type_a_matrix< RandomMatrix<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class SineWaveMatrix : public BaseMatrix<SineWaveMatrix<DataType>,
-                                         DataType,
-                                         false>
+class SineWaveMatrix : public BaseMatrix<SineWaveMatrix<DataType>,false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix<SineWaveMatrix<DataType>,
-                            DataType,
-                            false>;
+    friend class BaseMatrix<SineWaveMatrix<DataType>,false>;
 
     /**
      * @brief Construct a new Sine Wave Matrix object

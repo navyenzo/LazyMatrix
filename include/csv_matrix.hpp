@@ -87,18 +87,14 @@ class MatrixFactory;
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class CSVMatrix : public BaseMatrix<CSVMatrix<DataType>,
-                                    DataType,
-                                    false>
+class CSVMatrix : public BaseMatrix<CSVMatrix<DataType>,false>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = DataType;
 
-    friend class BaseMatrix<CSVMatrix<DataType>,
-                            DataType,
-                            false>;
+    friend class BaseMatrix<CSVMatrix<DataType>,false>;
 
     friend class MatrixFactory;
 

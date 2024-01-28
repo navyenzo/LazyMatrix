@@ -53,7 +53,6 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class PaddedMatrixView : public BaseMatrix<PaddedMatrixView<ReferenceType>,
-                                           typename ReferenceType::value_type,
                                            has_non_const_access<ReferenceType>::value>
 {
 public:
@@ -62,7 +61,6 @@ public:
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<PaddedMatrixView<ReferenceType>,
-                            typename ReferenceType::value_type,
                             has_non_const_access<ReferenceType>::value>;
 
     /**

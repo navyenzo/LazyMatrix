@@ -66,7 +66,6 @@ struct is_type_a_matrix : std::false_type
  */
 //-------------------------------------------------------------------
 template<typename MatrixType,
-         typename ValueType,
          bool HasNonConstAccess>
 
 class BaseMatrix
@@ -91,35 +90,35 @@ public:
     }
 
     // Operator overloads for element access.
-    ValueType operator()(int64_t row, int64_t column)const
+    decltype(auto) operator()(int64_t row, int64_t column)const
     {
         return underlying().const_at_(row, column);
     }
 
-    ValueType& operator()(int64_t row, int64_t column)
+    decltype(auto)  operator()(int64_t row, int64_t column)
     {
         return underlying().non_const_at_(row, column);
     }
     
-    ValueType operator()(int64_t index)const
+    decltype(auto) operator()(int64_t index)const
     {
         return underlying().const_at_(index / this->columns(), index % this->columns());
     }
     
-    ValueType& operator()(int64_t index)
+    decltype(auto)  operator()(int64_t index)
     {
         return underlying().non_const_at_(index / this->columns(), index % this->columns());
     }
 
     // Accessors for matrix elements.
     
-    ValueType at(int64_t row, int64_t column)const
+    decltype(auto) at(int64_t row, int64_t column)const
     {
         return underlying().const_at_(row, column);
     }
     
 
-    ValueType& at(int64_t row, int64_t column)
+    decltype(auto)  at(int64_t row, int64_t column)
     {
         return underlying().non_const_at_(row, column);
     }
@@ -129,33 +128,33 @@ public:
         return underlying().const_at_(index / this->columns(), index % this->columns());
     }
 
-    ValueType& at(int64_t index)
+    decltype(auto)  at(int64_t index)
     {
         return underlying().non_const_at_(index / this->columns(), index % this->columns());
     }
 
     // Circular accessors for matrix elements.
-    ValueType circ_at(int64_t row, int64_t column)const
+    decltype(auto) circ_at(int64_t row, int64_t column)const
     {
         int64_t circ_row = ( int64_t(this->rows()) + row % int64_t(this->rows()) ) % int64_t(this->rows());
         int64_t circ_column = ( int64_t(this->columns()) + column % int64_t(this->columns()) ) % int64_t(this->columns());
         return underlying().const_at_(circ_row, circ_column);
     }
     
-    ValueType&  circ_at(int64_t row, int64_t column)
+    decltype(auto)   circ_at(int64_t row, int64_t column)
     {
         int64_t circ_row = ( int64_t(this->rows()) + row % int64_t(this->rows()) ) % int64_t(this->rows());
         int64_t circ_column = ( int64_t(this->columns()) + column % int64_t(this->columns()) ) % int64_t(this->columns());
         return underlying().non_const_at_(circ_row, circ_column);
     }
     
-    ValueType circ_at(int64_t index)const
+    decltype(auto) circ_at(int64_t index)const
     {
         int64_t circ_index = ( int64_t(this->size()) + index % int64_t(this->size()) ) % int64_t(this->size());
         return (*this)(circ_index);
     }
     
-    ValueType& circ_at(int64_t index)
+    decltype(auto)  circ_at(int64_t index)
     {
         int64_t circ_index = ( int64_t(this->size()) + index % int64_t(this->size()) ) % int64_t(this->size());
         return (*this)(circ_index);
@@ -168,6 +167,7 @@ public:
     }
 
     // Setter methods defined here to help define python/c++ interface
+    template<typename ValueType>
     void set_circ_at(int64_t row, int64_t column, ValueType value)
     {
         this->circ_at(row, column) = value;
@@ -178,7 +178,7 @@ public:
 private:
 
     // Private default constructor to prevent direct instantiation.
-    BaseMatrix<MatrixType,ValueType,HasNonConstAccess>(){}
+    BaseMatrix<MatrixType,HasNonConstAccess>(){}
     friend MatrixType;
 
     // Accessors for the derived type.
@@ -197,10 +197,9 @@ private:
  * @brief Specialization for when there's only const-access
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         typename ValueType>
+template<typename MatrixType>
 
-class BaseMatrix<MatrixType,ValueType,false>
+class BaseMatrix<MatrixType,false>
 {
 public:
     
@@ -222,19 +221,19 @@ public:
     }
 
     // Operator overloads for element access.
-    ValueType operator()(int64_t row, int64_t column)const
+    decltype(auto) operator()(int64_t row, int64_t column)const
     {
         return underlying().const_at_(row, column);
     }
     
-    ValueType operator()(int64_t index)const
+    decltype(auto) operator()(int64_t index)const
     {
         return underlying().const_at_(index / this->columns(), index % this->columns());
     }
 
     // Accessors for matrix elements.
     
-    ValueType at(int64_t row, int64_t column)const
+    decltype(auto) at(int64_t row, int64_t column)const
     {
         return underlying().const_at_(row, column);
     }
@@ -245,14 +244,14 @@ public:
     }
 
     // Circular accessors for matrix elements.
-    ValueType circ_at(int64_t row, int64_t column)const
+    decltype(auto) circ_at(int64_t row, int64_t column)const
     {
         int64_t circ_row = ( int64_t(this->rows()) + row % int64_t(this->rows()) ) % int64_t(this->rows());
         int64_t circ_column = ( int64_t(this->columns()) + column % int64_t(this->columns()) ) % int64_t(this->columns());
         return underlying().const_at_(circ_row, circ_column);
     }
     
-    ValueType circ_at(int64_t index)const
+    decltype(auto) circ_at(int64_t index)const
     {
         int64_t circ_index = ( int64_t(this->size()) + index % int64_t(this->size()) ) % int64_t(this->size());
         return (*this)(circ_index);
@@ -269,7 +268,7 @@ public:
 private:
 
     // Private default constructor to prevent direct instantiation.
-    BaseMatrix<MatrixType,ValueType,false>(){}
+    BaseMatrix<MatrixType,false>(){}
     friend MatrixType;
 
     // Accessors for the derived type.
@@ -286,10 +285,9 @@ private:
  // Trait specialization to recognize BaseMatrix types as matrix expressions.
 //-------------------------------------------------------------------
 template<typename MatrixType,
-         typename ValueType,
          bool HasNonConstAccess>
 
-struct is_type_a_matrix<BaseMatrix<MatrixType,ValueType,HasNonConstAccess>> : std::true_type
+struct is_type_a_matrix<BaseMatrix<MatrixType,HasNonConstAccess>> : std::true_type
 {
 };
 //-------------------------------------------------------------------

@@ -59,9 +59,7 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
          std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
-class ElementByElementBinaryExpression : public BaseMatrix<ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>,
-                                                           typename ReferenceType1::value_type,
-                                                           false>
+class ElementByElementBinaryExpression : public BaseMatrix<ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>,false>
 {
 public:
 
@@ -71,9 +69,7 @@ public:
     // The operation function type
     using operation_type = std::function<value_type(value_type, value_type)>;
 
-    friend class BaseMatrix<ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>,
-                            typename ReferenceType1::value_type,
-                            false>;
+    friend class BaseMatrix<ElementByElementBinaryExpression<ReferenceType1, ReferenceType2>,false>;
 
     /**
      * @brief Construct a new Element By Element Binary Expression<Reference Type 1,Reference Type 2> object

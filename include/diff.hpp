@@ -73,7 +73,6 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class Diff : public BaseMatrix<Diff<ReferenceType>,
-                               typename ReferenceType::valuae_type,
                                has_non_const_access<ReferenceType>::value>
 {
 public:
@@ -82,7 +81,6 @@ public:
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<Diff<ReferenceType>,
-                            typename ReferenceType::valuae_type,
                             has_non_const_access<ReferenceType>::value>;
 
     /**

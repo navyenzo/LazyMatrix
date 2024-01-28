@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------
 /**
  * @file simple_matrix.hpp
- * @brief Defines the SimpleMatrix class for basic 2D matrix operations.
+ * @brief Defines the SimpleMatrix class for basic 2D matrix storage.
  *
  * The SimpleMatrix class provides a basic implementation of a 2D matrix
  * using a one-dimensional std::vector for storage. This class is a simpler
@@ -66,9 +66,7 @@ class MatrixFactory;
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType>,
-                                       DataType,
-                                       true>
+class SimpleMatrix : public BaseMatrix<SimpleMatrix<DataType>,true>
 {
 public:
 
@@ -76,9 +74,7 @@ public:
     using value_type = DataType;
 
     friend class MatrixFactory;
-    friend class BaseMatrix<SimpleMatrix<DataType>,
-                            DataType,
-                            true>;
+    friend class BaseMatrix<SimpleMatrix<DataType>,true>;
 
     /**
      * Default constructor. Creates a matrix of specified dimensions with all elements initialized to a default value.
@@ -89,19 +85,6 @@ public:
     SimpleMatrix(uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
     {
         this->resize_(rows, columns, initial_value);
-    }
-
-    /**
-     * Copy constructor. Creates a deep copy of the given matrix.
-     * @param matrix The SimpleMatrix object to copy.
-     */
-    SimpleMatrix(const SimpleMatrix<DataType>& matrix)
-    {
-        this->resize_(matrix.rows(), matrix.columns());
-
-        for(int i = 0; i < matrix.rows(); ++i)
-            for(int j = 0; j < matrix.columns(); ++j)
-                (*this)(i,j) = matrix(i,j);
     }
 
     /**
@@ -121,22 +104,6 @@ public:
         for(int i = 0; i < rows; ++i)
             for(int j = 0; j < columns; ++j)
                 (*this)(i,j) = matrix(i,j);
-    }
-
-    /**
-     * Copy assignment operator. Assigns the matrix with a deep copy of the given matrix.
-     * @param matrix The SimpleMatrix object to copy.
-     * @return A reference to this matrix.
-     */
-    SimpleMatrix<DataType>& operator=(const SimpleMatrix<DataType>& matrix)
-    {
-        this->resize_(matrix.rows(), matrix.columns());
-
-        for(int i = 0; i < matrix.rows(); ++i)
-            for(int j = 0; j < matrix.columns(); ++j)
-                (*this)(i,j) = matrix(i,j);
-
-        return (*this);
     }
 
     /**

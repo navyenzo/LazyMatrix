@@ -97,9 +97,7 @@ inline bool does_memory_contain_mapped_matrix3d(const char* memory_mapped_matrix
 // be evaluated
 //-------------------------------------------------------------------
 template<typename DataType>
-class Matrix3D : public BaseMatrix3D<Matrix3D<DataType>,
-                                     DataType,
-                                     true>
+class Matrix3D : public BaseMatrix3D<Matrix3D<DataType>,true>
 {
 public:
 
@@ -108,9 +106,7 @@ public:
 
     friend class MatrixFactory;
 
-    friend class BaseMatrix3D<Matrix3D<DataType>,
-                              DataType,
-                              true>;
+    friend class BaseMatrix3D<Matrix3D<DataType>,true>;
 
     // Copy constructor (We do shallow copy)
     Matrix3D(const Matrix3D<DataType>& matrix)

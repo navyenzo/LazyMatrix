@@ -154,9 +154,7 @@ class MatrixFactory;
  */
 //-------------------------------------------------------------------
 template<typename DataType>
-class Matrix : public BaseMatrix<Matrix<DataType>,
-                                 DataType,
-                                 true>
+class Matrix : public BaseMatrix<Matrix<DataType>,true>
 {
 public:
 
@@ -165,9 +163,7 @@ public:
 
     friend class MatrixFactory;
 
-    friend class BaseMatrix<Matrix<DataType>,
-                            DataType,
-                            true>;
+    friend class BaseMatrix<Matrix<DataType>,true>;
 
     /**
      * @brief Default constructor. Initializes a matrix with given rows and columns.

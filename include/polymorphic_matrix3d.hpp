@@ -8,7 +8,7 @@
  * types in a polymorphic context. This file includes the definition of the `PolymorphicMatrix3D` base
  * class, which offers a generic 3d-matrix interface, and the `PolymorphicMatrixWrapper3D` class, which
  * wraps around specific 3d-matrix types and exposes them through the `PolymorphicMatrix3D` interface.
- * These tools are essential for applications where polymorphic behavior with 3d-matrices is required.
+ * These tools are essential for applications where polymorphic behavior with matrices is required.
  * 
  * @author Vincenzo Barbato
  * 
@@ -28,6 +28,7 @@
 //-------------------------------------------------------------------
 #include <memory>
 #include <type_traits>
+#include "numerical_constants.hpp"
 #include "base_matrix3d.hpp"
 #include "shared_references.hpp"
 //-------------------------------------------------------------------
@@ -48,20 +49,18 @@ namespace LazyMatrix
  *
  * This class defines a generic interface for 3d-matrices, allowing for 
  * operations like accessing elements and querying dimensions. It's
- * templated to handle different data types within the 3d-matrix.
- */
+ * templated to handle different data types within the matrix.
+ */ 
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class PolymorphicMatrix3D : public BaseMatrix3D<PolymorphicMatrix3D<DataType>,
-                                                DataType,
-                                                true>
+class PolymorphicMatrix3D : public BaseMatrix3D<PolymorphicMatrix3D<DataType>,true>
 {
 public:
 
-    friend class BaseMatrix3D<PolymorphicMatrix3D<DataType>,
-                              DataType,
-                              true>;
+    using value_type = DataType;
+
+    friend class BaseMatrix3D<PolymorphicMatrix3D<DataType>,true>;
 
     PolymorphicMatrix3D() = default;
     virtual ~PolymorphicMatrix3D() = default;
@@ -70,13 +69,11 @@ public:
     virtual uintptr_t rows() const = 0;
     virtual uintptr_t columns() const = 0;
     virtual uintptr_t size() const = 0;
-
     virtual std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns) = 0;
 
 private:
 
-    // Accessors for matrix elements.
-    virtual DataType const_at_(int64_t page, int64_t row, int64_t column)const = 0;
+    virtual DataType const_at_(int64_t page, int64_t row, int64_t column) const = 0;
     virtual DataType& non_const_at_(int64_t page, int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
@@ -89,8 +86,7 @@ private:
  */
 //-------------------------------------------------------------------
 template<typename DataType>
-
-struct is_matrix3d_reference< PolymorphicMatrix3D<DataType> > : std::true_type {};
+struct is_type_a_matrix3d< PolymorphicMatrix3D<DataType> > : std::true_type {};
 //-------------------------------------------------------------------
 
 
@@ -98,7 +94,7 @@ struct is_matrix3d_reference< PolymorphicMatrix3D<DataType> > : std::true_type {
 //-------------------------------------------------------------------
 /**
  * @class PolymorphicMatrixWrapper3D
- * @brief Wrapper class that provides a polymorphic interface to a given 3d-matrix type.
+ * @brief Wrapper class that provides a polymorphic interface to a given matrix type.
  *
  * This class wraps around a specific 3d-matrix type and exposes it through
  * the PolymorphicMatrix3D interface. It handles both const and non-const
@@ -114,22 +110,44 @@ public:
 
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
-    using DataType = typename ReferenceType::value_type;
-    
-    explicit PolymorphicMatrixWrapper3D(ReferenceType& matrix) : matrix_(matrix) {}
+
+    explicit PolymorphicMatrixWrapper3D(ReferenceType matrix) : matrix_(matrix)
+    {
+    }
 
     uintptr_t pages() const override { return matrix_.pages(); }
     uintptr_t rows() const override { return matrix_.rows(); }
     uintptr_t columns() const override { return matrix_.columns(); }
     uintptr_t size() const override { return matrix_.size(); }
 
-    std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns) override { return matrix_.resize(pages, rows, columns); }
+    std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns) override
+    {
+        return matrix_.resize(pages, rows, columns);
+    }
+
+
 
 private: // Private functions
 
-    // Accessors for matrix elements.
-    DataType const_at_(int64_t page, int64_t row, int64_t column)const override { return matrix_.at(page, row, column); }
-    DataType& non_const_at_(int64_t page, int64_t row, int64_t column) override { return matrix_.at(page, row, column); }
+    value_type const_at_(int64_t page, int64_t row, int64_t column)const override
+    {
+        return matrix_.circ_at(page, row, column);
+    }
+
+    value_type& non_const_at_(int64_t page, int64_t row, int64_t column) override
+    {
+        if constexpr (has_non_const_access<ReferenceType>::value)
+        {
+            return matrix_.circ_at(page, row,column);
+        }
+        else
+        {
+            // Since we can't return a reference to a local,
+            // we return a reference to a dummy value
+            return DummyValueHolder<value_type>::zero;
+        }
+    }
+    
 
 private: // Private variables
 
@@ -145,8 +163,7 @@ private: // Private variables
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType>
-
-struct is_matrix3d_reference< PolymorphicMatrixWrapper3D<ReferenceType> > : std::true_type {};
+struct is_type_a_matrix3d< PolymorphicMatrixWrapper3D<ReferenceType> > : std::true_type {};
 //-------------------------------------------------------------------
 
 
@@ -157,7 +174,9 @@ struct is_matrix3d_reference< PolymorphicMatrixWrapper3D<ReferenceType> > : std:
 template<typename DataType>
 using Data3D = PolymorphicMatrix3D<DataType>;
 
-template<typename ReferenceType>
+
+
+template<typename ReferenceType,std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 using SpecializedData3D = PolymorphicMatrixWrapper3D<ReferenceType>;
 //-------------------------------------------------------------------
 
@@ -165,11 +184,13 @@ using SpecializedData3D = PolymorphicMatrixWrapper3D<ReferenceType>;
 
 //-------------------------------------------------------------------
 /**
- * @brief Wraps a matrix in a PolymorphicMatrixWrapper3D and returns a shared pointer to PolymorphicMatrix3D.
+ * @brief Wraps a 3dmatrix in a PolymorphicMatrixWrapper3D and returns a
+ *        shared pointer to PolymorphicMatrix3D.
  * 
  * @tparam ReferenceType Type of the 3d-matrix to wrap.
- * @param matrix The matrix to be wrapped.
- * @return std::shared_ptr<PolymorphicMatrix<value_type>> Shared pointer to the base polymorphic type of the wrapped matrix.
+ * @param matrix The 3d-matrix to be wrapped.
+ * @return std::shared_ptr<PolymorphicMatrix3D<value_type>> Shared
+ *         pointer to the base polymorphic type of the wrapped 3d-matrix.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -179,9 +200,9 @@ inline auto wrap_matrix3d(ReferenceType matrix)
 {
     using value_type = typename ReferenceType::value_type;
     
-    std::shared_ptr<PolymorphicMatrix3D<value_type>> wrapped_matrix3d = std::make_shared<PolymorphicMatrixWrapper3D<ReferenceType>>(matrix);
+    std::shared_ptr<PolymorphicMatrix3D<value_type>> wrapped_matrix = std::make_shared<PolymorphicMatrixWrapper3D<ReferenceType>>(matrix);
 
-    return wrapped_matrix3d;
+    return wrapped_matrix;
 }
 //-------------------------------------------------------------------
 

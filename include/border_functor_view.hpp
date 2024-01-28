@@ -53,14 +53,12 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 struct RepeatedBorderView : public BaseMatrix<RepeatedBorderView<ReferenceType>,
-                                              typename ReferenceType::value_type,
                                               has_non_const_access<ReferenceType>::value>
 {
     // Type of value that is stored in the expression
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<RepeatedBorderView<ReferenceType>,
-                            typename ReferenceType::value_type,
                             has_non_const_access<ReferenceType>::value>;
 
     /**
@@ -185,7 +183,6 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class ConstantBorderView : public BaseMatrix<ConstantBorderView<ReferenceType>,
-                                             typename ReferenceType::value_type,
                                              has_non_const_access<ReferenceType>::value>
 {
 public:
@@ -194,7 +191,6 @@ public:
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<ConstantBorderView<ReferenceType>,
-                            typename ReferenceType::value_type,
                             has_non_const_access<ReferenceType>::value>;
     
     /**

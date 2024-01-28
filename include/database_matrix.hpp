@@ -258,18 +258,14 @@ struct DatabaseWindow
  * operations and ensures safe interaction with the database.
  */
 //-------------------------------------------------------------------
-class DatabaseMatrix : public BaseMatrix<DatabaseMatrix,
-                                         Poco::Dynamic::Var,
-                                         false>
+class DatabaseMatrix : public BaseMatrix<DatabaseMatrix,false>
 {
 public:
 
     // Type of value that is stored in the expression
     using value_type = Poco::Dynamic::Var;
 
-    friend class BaseMatrix<DatabaseMatrix,
-                            Poco::Dynamic::Var,
-                            false>;
+    friend class BaseMatrix<DatabaseMatrix,false>;
 
     friend class MatrixFactory;
 

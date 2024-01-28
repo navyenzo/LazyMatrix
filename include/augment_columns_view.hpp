@@ -53,7 +53,6 @@ template<typename ReferenceType1,
          std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
 
 class AugmentColumnsView : public BaseMatrix<AugmentColumnsView<ReferenceType1, ReferenceType2>,
-                                             typename ReferenceType1::value_type,
                                              has_non_const_access<ReferenceType1>::value && has_non_const_access<ReferenceType2>::value>
 {
 public:
@@ -61,8 +60,7 @@ public:
     // Type of value that is stored in the matrix
     using value_type = typename ReferenceType1::value_type;
 
-    friend class BaseMatrix<AugmentColumnsView<ReferenceType1, ReferenceType2>,
-                            typename ReferenceType1::value_type,
+    friend class BaseMatrix<AugmentColumnsView<ReferenceType1, ReferenceType2>,-
                             has_non_const_access<ReferenceType1>::value && has_non_const_access<ReferenceType2>::value>;
 
     /**

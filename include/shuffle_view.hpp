@@ -58,7 +58,6 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class ShuffledView : public BaseMatrix<ShuffledView<ReferenceType>,
-                                       typename ReferenceType::value_type,
                                        has_non_const_access<ReferenceType>::value>
 {
 public:
@@ -67,7 +66,6 @@ public:
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<ShuffledView<ReferenceType>,
-                            typename ReferenceType::value_type,
                             has_non_const_access<ReferenceType>::value>;
 
     /**

@@ -120,6 +120,19 @@ public:
     ConstSharedMatrixRef(const ConstSharedMatrixRef<MatrixType>& shared_matrix_ref) = default;
 
     /**
+     * @brief Default assignment operator
+     */
+    ConstSharedMatrixRef& operator=(const ConstSharedMatrixRef<MatrixType>&) = default;
+
+    /**
+     * @brief Bool operator to check if reference is valid
+     */
+    explicit operator bool() const
+    {
+        return static_cast<bool>(ptr_);
+    }
+
+    /**
      * @brief Dereference operator to access the underlying matrix object.
      * @return A reference to the underlying matrix object.
      */
@@ -318,6 +331,11 @@ public:
     SharedMatrixRef(const SharedMatrixRef<MatrixType>& shared_matrix_ref) = default;
 
     /**
+     * @brief Default assignment operator
+     */
+    SharedMatrixRef& operator=(const SharedMatrixRef<MatrixType>&) = default;
+
+    /**
      * @brief Forwards the call to the at() method of the underlying matrix.
      * @param row The row index.
      * @param column The column index.
@@ -450,7 +468,7 @@ public:
      * @brief Constructs a SharedMatrix3DRef object.
      * @param ptr A shared pointer to the underlying matrix object.
      */
-    explicit ConstSharedMatrix3DRef(std::shared_ptr<MatrixType> ptr) : ptr_(ptr)
+    explicit ConstSharedMatrix3DRef(std::shared_ptr<MatrixType> ptr = nullptr) : ptr_(ptr)
     {
     }
 
@@ -458,6 +476,37 @@ public:
      * @brief Default copy constructor
      */
     ConstSharedMatrix3DRef(const ConstSharedMatrix3DRef<MatrixType>& shared_matrix3d_ref) = default;
+
+    /**
+     * @brief Default assignment operator
+     */
+    ConstSharedMatrix3DRef& operator=(const ConstSharedMatrix3DRef<MatrixType>&) = default;
+
+    /**
+     * @brief Bool operator to check if reference is valid
+     */
+    explicit operator bool() const
+    {
+        return static_cast<bool>(ptr_);
+    }
+    
+    /**
+     * @brief Dereference operator to access the underlying 3d matrix object.
+     * @return A reference to the underlying matrix object.
+     */
+    MatrixType& operator*()
+    {
+        return *ptr_;
+    }
+
+    /**
+     * @brief Member access operator to access members of the underlying 3d matrix object.
+     * @return A pointer to the underlying matrix object.
+     */
+    MatrixType* operator->()
+    {
+        return ptr_.get();
+    }
 
     /**
      * @brief Forwards the call to the pages() method of the underlying matrix.
@@ -641,7 +690,7 @@ public:
      * @brief Constructs a SharedMatrix3DRef object.
      * @param ptr A shared pointer to the underlying matrix object.
      */
-    explicit SharedMatrix3DRef(std::shared_ptr<MatrixType> ptr)
+    explicit SharedMatrix3DRef(std::shared_ptr<MatrixType> ptr = nullptr)
     : ConstSharedMatrix3DRef<MatrixType>(ptr)
     {
     }
@@ -652,6 +701,11 @@ public:
     SharedMatrix3DRef(const SharedMatrix3DRef<MatrixType>& shared_matrix3d_ref) = default;
 
     /**
+     * @brief Default assignment operator
+     */
+    SharedMatrix3DRef& operator=(const SharedMatrix3DRef<MatrixType>&) = default;
+
+    /**
      * @brief Forwards the call to the at() method of the underlying matrix.
      * @param page The page index.
      * @param row The row index.
@@ -660,7 +714,7 @@ public:
      */
     value_type& at(int64_t page, int64_t row, int64_t column)
     {
-        return ptr_->at(page, row, column);
+        return this->ptr_->at(page, row, column);
     }
 
     /**
@@ -670,7 +724,7 @@ public:
      */
     value_type& at(int64_t index)
     {
-        return ptr_->at(index);
+        return this->ptr_->at(index);
     }
 
     /**
@@ -682,7 +736,7 @@ public:
      */
     value_type& operator()(int64_t page, int64_t row, int64_t column)
     {
-        return ptr_->at(page, row, column);
+        return this->ptr_->at(page, row, column);
     }
 
     /**
@@ -692,7 +746,7 @@ public:
      */
     value_type& operator()(int64_t index)
     {
-        return ptr_->at(index);
+        return this->ptr_->at(index);
     }
 
     /**
@@ -704,7 +758,7 @@ public:
      */
     value_type& circ_at(int64_t page, int64_t row, int64_t column)
     {
-        return ptr_->circ_at(page, row, column);
+        return this->ptr_->circ_at(page, row, column);
     }
 
     /**
@@ -714,7 +768,7 @@ public:
      */
     value_type& circ_at(int64_t index)
     {
-        return ptr_->circ_at(index);
+        return this->ptr_->circ_at(index);
     }
 
     /**
@@ -729,14 +783,8 @@ public:
      */
     void set_circ_at(int64_t page, int64_t row, int64_t column, value_type value)
     {
-        ptr_->set_circ_at(page, row, column, value);
+        this->ptr_->set_circ_at(page, row, column, value);
     }
-
-
-
-private:
-
-    std::shared_ptr<MatrixType> ptr_; ///< A shared pointer to the underlying 3D matrix object.
 };
 //-------------------------------------------------------------------
 

@@ -54,7 +54,6 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class SingleVectorSelectorView : public BaseMatrix< SingleVectorSelectorView<ReferenceType>,
-                                                    typename ReferenceType::value_type,
                                                     has_non_const_access<ReferenceType>::value>
 {
 public:
@@ -63,7 +62,6 @@ public:
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<SingleVectorSelectorView<ReferenceType>,
-                            typename ReferenceType::value_type,
                             has_non_const_access<ReferenceType>::value>;
 
     /**
@@ -214,7 +212,6 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class MultipleVectorSelectorView : public BaseMatrix<MultipleVectorSelectorView<ReferenceType>,
-                                                     typename ReferenceType::value_type,
                                                      has_non_const_access<ReferenceType>::value>
 {
 public:
@@ -223,7 +220,6 @@ public:
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<MultipleVectorSelectorView<ReferenceType>,
-                            typename ReferenceType::value_type,
                             has_non_const_access<ReferenceType>::value>;
 
     /**
@@ -375,7 +371,6 @@ template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
 class RowAndColumnSelectorView : public BaseMatrix<RowAndColumnSelectorView<ReferenceType>,
-                                                   typename ReferenceType::value_type,
                                                    has_non_const_access<ReferenceType>::value>
 {
 public:
@@ -384,7 +379,6 @@ public:
     using value_type = typename ReferenceType::value_type;
 
     friend class BaseMatrix<RowAndColumnSelectorView<ReferenceType>,
-                            typename ReferenceType::value_type,
                             has_non_const_access<ReferenceType>::value>;
 
     /**

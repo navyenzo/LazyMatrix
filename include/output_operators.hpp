@@ -31,6 +31,7 @@
 #include "base_matrix3d.hpp"
 #include "image_matrix.hpp"
 #include "polymorphic_matrix.hpp"
+#include "polymorphic_matrix3d.hpp"
 #include "shared_references.hpp"
 //-------------------------------------------------------------------
 

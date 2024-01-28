@@ -56,9 +56,7 @@ namespace LazyMatrix
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-class ElementByElementUnaryExpression : public BaseMatrix<ElementByElementUnaryExpression<ReferenceType>,
-                                                          typename ReferenceType::value_type,
-                                                          false>
+class ElementByElementUnaryExpression : public BaseMatrix<ElementByElementUnaryExpression<ReferenceType>,false>
 {
 public:
 
@@ -68,9 +66,7 @@ public:
     // The operation function type
     using operation_type = std::function<value_type(value_type)>;
 
-    friend class BaseMatrix<ElementByElementUnaryExpression<ReferenceType>,
-                            typename ReferenceType::value_type,
-                            false>;
+    friend class BaseMatrix<ElementByElementUnaryExpression<ReferenceType>,false>;
 
     /**
      * @brief Construct a new Element By Element Unary Expression< Reference Type> object

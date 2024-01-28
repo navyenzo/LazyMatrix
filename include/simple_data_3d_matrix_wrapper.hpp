@@ -52,17 +52,13 @@ namespace LazyMatrix
  */
 //-------------------------------------------------------------------
 template<typename SimpleDataType>
-class SimpleData3DMatrixWrapper : public BaseMatrix3D<SimpleData3DMatrixWrapper<SimpleDataType>,
-                                                      SimpleDataType,
-                                                      true>
+class SimpleData3DMatrixWrapper : public BaseMatrix3D<SimpleData3DMatrixWrapper<SimpleDataType>,true>
 {
 public:
 
     using value_type = SimpleDataType;
 
-    friend class BaseMatrix3D<SimpleData3DMatrixWrapper<SimpleDataType>,
-                              SimpleDataType,
-                              true>;
+    friend class BaseMatrix3D<SimpleData3DMatrixWrapper<SimpleDataType>,true>;
 
     
     SimpleData3DMatrixWrapper(const SimpleDataType& value) : value_(value)

@@ -115,9 +115,7 @@ template<> struct is_valid_dlib_pixel_type<int> : std::true_type {};
  */
 //-------------------------------------------------------------------
 template<typename PixelType = dlib::rgb_pixel>
-class ImageMatrix : public BaseMatrix<ImageMatrix<PixelType>,
-                                      PixelType,
-                                      true>
+class ImageMatrix : public BaseMatrix<ImageMatrix<PixelType>,true>
 {
 public:
 
@@ -126,9 +124,7 @@ public:
 
     friend class MatrixFactory;
 
-    friend BaseMatrix<ImageMatrix<PixelType>,
-                      PixelType,
-                      true>;
+    friend BaseMatrix<ImageMatrix<PixelType>,true>;
 
     /**
      * @brief Static assertion to ensure the pixel type is valid.

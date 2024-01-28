@@ -51,17 +51,13 @@ namespace LazyMatrix
  */
 //-------------------------------------------------------------------
 template<typename SimpleDataType>
-class SimpleData2DMatrixWrapper : public BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,
-                                                    SimpleDataType,
-                                                    true>
+class SimpleData2DMatrixWrapper : public BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,true>
 {
 public:
 
     using value_type = SimpleDataType;
 
-    friend class BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,
-                            SimpleDataType,
-                            true>;
+    friend class BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,true>;
 
     /**
      * @brief Construct a new Simple Data 2D Matrix Wrapper object.

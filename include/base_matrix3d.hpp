@@ -57,7 +57,6 @@ struct is_type_a_matrix3d : std::false_type
  */
 //-------------------------------------------------------------------
 template<typename MatrixType,
-         typename ValueType,
          bool HasNonConstAccess>
 
 class BaseMatrix3D
@@ -86,18 +85,17 @@ public:
     }
 
     // Operator overloads for element access.
-    ValueType operator()(int64_t page, int64_t row, int64_t column)const
+    decltype(auto) operator()(int64_t page, int64_t row, int64_t column)const
     {
         return underlying().const_at_(page, row, column);
     }
     
-    template<typename = std::enable_if_t<HasNonConstAccess>>
-    ValueType& operator()(int64_t page, int64_t row, int64_t column)
+    decltype(auto) operator()(int64_t page, int64_t row, int64_t column)
     {
         return underlying().non_const_at_(page, row, column);
     }
     
-    ValueType operator()(int64_t index)const
+    decltype(auto) operator()(int64_t index)const
     {
         int64_t page = index / (this->rows() * this->columns());
 
@@ -106,8 +104,7 @@ public:
         return underlying().const_at_(page, remainder / this->columns(), remainder % this->columns());
     }
     
-    template<typename = std::enable_if_t<HasNonConstAccess>>
-    ValueType& operator()(int64_t index)
+    decltype(auto) operator()(int64_t index)
     {
         int64_t page = index / (this->rows() * this->columns());
 
@@ -117,18 +114,17 @@ public:
     }
 
     // Accessors for matrix elements.
-    ValueType at(int64_t page, int64_t row, int64_t column)const
+    decltype(auto) at(int64_t page, int64_t row, int64_t column)const
     {
         return underlying().const_at_(page, row, column);
     }
     
-    template<typename = std::enable_if_t<HasNonConstAccess>>
-    ValueType& at(int64_t page, int64_t row, int64_t column)
+    decltype(auto) at(int64_t page, int64_t row, int64_t column)
     {
         return underlying().non_const_at_(page, row, column);
     }
     
-    ValueType at(int64_t index)const
+    decltype(auto) at(int64_t index)const
     {
         int64_t page = index / (this->rows() * this->columns());
 
@@ -137,8 +133,7 @@ public:
         return underlying().const_at_(page, remainder / this->columns(), remainder % this->columns());
     }
     
-    template<typename = std::enable_if_t<HasNonConstAccess>>
-    ValueType& at(int64_t index)
+    decltype(auto) at(int64_t index)
     {
         int64_t page = index / (this->rows() * this->columns());
 
@@ -148,7 +143,7 @@ public:
     }
 
     // Circular accessors for matrix elements.
-    ValueType circ_at(int64_t page, int64_t row, int64_t column)const
+    decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)const
     {
         int64_t circ_page = (this->pages() + page % this->pages()) % this->pages();
         int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
@@ -156,8 +151,7 @@ public:
         return underlying().const_at_(circ_page, circ_row, circ_column);
     }
 
-    template<typename = std::enable_if_t<HasNonConstAccess>>
-    ValueType& circ_at(int64_t page, int64_t row, int64_t column)
+    decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)
     {
         int64_t circ_page = (this->pages() + page % this->pages()) % this->pages();
         int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
@@ -165,14 +159,13 @@ public:
         return underlying().non_const_at_(circ_page, circ_row, circ_column);
     }
 
-    ValueType circ_at(int64_t index)const
+    decltype(auto) circ_at(int64_t index)const
     {
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return (*this)(circ_index);
     }
 
-    template<typename = std::enable_if_t<HasNonConstAccess>>
-    ValueType& circ_at(int64_t index)
+    decltype(auto) circ_at(int64_t index)
     {
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return (*this)(circ_index);
@@ -187,15 +180,18 @@ public:
     }
 
     // Setter methods defined here to help define python/c++ interface
-    template<typename = std::enable_if_t<HasNonConstAccess>>
-    void set_circ_at(int64_t page, int64_t row, int64_t column, ValueType value) { this->circ_at(page, row, column) = value; }
+    template<typename ValueType>
+    void set_circ_at(int64_t page, int64_t row, int64_t column, ValueType value)
+    {
+        this->circ_at(page, row, column) = value;
+    }
 
 
 
 private:
 
     // Private constructor to prevent direct instantiation.
-    BaseMatrix3D<MatrixType,ValueType,HasNonConstAccess>(){}
+    BaseMatrix3D<MatrixType,HasNonConstAccess>(){}
     friend MatrixType;
 
     // Access to the derived class instance.
@@ -218,10 +214,9 @@ private:
  * @brief Specializatiion for when there's only const-access
  */
 //-------------------------------------------------------------------
-template<typename MatrixType,
-         typename ValueType>
+template<typename MatrixType>
 
-class BaseMatrix3D<MatrixType,ValueType,false>
+class BaseMatrix3D<MatrixType,false>
 {
 public:
 
@@ -247,12 +242,12 @@ public:
     }
 
     // Operator overloads for element access.
-    ValueType operator()(int64_t page, int64_t row, int64_t column)const
+    decltype(auto) operator()(int64_t page, int64_t row, int64_t column)const
     {
         return underlying().const_at_(page, row, column);
     }
     
-    ValueType operator()(int64_t index)const
+    decltype(auto) operator()(int64_t index)const
     {
         int64_t page = index / (this->rows() * this->columns());
 
@@ -262,12 +257,12 @@ public:
     }
 
     // Accessors for matrix elements.
-    ValueType at(int64_t page, int64_t row, int64_t column)const
+    decltype(auto) at(int64_t page, int64_t row, int64_t column)const
     {
         return underlying().const_at_(page, row, column);
     }
     
-    ValueType at(int64_t index)const
+    decltype(auto) at(int64_t index)const
     {
         int64_t page = index / (this->rows() * this->columns());
 
@@ -277,7 +272,7 @@ public:
     }
 
     // Circular accessors for matrix elements.
-    ValueType circ_at(int64_t page, int64_t row, int64_t column)const
+    decltype(auto) circ_at(int64_t page, int64_t row, int64_t column)const
     {
         int64_t circ_page = (this->pages() + page % this->pages()) % this->pages();
         int64_t circ_row = (this->rows() + row % this->rows()) % this->rows();
@@ -285,7 +280,7 @@ public:
         return underlying().const_at_(circ_page, circ_row, circ_column);
     }
 
-    ValueType circ_at(int64_t index)const
+    decltype(auto) circ_at(int64_t index)const
     {
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return (*this)(circ_index);
@@ -304,7 +299,7 @@ public:
 private:
 
     // Private constructor to prevent direct instantiation.
-    BaseMatrix3D<MatrixType,ValueType,false>(){}
+    BaseMatrix3D<MatrixType,false>(){}
     friend MatrixType;
 
     const MatrixType& underlying()const
@@ -320,10 +315,9 @@ private:
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
 template<typename MatrixType,
-         typename ValueType,
          bool HasNonConstAccess>
 
-struct is_type_a_matrix3d<BaseMatrix3D<MatrixType,ValueType,HasNonConstAccess>> : std::true_type
+struct is_type_a_matrix3d<BaseMatrix3D<MatrixType,HasNonConstAccess>> : std::true_type
 {
 };
 //-------------------------------------------------------------------
