@@ -33,6 +33,7 @@
 #include "polymorphic_matrix.hpp"
 #include "polymorphic_matrix3d.hpp"
 #include "shared_references.hpp"
+#include "eigen_wrapper.hpp"
 //-------------------------------------------------------------------
 
 
@@ -360,6 +361,27 @@ template<typename ReferenceType,
 inline std::ostream& operator<<(std::ostream& os, ReferenceType expression)
 {
     os << *expression;
+    return os;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Prints an eigen wrapped 2d matrix expression reference to an output stream.
+ * 
+ * @param os The output stream we're printing to.
+ * @param expression The eigen wrapped 2d matrix reference we're printing.
+ * @return std::ostream& The output stream.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<LazyMatrix::is_matrix_reference<ReferenceType>{}>* = nullptr>
+
+inline std::ostream& operator<<(std::ostream& os, const LazyMatrix::CustomEigenWrapper<ReferenceType>& expression)
+{
+    os << expression.get_matrix();
     return os;
 }
 //-------------------------------------------------------------------

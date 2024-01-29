@@ -7,6 +7,10 @@
  * It creates simple matrices, adds them, and verifies the values in the container.
  * 
  * @author Vincenzo Barbato
+ * 
+ * Additional Information:
+ * - GitHub Project: [LazyMatrix](https://github.com/navyenzo/LazyMatrix.git)
+ * - LinkedIn: [Vincenzo Barbato](https://www.linkedin.com/in/vincenzobarbato/)
  */
 //-------------------------------------------------------------------
 

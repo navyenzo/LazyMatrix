@@ -51,6 +51,9 @@
 // Shared Reference to 2d and 3d Matrix expressions
 #include "shared_references.hpp"
 
+// Custom eigen matrix wrapper for LazyMatrix matrix expressions
+#include "eigen_wrapper.hpp"
+
 // Wrapper for 2D matrices with simple data storage allowing modification
 #include "simple_data_2d_matrix_wrapper.hpp"
 
