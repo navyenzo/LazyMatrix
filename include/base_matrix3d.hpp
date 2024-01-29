@@ -285,14 +285,6 @@ public:
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return (*this)(circ_index);
     }
-    
-    // Function used to resize the underlying matrix
-    std::error_code resize(uintptr_t pages,
-                           uintptr_t rows,
-                           uintptr_t columns)
-    {
-        return underlying().resize_(pages, rows, columns);
-    }
 
 
 

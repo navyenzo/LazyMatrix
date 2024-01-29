@@ -120,7 +120,14 @@ public:
 
     std::error_code resize(uintptr_t rows, uintptr_t columns) override
     {
-        return matrix_.resize(rows, columns);
+        if constexpr (has_non_const_access<ReferenceType>::value)
+        {
+            return matrix_.resize(rows, columns);
+        }
+        else
+        {
+            return std::error_code();
+        }
     }
 
 
@@ -182,11 +189,13 @@ using SpecializedData = PolymorphicMatrixWrapper<ReferenceType>;
 
 //-------------------------------------------------------------------
 /**
- * @brief Wraps a matrix in a PolymorphicMatrixWrapper and returns a shared pointer to PolymorphicMatrix.
+ * @brief Wraps a matrix in a PolymorphicMatrixWrapper and returns a Shared
+ *        Reference to the base PolymorphicMatrix class so that a user can
+ *        store multiple different types of 2d-matrices in a single container
  * 
  * @tparam ReferenceType Type of the matrix to wrap.
  * @param matrix The matrix to be wrapped.
- * @return std::shared_ptr<PolymorphicMatrix<value_type>> Shared pointer to the base polymorphic type of the wrapped matrix.
+ * @return SharedMatrixRef wrapping the input matrix.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -195,10 +204,10 @@ template<typename ReferenceType,
 inline auto wrap_matrix(ReferenceType matrix)
 {
     using value_type = typename ReferenceType::value_type;
-    
-    std::shared_ptr<PolymorphicMatrix<value_type>> wrapped_matrix = std::make_shared<PolymorphicMatrixWrapper<ReferenceType>>(matrix);
 
-    return wrapped_matrix;
+    std::shared_ptr<PolymorphicMatrix<value_type>> wrapped_matrix_ptr = std::make_shared<PolymorphicMatrixWrapper<ReferenceType>>(matrix);
+
+    return SharedMatrixRef<PolymorphicMatrix<value_type>>(wrapped_matrix_ptr);
 }
 //-------------------------------------------------------------------
 

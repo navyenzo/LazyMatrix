@@ -148,6 +148,9 @@
 // Factory functions to create 2d and 3d Matrix storage
 #include "matrix_factory.hpp"
 
+// Matrix container holding 2d matrices and looks like a 3d matrix
+#include "polymorphic_matrix_container.hpp"
+
 // Output operators for matrix serialization
 #include "output_operators.hpp"
 

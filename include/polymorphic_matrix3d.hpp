@@ -122,7 +122,14 @@ public:
 
     std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns) override
     {
-        return matrix_.resize(pages, rows, columns);
+        if constexpr (has_non_const_access<ReferenceType>::value)
+        {
+            return matrix_.resize(pages, rows, columns);
+        }
+        else
+        {
+            return std::error_code();
+        }
     }
 
 
@@ -184,13 +191,13 @@ using SpecializedData3D = PolymorphicMatrixWrapper3D<ReferenceType>;
 
 //-------------------------------------------------------------------
 /**
- * @brief Wraps a 3dmatrix in a PolymorphicMatrixWrapper3D and returns a
- *        shared pointer to PolymorphicMatrix3D.
+ * @brief Wraps a 3d-matrix in a PolymorphicMatrixWrapper3D and returns a Shared
+ *        Reference to the base PolymorphicMatrix3D class so that a user can
+ *        store multiple different types of 3d-matrices in a single container
  * 
- * @tparam ReferenceType Type of the 3d-matrix to wrap.
- * @param matrix The 3d-matrix to be wrapped.
- * @return std::shared_ptr<PolymorphicMatrix3D<value_type>> Shared
- *         pointer to the base polymorphic type of the wrapped 3d-matrix.
+ * @tparam ReferenceType Type of the matrix to wrap.
+ * @param matrix The matrix to be wrapped.
+ * @return SharedMatrix3DRef wrapping the input matrix.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -199,10 +206,10 @@ template<typename ReferenceType,
 inline auto wrap_matrix3d(ReferenceType matrix)
 {
     using value_type = typename ReferenceType::value_type;
-    
-    std::shared_ptr<PolymorphicMatrix3D<value_type>> wrapped_matrix = std::make_shared<PolymorphicMatrixWrapper3D<ReferenceType>>(matrix);
 
-    return wrapped_matrix;
+    std::shared_ptr<PolymorphicMatrix3D<value_type>> wrapped_matrix_ptr = std::make_shared<PolymorphicMatrixWrapper3D<ReferenceType>>(matrix);
+
+    return SharedMatrix3DRef<PolymorphicMatrix3D<value_type>>(wrapped_matrix_ptr);
 }
 //-------------------------------------------------------------------
 

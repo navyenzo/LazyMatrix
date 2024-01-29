@@ -257,12 +257,6 @@ public:
         return (*this)(circ_index);
     }
 
-    // Function used to resize the underlying matrix storage
-    std::error_code resize(uintptr_t rows, uintptr_t columns)
-    {
-        return this->resize_(rows, columns);
-    }
-
 
 
 private:
@@ -273,9 +267,6 @@ private:
 
     // Accessors for the derived type.
     const MatrixType& underlying()const { return static_cast<const MatrixType&>(*this); }
-
-    // Implementation for resize function
-    std::error_code resize_(uintptr_t rows, uintptr_t columns) { return underlying().resize_(rows, columns); }
 };
 //-------------------------------------------------------------------
 

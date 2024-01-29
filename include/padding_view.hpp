@@ -210,7 +210,7 @@ struct is_type_a_matrix< PaddedMatrixView<ReferenceType> > : std::true_type
 
 //-------------------------------------------------------------------
 /**
- * @brief Creates a sorted view of a matrix.
+ * @brief Creates a padded view of a matrix.
  * @tparam ReferenceType Type of the input matrix expression.
  * @param m The input matrix expression.
  * @param padded_rows Number of rows after padding.

@@ -240,18 +240,6 @@ public:
         return ptr_->circ_at(index);
     }
 
-    /**
-     * @brief Resizes the underlying matrix expression (if possible).
-     * 
-     * @param rows 
-     * @param columns 
-     * @return std::error_code 
-     */
-    std::error_code resize(uintptr_t rows, uintptr_t columns)
-    {
-        return ptr_->resize(rows, columns);
-    }
-
 
 
 protected:
@@ -410,6 +398,18 @@ public:
     void set_circ_at(int64_t row, int64_t column, value_type value)
     {
         this->ptr_->set_circ_at(row, column, value);
+    }
+
+    /**
+     * @brief Resizes the underlying matrix expression (if possible).
+     * 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    std::error_code resize(uintptr_t rows, uintptr_t columns)
+    {
+        return this->ptr_->resize(rows, columns);
     }
 };
 //-------------------------------------------------------------------
@@ -610,20 +610,6 @@ public:
         return ptr_->circ_at(index);
     }
 
-    /**
-     * @brief Resizes underlying matrix expression (if possible).
-     * 
-     * @param pages 
-     * @param rows 
-     * @param columns 
-     * @return std::error_code 
-     */
-    
-    std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns)
-    {
-        return ptr_->resize(pages, rows, columns);
-    }
-
 
 
 protected:
@@ -784,6 +770,20 @@ public:
     void set_circ_at(int64_t page, int64_t row, int64_t column, value_type value)
     {
         this->ptr_->set_circ_at(page, row, column, value);
+    }
+
+    /**
+     * @brief Resizes underlying matrix expression (if possible).
+     * 
+     * @param pages 
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
+     */
+    
+    std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns)
+    {
+        return this->ptr_->resize(pages, rows, columns);
     }
 };
 //-------------------------------------------------------------------

@@ -39,15 +39,15 @@ TEST_CASE("Wrapping a matrix with polymorphic wrapper with non-const access", "[
     auto wrapper = LazyMatrix::wrap_matrix(mat);
 
     // Test wrapped matrix
-    REQUIRE(wrapper->rows() == mat.rows()); // Rows
-    REQUIRE(wrapper->columns() == mat.columns()); // Columns
-    REQUIRE(wrapper->size() == mat.size()); // Size
+    REQUIRE(wrapper.rows() == mat.rows()); // Rows
+    REQUIRE(wrapper.columns() == mat.columns()); // Columns
+    REQUIRE(wrapper.size() == mat.size()); // Size
 
     // Test const access
-    REQUIRE(wrapper->at(0,0) == mat(0,0));
-    REQUIRE(wrapper->at(0,1) == mat(0,1));
-    REQUIRE(wrapper->at(1,0) == mat(1,0));
-    REQUIRE(wrapper->at(1,1) == mat(1,1));
+    REQUIRE(wrapper(0,0) == mat(0,0));
+    REQUIRE(wrapper(0,1) == mat(0,1));
+    REQUIRE(wrapper(1,0) == mat(1,0));
+    REQUIRE(wrapper(1,1) == mat(1,1));
 }
 //-------------------------------------------------------------------
 
@@ -69,19 +69,19 @@ TEST_CASE("Wrapping a 3d matrix with polymorphic wrapper with non-const access",
     auto wrapper = LazyMatrix::wrap_matrix3d(mat);
 
     // Test wrapped matrix
-    REQUIRE(wrapper->pages() == mat.pages()); // Rows
-    REQUIRE(wrapper->rows() == mat.rows()); // Rows
-    REQUIRE(wrapper->columns() == mat.columns()); // Columns
-    REQUIRE(wrapper->size() == mat.size()); // Size
+    REQUIRE(wrapper.pages() == mat.pages()); // Rows
+    REQUIRE(wrapper.rows() == mat.rows()); // Rows
+    REQUIRE(wrapper.columns() == mat.columns()); // Columns
+    REQUIRE(wrapper.size() == mat.size()); // Size
 
     // Test const access
-    REQUIRE(wrapper->at(0,0,0) == mat(0,0,0));
-    REQUIRE(wrapper->at(0,0,1) == mat(0,0,1));
-    REQUIRE(wrapper->at(0,1,0) == mat(0,1,0));
-    REQUIRE(wrapper->at(0,1,1) == mat(0,1,1));
-    REQUIRE(wrapper->at(1,0,0) == mat(1,0,0));
-    REQUIRE(wrapper->at(1,0,1) == mat(1,0,1));
-    REQUIRE(wrapper->at(1,1,0) == mat(1,1,0));
-    REQUIRE(wrapper->at(1,1,1) == mat(1,1,1));
+    REQUIRE(wrapper(0,0,0) == mat(0,0,0));
+    REQUIRE(wrapper(0,0,1) == mat(0,0,1));
+    REQUIRE(wrapper(0,1,0) == mat(0,1,0));
+    REQUIRE(wrapper(0,1,1) == mat(0,1,1));
+    REQUIRE(wrapper(1,0,0) == mat(1,0,0));
+    REQUIRE(wrapper(1,0,1) == mat(1,0,1));
+    REQUIRE(wrapper(1,1,0) == mat(1,1,0));
+    REQUIRE(wrapper(1,1,1) == mat(1,1,1));
 }
 //-------------------------------------------------------------------
