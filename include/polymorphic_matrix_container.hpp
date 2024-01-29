@@ -50,14 +50,14 @@ namespace LazyMatrix
  */
 //-------------------------------------------------------------------
 template<typename DataType>
-class MatrixContainer : public BaseMatrix3D<MatrixContainer<DataType>, true>
+class MatrixContainer : public BaseMatrix3D<MatrixContainer<DataType>, false>
 {
 public:
 
     using value_type = DataType;
-    using MatrixBaseRef = SharedMatrixRef<PolymorphicMatrix<DataType>>;
+    using MatrixBaseRef = ConstSharedMatrixRef<PolymorphicMatrix<DataType>>;
 
-    friend class BaseMatrix3D<MatrixContainer<DataType>, true>;
+    friend class BaseMatrix3D<MatrixContainer<DataType>, false>;
 
     /**
      * @brief Adds a new matrix to the container and pads it to maintain consistent dimensions.
@@ -69,7 +69,9 @@ public:
     {
         MatrixBaseRef wrapped_matrix = wrap_matrix(matrix);
         matrices_.push_back(wrapped_matrix);
-        recalculate_dimensions();
+        
+        max_rows_ = std::max(max_rows_, matrix.rows());
+        max_columns_ = std::max(max_columns_, matrix.columns());
     }
 
     /**
@@ -78,8 +80,15 @@ public:
      */
     void remove_matrix(size_t index)
     {
+        auto& matrix = matrices_[index];
+        bool recalculate = matrix.rows() == max_rows_ || matrix.columns() == max_columns_;
+
         matrices_.erase(matrices_.begin() + index);
-        recalculate_dimensions();
+
+        if (recalculate)
+        {
+            recalculate_dimensions();
+        }
     }
 
     /**
@@ -160,19 +169,19 @@ private: // Private functions
      * @return A reference to the element at the specified position. This function
      *         indexes the vector of matrices as if it were a single 3d matrix.
      */
-    DataType& non_const_at_(int64_t page, int64_t row, int64_t column)
-    {
-        if (page < 0 || page >= static_cast<int64_t>(matrices_.size()) ||
-            row >= matrices_[page].rows() ||
-            column >= matrices_[page].columns())
-        {
-            return DummyValueHolder<DataType>::zero;
-        }
-        else
-        {
-            return matrices_[page](row, column);
-        }
-    }
+    // DataType& non_const_at_(int64_t page, int64_t row, int64_t column)
+    // {
+    //     if (page < 0 || page >= static_cast<int64_t>(matrices_.size()) ||
+    //         row >= matrices_[page].rows() ||
+    //         column >= matrices_[page].columns())
+    //     {
+    //         return DummyValueHolder<DataType>::zero;
+    //     }
+    //     else
+    //     {
+    //         return matrices_[page](row, column);
+    //     }
+    // }
 
     /**
      * @brief Recalculates the maximum rows and columns across all matrices.

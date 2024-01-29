@@ -54,13 +54,13 @@ namespace LazyMatrix
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class PolymorphicMatrix : public BaseMatrix<PolymorphicMatrix<DataType>,true>
+class PolymorphicMatrix : public BaseMatrix<PolymorphicMatrix<DataType>,false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix<PolymorphicMatrix<DataType>,true>;
+    friend class BaseMatrix<PolymorphicMatrix<DataType>,false>;
 
     PolymorphicMatrix() = default;
     virtual ~PolymorphicMatrix() = default;
@@ -73,7 +73,6 @@ public:
 private:
 
     virtual DataType const_at_(int64_t row, int64_t column) const = 0;
-    virtual DataType& non_const_at_(int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
 
@@ -138,20 +137,6 @@ private: // Private functions
     {
         return matrix_.circ_at(row, column);
     }
-
-    value_type& non_const_at_(int64_t row, int64_t column) override
-    {
-        if constexpr (has_non_const_access<ReferenceType>::value)
-        {
-            return matrix_.circ_at(row,column);
-        }
-        else
-        {
-            // Since we can't return a reference to a local,
-            // we return a reference to a dummy value
-            return DummyValueHolder<value_type>::zero;
-        }
-    }
     
 
 private: // Private variables
@@ -207,7 +192,7 @@ inline auto wrap_matrix(ReferenceType matrix)
 
     std::shared_ptr<PolymorphicMatrix<value_type>> wrapped_matrix_ptr = std::make_shared<PolymorphicMatrixWrapper<ReferenceType>>(matrix);
 
-    return SharedMatrixRef<PolymorphicMatrix<value_type>>(wrapped_matrix_ptr);
+    return ConstSharedMatrixRef<PolymorphicMatrix<value_type>>(wrapped_matrix_ptr);
 }
 //-------------------------------------------------------------------
 

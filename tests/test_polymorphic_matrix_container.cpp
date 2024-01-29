@@ -30,16 +30,8 @@ TEST_CASE("MatrixContainer Functionality", "[MatrixContainer]")
     auto m3 = m1 + m2;
     auto m4 = m1 - m2;
 
-    std::cout << "\n\n\nm1 =\n" << m1 << "\n\n\n";
-    std::cout << "\n\n\nm2 =\n" << m2 << "\n\n\n";
-    std::cout << "\n\n\nm3 =\n" << m3 << "\n\n\n";
-    std::cout << "\n\n\nm4 =\n" << m4 << "\n\n\n";
-
     auto m3_wrapped = LazyMatrix::wrap_matrix(m3);
     auto m4_wrapped = LazyMatrix::wrap_matrix(m4);
-
-    std::cout << "\n\n\nm3_wrapped =\n" << m3_wrapped << "\n\n\n";
-    std::cout << "\n\n\nm4_wrapped =\n" << m4_wrapped << "\n\n\n";
 
     // Create a MatrixContainer and add matrices
     LazyMatrix::MatrixContainer<int> container;
@@ -48,10 +40,8 @@ TEST_CASE("MatrixContainer Functionality", "[MatrixContainer]")
     container.add_matrix(m3);
     container.add_matrix(m4);
 
-    std::cout << "\n\n\ncontainer =\n" << container << "\n\n\n";
-
     // Test the dimensions
-    REQUIRE(container.pages() == 3);
+    REQUIRE(container.pages() == 4);
     REQUIRE(container.rows() == 2);
     REQUIRE(container.columns() == 2);
 
@@ -75,9 +65,9 @@ TEST_CASE("MatrixContainer Functionality", "[MatrixContainer]")
     REQUIRE(container(2, 1, 1) == 3);
 
     // Page 3 (m3 = m1 - m2)
-    REQUIRE(container(2, 0, 0) == -1);
-    REQUIRE(container(2, 0, 1) == -1);
-    REQUIRE(container(2, 1, 0) == -1);
-    REQUIRE(container(2, 1, 1) == -1);
+    REQUIRE(container(3, 0, 0) == -1);
+    REQUIRE(container(3, 0, 1) == -1);
+    REQUIRE(container(3, 1, 0) == -1);
+    REQUIRE(container(3, 1, 1) == -1);
 }
 //-------------------------------------------------------------------

@@ -105,6 +105,7 @@ public:
 
     // Type of value that is stored in the matrix
     using value_type = typename MatrixType::value_type;
+    using matrix_type = MatrixType;
 
     /**
      * @brief Constructs a SharedMatrixRef object.
@@ -298,6 +299,7 @@ public:
 
     // Type of value that is stored in the matrix
     using value_type = typename MatrixType::value_type;
+    using matrix_type = MatrixType;
 
     // Bring const access member functions into scope
     using ConstSharedMatrixRef<MatrixType>::at;
@@ -463,6 +465,7 @@ public:
 
     // Type of value that is stored in the matrix
     using value_type = typename MatrixType::value_type;
+    using matrix_type = MatrixType;
 
     /**
      * @brief Constructs a SharedMatrix3DRef object.
@@ -666,6 +669,7 @@ public:
 
     // Type of value that is stored in the matrix
     using value_type = typename MatrixType::value_type;
+    using matrix_type = MatrixType;
 
     // Bring const access member functions into scope
     using ConstSharedMatrix3DRef<MatrixType>::at;
