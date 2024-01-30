@@ -624,6 +624,53 @@ create_multiple_vector_selector_view(ReferenceType m,
 
 
 //-------------------------------------------------------------------
+/**
+ * @brief Specialized functions that make it easier to select rows
+ *        and column vectors from a matrix expression.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+
+inline auto row(ReferenceType m, int64_t row_index)
+{
+    return create_single_vector_selector_view(m, row_index, true);
+}
+
+
+
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+
+inline auto column(ReferenceType m, int64_t column_index)
+{
+    return create_single_vector_selector_view(m, column_index, false);
+}
+
+
+
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+
+inline auto rows(ReferenceType m, const std::vector<int64_t>& row_indeces)
+{
+    return create_multiple_vector_selector_view(m, row_indeces, true);
+}
+
+
+
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+
+inline auto columns(ReferenceType m, const std::vector<int64_t>& column_indeces)
+{
+    return create_multiple_vector_selector_view(m, column_indeces, false);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 } // namespace LazyMatrix
 //-------------------------------------------------------------------
 
