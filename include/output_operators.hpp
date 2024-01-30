@@ -376,11 +376,21 @@ inline std::ostream& operator<<(std::ostream& os, ReferenceType expression)
  * @return std::ostream& The output stream.
  */
 //-------------------------------------------------------------------
-template<typename MatrixType>
+template<typename ReferenceType>
 
-inline std::ostream& operator<<(std::ostream& os, const LazyMatrix::EigenMatrixAdapter<MatrixType>& expression)
+inline std::ostream& operator<<(std::ostream& os, const LazyMatrix::EigenWrapper<ReferenceType>& expression)
 {
-    os << expression.get_matrix_ref();
+    os << expression.get_matrix();
+    return os;
+}
+
+
+
+template<typename ReferenceType>
+
+inline std::ostream& operator<<(std::ostream& os, const LazyMatrix::ConstEigenWrapper<ReferenceType>& expression)
+{
+    os << expression.get_matrix();
     return os;
 }
 //-------------------------------------------------------------------
