@@ -26,6 +26,7 @@
 
 //-------------------------------------------------------------------
 #include "base_matrix3d.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -48,20 +49,20 @@ namespace LazyMatrix
  * allowing them to be used interchangeably with more complex matrix types in
  * operations and functions expecting matrix-like objects.
  *
- * @tparam SimpleDataType The type of the simple data to be wrapped.
+ * @tparam ScalarDataType The type of the simple data to be wrapped.
  */
 //-------------------------------------------------------------------
-template<typename SimpleDataType>
-class SimpleData3DMatrixWrapper : public BaseMatrix3D<SimpleData3DMatrixWrapper<SimpleDataType>,true>
+template<typename ScalarDataType>
+class SimpleData3DMatrixWrapper : public BaseMatrix3D<SimpleData3DMatrixWrapper<ScalarDataType>,true>
 {
 public:
 
-    using value_type = SimpleDataType;
+    using value_type = ScalarDataType;
 
-    friend class BaseMatrix3D<SimpleData3DMatrixWrapper<SimpleDataType>,true>;
+    friend class BaseMatrix3D<SimpleData3DMatrixWrapper<ScalarDataType>,true>;
 
     
-    SimpleData3DMatrixWrapper(const SimpleDataType& value) : value_(value)
+    SimpleData3DMatrixWrapper(const ScalarDataType& value) : value_(value)
     {
     }
 
@@ -107,7 +108,7 @@ public:
      * @param column Column index (ignored).
      * @return The wrapped value.
      */
-    SimpleDataType at_(int64_t page, int64_t row, int64_t column)const
+    ScalarDataType at_(int64_t page, int64_t row, int64_t column)const
     {
         return value_; // Since it's a single value, ignore page, row and column indices
     }
@@ -122,7 +123,7 @@ public:
      * @param column Column index (ignored).
      * @return The wrapped value.
      */
-    SimpleDataType at_(int64_t page, int64_t row, int64_t column)
+    ScalarDataType at_(int64_t page, int64_t row, int64_t column)
     {
         return value_; // Since it's a single value, ignore page, row and column indices
     }
@@ -131,7 +132,7 @@ public:
 
 private:
 
-    SimpleDataType value_;
+    ScalarDataType value_;
 };
 //-------------------------------------------------------------------
 
@@ -140,9 +141,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename SimpleDataType>
+template<typename ScalarDataType>
 
-struct is_type_a_matrix3d< SimpleData3DMatrixWrapper<SimpleDataType> > : std::true_type
+struct is_type_a_matrix3d< SimpleData3DMatrixWrapper<ScalarDataType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -156,16 +157,19 @@ struct is_type_a_matrix3d< SimpleData3DMatrixWrapper<SimpleDataType> > : std::tr
  * This function takes a simple data type and wraps it in a `SimpleData2DMatrixWrapper`,
  * allowing it to be used in contexts that expect a matrix-like object.
  *
- * @tparam SimpleDataType The type of the simple data to be wrapped.
+ * @tparam ScalarDataType The type of the simple data to be wrapped.
  * @param value The value to be wrapped.
- * @return SimpleData2DMatrixWrapper<SimpleDataType> The wrapped matrix-like object.
+ * @return SharedMatrix3DRef of a scalar wrapped in a 3d matrix.
  */
 //-------------------------------------------------------------------
-template<typename SimpleDataType>
+template<typename ScalarDataType>
 
-SimpleData3DMatrixWrapper<SimpleDataType> wrap_in_matrix(const SimpleDataType& value)
+inline auto
+
+wrap_scalar_in_matrix3d(const ScalarDataType& value)
 {
-    return SimpleData3DMatrixWrapper<SimpleDataType>(value);
+    auto wrapped_scalar = std::make_shared<SimpleData3DMatrixWrapper<ScalarDataType>>(value);
+    return SharedMatrix3DRef<SimpleData3DMatrixWrapper<ScalarDataType>>(wrapped_scalar);
 }
 //-------------------------------------------------------------------
 

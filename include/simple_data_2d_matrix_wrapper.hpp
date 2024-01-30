@@ -47,24 +47,24 @@ namespace LazyMatrix
  * It's particularly useful in a polymorphic context where different data types including
  * matrices and simple data types are handled uniformly.
  *
- * @tparam SimpleDataType The data type of the value to be wrapped.
+ * @tparam ScalarDataType The data type of the value to be wrapped.
  */
 //-------------------------------------------------------------------
-template<typename SimpleDataType>
-class SimpleData2DMatrixWrapper : public BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,true>
+template<typename ScalarDataType>
+class SimpleData2DMatrixWrapper : public BaseMatrix<SimpleData2DMatrixWrapper<ScalarDataType>,true>
 {
 public:
 
-    using value_type = SimpleDataType;
+    using value_type = ScalarDataType;
 
-    friend class BaseMatrix<SimpleData2DMatrixWrapper<SimpleDataType>,true>;
+    friend class BaseMatrix<SimpleData2DMatrixWrapper<ScalarDataType>,true>;
 
     /**
      * @brief Construct a new Simple Data 2D Matrix Wrapper object.
      * 
      * @param value The value to be wrapped in the matrix.
      */
-    explicit SimpleData2DMatrixWrapper(const SimpleDataType& value) : value_(value)
+    explicit SimpleData2DMatrixWrapper(const ScalarDataType& value) : value_(value)
     {
     }
 
@@ -97,7 +97,7 @@ public:
      * @param column Column index (ignored).
      * @return The wrapped value.
      */
-    SimpleDataType at_(int64_t row, int64_t column) const
+    ScalarDataType at_(int64_t row, int64_t column) const
     {
         return value_; // Since it's a single value, ignore row and column indices
     }
@@ -109,7 +109,7 @@ public:
      * @param column Column index (ignored).
      * @return The wrapped value.
      */
-    SimpleDataType at_(int64_t row, int64_t column)
+    ScalarDataType at_(int64_t row, int64_t column)
     {
         return value_; // Since it's a single value, ignore row and column indices
     }
@@ -118,7 +118,7 @@ public:
 
 private:
 
-    SimpleDataType value_;
+    ScalarDataType value_;
 };
 //-------------------------------------------------------------------
 
@@ -127,9 +127,9 @@ private:
 //-------------------------------------------------------------------
 // Compile time functions to check if the type is an expression type
 //-------------------------------------------------------------------
-template<typename SimpleDataType>
+template<typename ScalarDataType>
 
-struct is_type_a_matrix< SimpleData2DMatrixWrapper<SimpleDataType> > : std::true_type
+struct is_type_a_matrix< SimpleData2DMatrixWrapper<ScalarDataType> > : std::true_type
 {
 };
 //-------------------------------------------------------------------
@@ -143,16 +143,19 @@ struct is_type_a_matrix< SimpleData2DMatrixWrapper<SimpleDataType> > : std::true
  * This function takes a simple data type and wraps it in a `SimpleData2DMatrixWrapper`,
  * allowing it to be used in contexts that expect a matrix-like object.
  *
- * @tparam SimpleDataType The type of the simple data to be wrapped.
+ * @tparam ScalarDataType The type of the simple data to be wrapped.
  * @param value The value to be wrapped.
- * @return SimpleData2DMatrixWrapper<SimpleDataType> The wrapped matrix-like object.
+ * @return SimpleData2DMatrixWrapper<ScalarDataType> The wrapped matrix-like object.
  */
 //-------------------------------------------------------------------
-template<typename SimpleDataType>
+template<typename ScalarDataType>
 
-SimpleData2DMatrixWrapper<SimpleDataType> wrap_in_matrix(const SimpleDataType& value)
+inline auto
+
+wrap_scalar_in_matrix(const ScalarDataType& value)
 {
-    return SimpleData2DMatrixWrapper<SimpleDataType>(value);
+    auto wrapped_scalar = std::make_shared<SimpleData2DMatrixWrapper<ScalarDataType>>(value);
+    return SharedMatrixRef<SimpleData2DMatrixWrapper<ScalarDataType>>(wrapped_scalar);
 }
 //-------------------------------------------------------------------
 
