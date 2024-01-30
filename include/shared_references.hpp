@@ -241,6 +241,14 @@ public:
         return ptr_->circ_at(index);
     }
 
+    /**
+     * @brief Return underlying shared_ptr pointer
+     */
+    std::shared_ptr<MatrixType> get_ptr()const
+    {
+        return ptr_;
+    }
+
 
 
 protected:
@@ -611,6 +619,14 @@ public:
     value_type circ_at(int64_t index) const
     {
         return ptr_->circ_at(index);
+    }
+
+    /**
+     * @brief Return underlying shared_ptr pointer
+     */
+    std::shared_ptr<MatrixType> get_ptr()const
+    {
+        return ptr_;
     }
 
 

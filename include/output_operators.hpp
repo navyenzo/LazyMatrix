@@ -33,7 +33,7 @@
 #include "polymorphic_matrix.hpp"
 #include "polymorphic_matrix3d.hpp"
 #include "shared_references.hpp"
-#include "eigen_wrapper.hpp"
+#include "eigen_wrappers.hpp"
 //-------------------------------------------------------------------
 
 
@@ -376,12 +376,11 @@ inline std::ostream& operator<<(std::ostream& os, ReferenceType expression)
  * @return std::ostream& The output stream.
  */
 //-------------------------------------------------------------------
-template<typename ReferenceType,
-         std::enable_if_t<LazyMatrix::is_matrix_reference<ReferenceType>{}>* = nullptr>
+template<typename MatrixType>
 
-inline std::ostream& operator<<(std::ostream& os, const LazyMatrix::CustomEigenWrapper<ReferenceType>& expression)
+inline std::ostream& operator<<(std::ostream& os, const LazyMatrix::EigenMatrixAdapter<MatrixType>& expression)
 {
-    os << expression.get_matrix();
+    os << expression.get_matrix_ref();
     return os;
 }
 //-------------------------------------------------------------------
