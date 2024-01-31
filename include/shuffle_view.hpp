@@ -144,7 +144,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    template<typename T = ReferenceType>
+    std::enable_if_t<has_non_const_access<T>::value, value_type&>
     non_const_at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(row_indeces_[row], column_indeces_[column]);

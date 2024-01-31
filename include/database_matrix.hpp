@@ -338,16 +338,6 @@ private: // Private functions
     value_type const_at_(int64_t row, int64_t column) const;
 
     /**
-     * @brief Since reference access in this context doesn't make sense, this
-     *        function returns a dummy value.
-     * @param row Row index.
-     * @param column Column index.
-     * @return Since reference access in this context doesn't make sense, this
-     *         function returns a dummy value.
-     */
-    value_type& non_const_at_(int64_t row, int64_t column);
-
-    /**
      * @brief Counts the number of rows in the matrix.
      */
     void count_rows()const;
@@ -517,15 +507,6 @@ inline DatabaseMatrix::value_type DatabaseMatrix::const_at_(int64_t row, int64_t
 
     // Return the data from the cache
     return cache_window_.cache[cache_index];
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-inline DatabaseMatrix::value_type& DatabaseMatrix::non_const_at_(int64_t row, int64_t column)
-{
-    return DummyValueHolder<DatabaseMatrix::value_type>::zero;
 }
 //-------------------------------------------------------------------
 

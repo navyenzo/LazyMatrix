@@ -138,7 +138,9 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    value_type& non_const_at_(int64_t row, int64_t column)
+    template<typename T = ReferenceType>
+    std::enable_if_t<has_non_const_access<T>::value, value_type&>
+    non_const_at_(int64_t row, int64_t column)
     {
         row = std::max(row, int64_t(0));
         row = std::min(this->rows() - 1, row);
@@ -268,7 +270,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    template<typename T = ReferenceType>
+    std::enable_if_t<has_non_const_access<T>::value, value_type&>
     non_const_at_(int64_t row, int64_t column)
     {
         if(row < 0 || row >= this->rows() || column < 0 || column >= this->columns())

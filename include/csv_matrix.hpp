@@ -136,7 +136,6 @@ private: // Private functions
 
 
     decltype(auto) const_at_(int64_t row, int64_t column)const;
-    DataType& non_const_at_(int64_t row, int64_t column);
     
     uintptr_t find_end_of_current_row(uintptr_t current_position_in_csv_string)const;
     uintptr_t find_end_of_current_column(uintptr_t current_position_in_csv_string, uintptr_t end_of_row)const;
@@ -258,20 +257,6 @@ template<>
 inline decltype(auto) CSVMatrix<std::string_view>::const_at_(int64_t row, int64_t column)const
 {
     return this->string_at(row, column);
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Since allowing reference access doesn't make sense, in this case
-// we just return a dummy value
-//-------------------------------------------------------------------
-template<typename DataType>
-
-inline DataType& CSVMatrix<DataType>::non_const_at_(int64_t row, int64_t column)
-{
-    return DummyValueHolder<DataType>::zero;
 }
 //-------------------------------------------------------------------
 

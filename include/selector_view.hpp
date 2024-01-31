@@ -166,7 +166,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    template<typename T = ReferenceType>
+    std::enable_if_t<has_non_const_access<T>::value, value_type&>
     non_const_at_(int64_t row, int64_t column)
     {
         if(are_we_selecting_a_row_)
@@ -326,7 +327,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    template<typename T = ReferenceType>
+    std::enable_if_t<has_non_const_access<T>::value, value_type&>
     non_const_at_(int64_t row, int64_t column)
     {
         if(are_we_selecting_rows_)
@@ -482,7 +484,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType>::value, value_type&>
+    template<typename T = ReferenceType>
+    std::enable_if_t<has_non_const_access<T>::value, value_type&>
     non_const_at_(int64_t row, int64_t column)
     {
         return expression_.circ_at(selected_rows_[row], selected_columns_[column]);
@@ -604,9 +607,9 @@ template<typename ReferenceType,
 
 inline auto
 
-create_multiple_vector_selector_view(ReferenceType m,
-                                     const std::vector<int64_t>& selected_rows,
-                                     const std::vector<int64_t>& selected_columns)
+rows_and_columns(ReferenceType m,
+                 const std::vector<int64_t>& selected_rows,
+                 const std::vector<int64_t>& selected_columns)
 {
     auto view = std::make_shared<RowAndColumnSelectorView<ReferenceType>>(m, selected_rows, selected_columns);
 

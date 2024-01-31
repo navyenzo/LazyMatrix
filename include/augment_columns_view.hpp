@@ -148,7 +148,8 @@ private: // Private functions
      * @param column Column index.
      * @return A reference to the element at the specified position.
      */
-    std::enable_if_t<has_non_const_access<ReferenceType1>::value && has_non_const_access<ReferenceType2>::value, value_type&>
+    template<typename T1 = ReferenceType1, typename T2 = ReferenceType2>
+    std::enable_if_t<has_non_const_access<T1>::value && has_non_const_access<T2>::value, value_type&>
     non_const_at_(int64_t row, int64_t column)
     {
         if(column < left_side_expression_.columns())
