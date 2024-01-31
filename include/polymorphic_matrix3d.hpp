@@ -197,7 +197,7 @@ using SpecializedData3D = PolymorphicMatrixWrapper3D<ReferenceType>;
  * 
  * @tparam ReferenceType Type of the matrix to wrap.
  * @param matrix The matrix to be wrapped.
- * @return SharedMatrix3DRef wrapping the input matrix.
+ * @return ConstSharedMatrix3DRef wrapping the input matrix.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -209,7 +209,7 @@ inline auto wrap_matrix3d(ReferenceType matrix)
 
     std::shared_ptr<PolymorphicMatrix3D<value_type>> wrapped_matrix_ptr = std::make_shared<PolymorphicMatrixWrapper3D<ReferenceType>>(matrix);
 
-    return SharedMatrix3DRef<PolymorphicMatrix3D<value_type>>(wrapped_matrix_ptr);
+    return ConstSharedMatrix3DRef<PolymorphicMatrix3D<value_type>>(wrapped_matrix_ptr);
 }
 //-------------------------------------------------------------------
 
