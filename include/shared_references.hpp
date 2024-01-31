@@ -322,6 +322,18 @@ public:
     : ConstSharedMatrixRef<MatrixType>(ptr)
     {
     }
+    
+    /**
+     * @brief Explicit constructor to allow conversion from ConstSharedMatrixRef to SharedMatrixRef.
+     *        - Use this carefully when you know the underlying MatrixType allows for non-const
+     *          access
+     * 
+     * @param const_ref 
+     */
+    explicit SharedMatrixRef(const ConstSharedMatrixRef<MatrixType>& const_ref)
+    : ConstSharedMatrixRef<MatrixType>(std::const_pointer_cast<MatrixType>(const_ref.get_ptr()))
+    {
+    }
 
     /**
      * @brief Default copy constructor
@@ -332,6 +344,22 @@ public:
      * @brief Default assignment operator
      */
     SharedMatrixRef& operator=(const SharedMatrixRef<MatrixType>&) = default;
+    
+    /**
+     * @brief Assignement operator for converting ConstSharedMatrixRef to SharedMatrixRef
+     * 
+     * @param const_ref
+     * @return SharedMatrixRef& 
+     */
+    SharedMatrixRef& operator=(const ConstSharedMatrixRef<MatrixType>& const_ref)
+    {
+        if (this != &const_ref)
+        {
+            this->ptr_ = std::const_pointer_cast<MatrixType>(const_ref.get_ptr());
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Forwards the call to the at() method of the underlying matrix.
@@ -700,6 +728,18 @@ public:
     : ConstSharedMatrix3DRef<MatrixType>(ptr)
     {
     }
+    
+    /**
+     * @brief Explicit constructor to allow conversion from ConstSharedMatrixRef to SharedMatrixRef.
+     *        - Use this carefully when you know the underlying MatrixType allows for non-const
+     *          access
+     * 
+     * @param const_ref 
+     */
+    explicit SharedMatrix3DRef(const ConstSharedMatrix3DRef<MatrixType>& const_ref)
+    : ConstSharedMatrix3DRef<MatrixType>(std::const_pointer_cast<MatrixType>(const_ref.get_ptr()))
+    {
+    }
 
     /**
      * @brief Default copy constructor
@@ -710,6 +750,22 @@ public:
      * @brief Default assignment operator
      */
     SharedMatrix3DRef& operator=(const SharedMatrix3DRef<MatrixType>&) = default;
+    
+    /**
+     * @brief Assignement operator for converting ConstSharedMatrixRef to SharedMatrixRef
+     * 
+     * @param const_ref
+     * @return SharedMatrixRef& 
+     */
+    SharedMatrix3DRef& operator=(const ConstSharedMatrix3DRef<MatrixType>& const_ref)
+    {
+        if (this != &const_ref)
+        {
+            this->ptr_ = std::const_pointer_cast<MatrixType>(const_ref.get_ptr());
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Forwards the call to the at() method of the underlying matrix.
