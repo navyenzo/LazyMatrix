@@ -265,7 +265,7 @@ public:
      */
     void set_are_we_selecting_rows(bool are_we_selecting_rows)
     {
-        are_we_selecting_rows_ = are_we_selecting_rows_;
+        are_we_selecting_rows_ = are_we_selecting_rows;
     }
 
     /**

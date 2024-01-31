@@ -29,40 +29,75 @@
 TEST_CASE("Rows and Columns Selection and Region Of Interest (ROI)", "[Rows_and_Columns_Selection_and_ROIs]")
 {
     // Create a small matrix for testing with incrementing values
-    auto matrix = LazyMatrix::generate_iota_matrix(10, 10, 0, 1);
+    auto matrix = LazyMatrix::generate_iota_matrix(3, 3, 0, 1);
 
-    std::cout << "matrix =\n" << matrix << std::endl;
+    int64_t row_index = 0;
+    int64_t column_index = 1;
+    std::vector<int64_t> selected_vectors = {0, 2};
 
-    auto selected_row = LazyMatrix::row(matrix, 0);
-    auto selected_column = LazyMatrix::column(matrix, 0);
-    auto selected_rows = LazyMatrix::rows(matrix, {0, 1, 2});
-    auto selected_columns = LazyMatrix::columns(matrix, {0, 1, 2});
+    SECTION("single row and column selection test")
+    {
+        auto selected_row = LazyMatrix::row(matrix, row_index);
+        auto selected_column = LazyMatrix::column(matrix, column_index);
 
-    std::cout << "selected_row =\n" << selected_row << std::endl;
-    std::cout << "selected_column =\n" << selected_column << std::endl;
-    std::cout << "selected_rows =\n" << selected_rows << std::endl;
-    std::cout << "selected_columns =\n" << selected_columns << std::endl;
+        // Testing single row selection
+        for(int i = 0; i < matrix.columns(); ++i)
+        {
+            REQUIRE(matrix(row_index, i) == selected_row(0, i));
+        }
 
-    // // Define padded size
-    // const uintptr_t padded_rows = 4;
-    // const uintptr_t padded_columns = 4;
+        // Testing single column selection
+        for(int i = 0; i < matrix.rows(); ++i)
+        {
+            REQUIRE(matrix(i, column_index) == selected_column(i,0));
+        }
+    }
 
-    // SECTION("padded_matrix Test")
-    // {
-    //     // Apply padding
-    //     auto padded_matrix = LazyMatrix::create_padded_matrix_view(small_matrix, padded_rows, padded_columns);
+    SECTION("multiple rows and column selection test")
+    {
+        auto selected_rows = LazyMatrix::rows(matrix, selected_vectors);
+        auto selected_columns = LazyMatrix::columns(matrix, selected_vectors);
 
-    //     // Check dimensions
-    //     REQUIRE(padded_matrix.rows() == padded_rows);
-    //     REQUIRE(padded_matrix.columns() == padded_columns);
+        // Testing multiple row selection
+        for(int i = 0; i < selected_vectors.size(); ++i)
+        {
+            for(int j = 0; j < matrix.columns(); ++j)
+            {
+                REQUIRE(matrix(selected_vectors[i], j) == selected_rows(i, j));
+            }
+        }
 
-    //     // Check original values
-    //     REQUIRE(padded_matrix(0, 0) == 1);
-    //     REQUIRE(padded_matrix(1, 1) == 4);
+        // Testing multiple column selection
+        for(int i = 0; i < selected_vectors.size(); ++i)
+        {
+            for(int j = 0; j < matrix.rows(); ++j)
+            {
+                REQUIRE(matrix(j, selected_vectors[i]) == selected_columns(j, i));
+            }
+        }
+    }
 
-    //     // Check padding values
-    //     REQUIRE(padded_matrix(2, 2) == 0);
-    //     REQUIRE(padded_matrix(3, 3) == 0);
-    // }
+    SECTION("selecting multiple rows and columns at the same time test")
+    {
+        auto selected_rows_and_columns = LazyMatrix::rows_and_columns(matrix, selected_vectors, selected_vectors);
+
+        for(int i = 0; i < selected_vectors.size(); ++i)
+        {
+            for(int j = 0; j < selected_vectors.size(); ++j)
+            {
+                REQUIRE(matrix(selected_vectors[i], selected_vectors[j]) == selected_rows_and_columns(i,j));
+            }
+        }
+    }
+
+    SECTION("Region Of Interest (ROI) selection test")
+    {
+        auto roi_matrix = LazyMatrix::roi(matrix, 1, 1, 2, 2);
+
+        REQUIRE(matrix(1,1) == roi_matrix(0,0));
+        REQUIRE(matrix(1,2) == roi_matrix(0,1));
+        REQUIRE(matrix(2,1) == roi_matrix(1,0));
+        REQUIRE(matrix(2,2) == roi_matrix(1,1));
+    }
 }
 //-------------------------------------------------------------------

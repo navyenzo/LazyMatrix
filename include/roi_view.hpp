@@ -241,8 +241,8 @@ template<typename ReferenceType,
 
 inline auto
 
-create_roi_view(ReferenceType m,
-                          int64_t row1, int64_t column1, int64_t row2, int64_t column2)
+roi(ReferenceType m,
+    int64_t row1, int64_t column1, int64_t row2, int64_t column2)
 {
     auto view = std::make_shared<ROIView<ReferenceType>>(m, row1, column1, row2, column2);
 
