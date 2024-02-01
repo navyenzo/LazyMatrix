@@ -29,6 +29,13 @@
 #include <cstdint>
 
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
+
+// eigen library for fast/efficient matrix math
+#include "Eigen/Eigen"
+
+// dlib library for neural networks
+#include "dlib/mlp.h"
 //-------------------------------------------------------------------
 
 
@@ -77,56 +84,83 @@ public:
     friend class BaseMatrix<SimpleMatrix<DataType>,true>;
 
     /**
-     * Default constructor. Creates a matrix of specified dimensions with all elements initialized to a default value.
-     * @param rows The number of rows in the matrix. Default is 0.
-     * @param columns The number of columns in the matrix. Default is 0.
-     * @param initial_value The initial value for each element of the matrix. Default is static_cast<DataType>(0).
+     * @brief Default constructor. Initializes a matrix with given rows and columns.
+     * @param rows Number of rows in the matrix. Default is 0.
+     * @param columns Number of columns in the matrix. Default is 0.
+     * @param initial_value The initial value to fill the matrix. Default is 0.
      */
-    SimpleMatrix(uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
-    {
-        this->resize_(rows, columns, initial_value);
-    }
+    SimpleMatrix(uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0));
 
     /**
-     * Constructor from a generic matrix expression.
-     * @param matrix The matrix expression from which to initialize this matrix.
+     * @brief Default copy constructor (deep copy).
+     * @param matrix The source matrix to deep copy.
      */
-    template<typename MatrixType,
-             std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
-
-    SimpleMatrix(const MatrixType& matrix)
-    {
-        auto rows = matrix.rows();
-        auto columns = matrix.columns();
-
-        this->resize_(matrix.rows(), matrix.columns());
-
-        for(int i = 0; i < rows; ++i)
-            for(int j = 0; j < columns; ++j)
-                (*this)(i,j) = matrix(i,j);
-    }
+    SimpleMatrix(const SimpleMatrix<DataType>& matrix) = default;
 
     /**
-     * Assignment operator from a generic matrix expression.
-     * @param matrix The matrix expression from which to assign this matrix.
-     * @return A reference to this matrix.
+     * @brief Constructor to create a matrix from a dlib matrix.
+     * @tparam DataType2 Data type of the dlib matrix.
+     * @tparam NR Number of rows in the dlib matrix.
+     * @tparam NC Number of columns in the dlib matrix.
+     * @tparam mem_manager Memory manager type of the dlib matrix.
+     * @tparam layout Memory layout type of the dlib matrix.
+     * @param dlib_matrix The dlib matrix to convert from.
      */
-    template<typename MatrixType,
-             std::enable_if_t<is_type_a_matrix<MatrixType>{}>* = nullptr>
+    template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
+    SimpleMatrix(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix);
 
-    SimpleMatrix<DataType>& operator=(const MatrixType& matrix)
-    {
-        auto rows = matrix.rows();
-        auto columns = matrix.columns();
+    /**
+     * @brief Constructor to create a matrix from an Eigen matrix.
+     * @tparam DataType2 Data type of the Eigen matrix.
+     * @param m The Eigen matrix to convert from.
+     */
+    template<typename DataType2>
+    SimpleMatrix(const Eigen::MatrixBase<DataType2>& m);
 
-        this->resize_(rows, columns);
+    /**
+     * @brief Construct a new Matrix object copying a matrix reference
+     * 
+     * @param matrix_expression The matrix to deep copy
+     */
+    template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+    SimpleMatrix(ReferenceType matrix_expression);
 
-        for(int i = 0; i < rows; ++i)
-            for(int j = 0; j < columns; ++j)
-                (*this)(i,j) = matrix(i,j);
-        
-        return (*this);
-    }
+    /**
+     * @brief Default Assignment operator (deep copy).
+     * @param matrix The source matrix to deep copy.
+     * @return Reference to this matrix after deep copying.
+     */
+    SimpleMatrix<DataType>& operator=(const SimpleMatrix<DataType>& matrix) = default;
+
+    /**
+     * @brief Assignment operator from a dlib matrix.
+     * @tparam DataType2 Data type of the dlib matrix.
+     * @tparam NR Number of rows in the dlib matrix.
+     * @tparam NC Number of columns in the dlib matrix.
+     * @tparam mem_manager Memory manager type of the dlib matrix.
+     * @tparam layout Memory layout type of the dlib matrix.
+     * @param dlib_matrix The dlib matrix to assign from.
+     * @return Reference to this matrix after assignment.
+     */
+    template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
+    SimpleMatrix<DataType>& operator=(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix);
+
+    /**
+     * @brief Assignment operator from an eigen matrix expression.
+     * @tparam DataType2 Data type of the Eigen matrix.
+     * @param m The Eigen matrix to copy from.
+     * @return Reference to this matrix object after assignment.
+     */
+    template<typename DataType2>
+    SimpleMatrix<DataType>& operator=(const Eigen::MatrixBase<DataType2>& m);
+
+    /**
+     * @brief Assignement from a reference to a matrix expression.
+     * 
+     * @param matrix_expression The matrix to copy from
+     */
+    template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+    SimpleMatrix<DataType>& operator=(ReferenceType matrix_expression);
 
     /**
      * Gets the number of rows in the matrix.
@@ -220,6 +254,165 @@ template<typename MatrixType>
 struct is_type_a_matrix< SimpleMatrix<MatrixType> > : std::true_type
 {
 };
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Default constructor from rows, columns and initial value
+//-------------------------------------------------------------------
+template<typename DataType>
+
+inline SimpleMatrix<DataType>::SimpleMatrix(uintptr_t rows, uintptr_t columns, const DataType& initial_value)
+{
+    this->resize_(rows, columns, initial_value);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Constructor from a dlib matrix
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
+
+inline SimpleMatrix<DataType>::SimpleMatrix(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix)
+{
+    this->resize_(dlib_matrix.nr(), dlib_matrix.nc());
+
+    for(int64_t i = 0; i < this->rows(); ++i)
+    {
+        for(int64_t j = 0; j < this->columns(); ++j)
+        {
+            (*this)(i,j) = dlib_matrix(i,j);
+        }
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Constructor from an eigen matrix
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename DataType2>
+
+inline SimpleMatrix<DataType>::SimpleMatrix(const Eigen::MatrixBase<DataType2>& m)
+{
+    uintptr_t rows = m.rows();
+    uintptr_t columns = m.columns();
+
+    this->resize_(rows,columns);
+
+    for(int64_t i = 0; i < rows; ++i)
+    {
+        for(int64_t j = 0; j < columns; ++j)
+        {
+            (*this)(i,j) = m(i,j);
+        }
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Constructor from a matrix expression reference
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>*>
+
+inline SimpleMatrix<DataType>::SimpleMatrix(ReferenceType matrix_expression)
+{
+    uintptr_t rows = matrix_expression.rows();
+    uintptr_t columns = matrix_expression.columns();
+
+    this->resize_(rows,columns);
+
+    for(int64_t i = 0; i < rows; ++i)
+    {
+        for(int64_t j = 0; j < columns; ++j)
+        {
+            (*this)(i,j) = matrix_expression(i,j);
+        }
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Assignment from a dlib matrix
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
+
+inline SimpleMatrix<DataType>& SimpleMatrix<DataType>::operator=(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix)
+{
+    this->resize_(dlib_matrix.nr(), dlib_matrix.nc());
+
+    for(int64_t i = 0; i < this->rows(); ++i)
+    {
+        for(int64_t j = 0; j < this->columns(); ++j)
+        {
+            (*this)(i,j) = dlib_matrix(i,j);
+        }
+    }
+
+    return (*this);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Assignment from an eigen matrix
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename DataType2>
+
+inline SimpleMatrix<DataType>& SimpleMatrix<DataType>::operator=(const Eigen::MatrixBase<DataType2>& m)
+{
+    this->resize_(m.rows(),m.cols());
+
+    for(int64_t i = 0; i < m.rows(); ++i)
+    {
+        for(int64_t j = 0; j < m.cols(); ++j)
+        {
+            (*this)(i,j) = m(i,j);
+        }
+    }
+
+    return (*this);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Assignment from a reference to a matrix expression
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>*>
+
+inline SimpleMatrix<DataType>& SimpleMatrix<DataType>::operator=(ReferenceType matrix_expression)
+{
+    uintptr_t rows = matrix_expression.rows();
+    uintptr_t columns = matrix_expression.columns();
+
+    std::error_code error = this->resize_(rows, columns);
+
+    if(error)
+        return (*this);
+
+    for(int64_t i = 0; i < rows; ++i)
+        for(int64_t j = 0; j < columns; ++j)
+            (*this)(i,j) = matrix_expression(i,j);
+
+    return (*this);
+}
 //-------------------------------------------------------------------
 
 

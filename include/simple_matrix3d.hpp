@@ -29,6 +29,7 @@
 #include <cstdint>
 
 #include "base_matrix3d.hpp"
+#include "shared_references.hpp"
 //-------------------------------------------------------------------
 
 
@@ -77,65 +78,46 @@ public:
     friend class BaseMatrix3D<SimpleMatrix3D<DataType>,true>;
 
     /**
-     * Default constructor. Creates a matrix of specified dimensions with all elements initialized to a default value.
-     * @param pages The number of pages in the matrix. Default is 0.
-     * @param rows The number of rows in the matrix. Default is 0.
-     * @param columns The number of columns in the matrix. Default is 0.
-     * @param initial_value The initial value for each element of the matrix. Default is static_cast<DataType>(0).
+     * @brief Default constructor. Initializes a matrix with given rows and columns.
+     * @param pages Number of pages in the matrix. Default is 0.
+     * @param rows Number of rows in the matrix. Default is 0.
+     * @param columns Number of columns in the matrix. Default is 0.
+     * @param initial_value The initial value to fill the matrix. Default is 0.
      */
-    SimpleMatrix3D(uintptr_t pages = 0, uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0))
-    {
-        this->resize_(pages, rows, columns, initial_value);
-    }
+    SimpleMatrix3D(uintptr_t pages = 0, uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0));
 
     /**
-     * Constructor from a generic matrix expression.
-     * @param matrix The matrix expression from which to initialize this matrix.
+     * @brief Default copy constructor (deep copy).
+     * @param matrix The source matrix to deep copy.
      */
-    template<typename MatrixType,
-             std::enable_if_t<is_type_a_matrix3d<MatrixType>{}>* = nullptr>
-
-    SimpleMatrix3D(const MatrixType& matrix)
-    {
-        auto pages = matrix.pages();
-        auto rows = matrix.rows();
-        auto columns = matrix.columns();
-
-        this->resize_(pages, rows, columns);
-
-        for(int k = 0; k < pages; ++k)
-            for(int i = 0; i < rows; ++i)
-                for(int j = 0; j < columns; ++j)
-                    (*this)(k,i,j) = matrix(k,i,j);
-    }
+    SimpleMatrix3D(const SimpleMatrix3D<DataType>& matrix) = default;
 
     /**
-     * Assignment operator from a generic matrix expression.
-     * @param matrix The matrix expression from which to assign this matrix.
-     * @return A reference to this matrix.
+     * @brief Construct a new Matrix object copying a matrix reference
+     * 
+     * @param matrix_expression The matrix to deep copy
      */
-    template<typename MatrixType,
-             std::enable_if_t<is_type_a_matrix3d<MatrixType>{}>* = nullptr>
-
-    SimpleMatrix3D<DataType>& operator=(const MatrixType& matrix)
-    {
-        auto pages = matrix.pages();
-        auto rows = matrix.rows();
-        auto columns = matrix.columns();
-
-        this->resize_(pages,rows, columns);
-
-        for(int k = 0; k < pages; ++k)
-            for(int i = 0; i < rows; ++i)
-                for(int j = 0; j < columns; ++j)
-                    (*this)(k,i,j) = matrix(k,i,j);
-        
-        return (*this);
-    }
+    template<typename ReferenceType, std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
+    SimpleMatrix3D(ReferenceType matrix_expression);
 
     /**
-     * Gets the number of rows in the matrix.
-     * @return The number of rows.
+     * @brief Default Assignment operator (deep copy).
+     * @param matrix The source matrix to deep copy.
+     * @return Reference to this matrix after deep copying.
+     */
+    SimpleMatrix3D<DataType>& operator=(const SimpleMatrix3D<DataType>& matrix) = default;
+
+    /**
+     * @brief Assignement from a reference to a matrix expression.
+     * 
+     * @param matrix_expression The matrix to copy from
+     */
+    template<typename ReferenceType, std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
+    SimpleMatrix3D<DataType>& operator=(ReferenceType matrix_expression);
+
+    /**
+     * Gets the number of pages in the matrix.
+     * @return The number of pages.
      */
     uintptr_t pages() const
     {
@@ -223,10 +205,10 @@ private: // Private functions
 
 private: // Private variables
 
-    uintptr_t pages_ = 0;           ///< The number pf pages in the 3d-matrix.
-    uintptr_t rows_ = 0;            ///< The number of rows in the matrix.
-    uintptr_t columns_ = 0;         ///< The number of columns in the matrix.
-    std::vector<DataType> data_;    ///< The flat array storing matrix elements.
+    uintptr_t pages_ = 0;               ///< The number of pages in the 3d matrix.
+    uintptr_t rows_ = 0;                ///< The number of rows in the 3d matrix.
+    uintptr_t columns_ = 0;             ///< The number of columns in the 3d matrix.
+    std::vector<DataType> data_;        ///< The flat array storing matrix elements.
 };
 //-------------------------------------------------------------------
 
@@ -240,6 +222,79 @@ template<typename MatrixType>
 struct is_type_a_matrix3d< SimpleMatrix3D<MatrixType> > : std::true_type
 {
 };
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Default constructor from rows, columns and initial value
+//-------------------------------------------------------------------
+template<typename DataType>
+
+inline SimpleMatrix3D<DataType>::SimpleMatrix3D(uintptr_t pages, uintptr_t rows, uintptr_t columns, const DataType& initial_value)
+{
+    this->resize_(pages, rows, columns, initial_value);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Constructor from a matrix expression reference
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename ReferenceType, std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>*>
+
+inline SimpleMatrix3D<DataType>::SimpleMatrix3D(ReferenceType matrix_expression)
+{
+    uintptr_t pages = matrix_expression.pages();
+    uintptr_t rows = matrix_expression.rows();
+    uintptr_t columns = matrix_expression.columns();
+
+    this->resize_(pages,rows,columns);
+
+    for(int64_t k = 0; k < pages; ++k)
+    {
+        for(int64_t i = 0; i < rows; ++i)
+        {
+            for(int64_t j = 0; j < columns; ++j)
+            {
+                (*this)(i,j) = matrix_expression(i,j);
+            }
+        }
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Assignment from a reference to a matrix expression
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename ReferenceType, std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>*>
+
+inline SimpleMatrix3D<DataType>& SimpleMatrix3D<DataType>::operator=(ReferenceType matrix_expression)
+{
+    uintptr_t pages = matrix_expression.pages();
+    uintptr_t rows = matrix_expression.rows();
+    uintptr_t columns = matrix_expression.columns();
+
+    this->resize_(pages,rows,columns);
+
+    for(int64_t k = 0; k < pages; ++k)
+    {
+        for(int64_t i = 0; i < rows; ++i)
+        {
+            for(int64_t j = 0; j < columns; ++j)
+            {
+                (*this)(i,j) = matrix_expression(i,j);
+            }
+        }
+    }
+
+    return (*this);
+}
 //-------------------------------------------------------------------
 
 

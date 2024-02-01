@@ -69,7 +69,7 @@ TEST_CASE("Wrapping a 3d matrix with polymorphic wrapper with non-const access",
     auto wrapper = LazyMatrix::wrap_matrix3d(mat);
 
     // Test wrapped matrix
-    REQUIRE(wrapper.pages() == mat.pages()); // Rows
+    REQUIRE(wrapper.pages() == mat.pages()); // Pages
     REQUIRE(wrapper.rows() == mat.rows()); // Rows
     REQUIRE(wrapper.columns() == mat.columns()); // Columns
     REQUIRE(wrapper.size() == mat.size()); // Size

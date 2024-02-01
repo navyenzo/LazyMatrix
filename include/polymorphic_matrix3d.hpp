@@ -47,20 +47,20 @@ namespace LazyMatrix
  * @class PolymorphicMatrix3D
  * @brief Base class providing a polymorphic interface for 3d-matrix-like data.
  *
- * This class defines a generic interface for 3d-matrices, allowing for 
+ * This class defines a generic interface for 3d matrices, allowing for 
  * operations like accessing elements and querying dimensions. It's
  * templated to handle different data types within the matrix.
  */ 
 //-------------------------------------------------------------------
 template<typename DataType>
 
-class PolymorphicMatrix3D : public BaseMatrix3D<PolymorphicMatrix3D<DataType>,true>
+class PolymorphicMatrix3D : public BaseMatrix3D<PolymorphicMatrix3D<DataType>,false>
 {
 public:
 
     using value_type = DataType;
 
-    friend class BaseMatrix3D<PolymorphicMatrix3D<DataType>,true>;
+    friend class BaseMatrix3D<PolymorphicMatrix3D<DataType>,false>;
 
     PolymorphicMatrix3D() = default;
     virtual ~PolymorphicMatrix3D() = default;
@@ -74,7 +74,6 @@ public:
 private:
 
     virtual DataType const_at_(int64_t page, int64_t row, int64_t column) const = 0;
-    virtual DataType& non_const_at_(int64_t page, int64_t row, int64_t column) = 0;
 };
 //-------------------------------------------------------------------
 
@@ -82,7 +81,7 @@ private:
 
 //-------------------------------------------------------------------
 /**
- * @brief Compile time function to check if the type is a matrix expression type.
+ * @brief Compile time function to check if the type is a 3d matrix expression type.
  */
 //-------------------------------------------------------------------
 template<typename DataType>
@@ -94,11 +93,11 @@ struct is_type_a_matrix3d< PolymorphicMatrix3D<DataType> > : std::true_type {};
 //-------------------------------------------------------------------
 /**
  * @class PolymorphicMatrixWrapper3D
- * @brief Wrapper class that provides a polymorphic interface to a given matrix type.
+ * @brief Wrapper class that provides a polymorphic interface to a given 3d matrix type.
  *
- * This class wraps around a specific 3d-matrix type and exposes it through
- * the PolymorphicMatrix3D interface. It handles both const and non-const
- * 3d-matrix types, allowing for uniform treatment in a polymorphic context.
+ * This class wraps around a specific matrix type and exposes it through
+ * the PolymorphicMatrix interface. It handles both const and non-const
+ * matrix types, allowing for uniform treatment in a polymorphic context.
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -140,20 +139,6 @@ private: // Private functions
     {
         return matrix_.circ_at(page, row, column);
     }
-
-    value_type& non_const_at_(int64_t page, int64_t row, int64_t column) override
-    {
-        if constexpr (has_non_const_access<ReferenceType>::value)
-        {
-            return matrix_.circ_at(page, row,column);
-        }
-        else
-        {
-            // Since we can't return a reference to a local,
-            // we return a reference to a dummy value
-            return DummyValueHolder<value_type>::zero;
-        }
-    }
     
 
 private: // Private variables
@@ -183,7 +168,7 @@ using Data3D = PolymorphicMatrix3D<DataType>;
 
 
 
-template<typename ReferenceType,std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+template<typename ReferenceType,std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
 using SpecializedData3D = PolymorphicMatrixWrapper3D<ReferenceType>;
 //-------------------------------------------------------------------
 
@@ -191,12 +176,12 @@ using SpecializedData3D = PolymorphicMatrixWrapper3D<ReferenceType>;
 
 //-------------------------------------------------------------------
 /**
- * @brief Wraps a 3d-matrix in a PolymorphicMatrixWrapper3D and returns a Shared
+ * @brief Wraps a 3d matrix in a PolymorphicMatrixWrapper3D and returns a Shared
  *        Reference to the base PolymorphicMatrix3D class so that a user can
  *        store multiple different types of 3d-matrices in a single container
  * 
- * @tparam ReferenceType Type of the matrix to wrap.
- * @param matrix The matrix to be wrapped.
+ * @tparam ReferenceType Type of the 3d matrix to wrap.
+ * @param matrix The 3d matrix to be wrapped.
  * @return ConstSharedMatrix3DRef wrapping the input matrix.
  */
 //-------------------------------------------------------------------

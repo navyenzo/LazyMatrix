@@ -36,6 +36,7 @@
 #include "files.hpp"
 
 #include "base_matrix.hpp"
+#include "shared_references.hpp"
 
 // mio library for cross-platform memory-mapping
 #include <single_include/mio/mio.hpp>
@@ -76,7 +77,6 @@ const std::string matrix_footer_byte_sequence = "::----end----::\n";
 struct MatrixHeader
 {
     char header[16] = {':', ':', '-', '-', '-', 'b', 'e', 'g', 'i', 'n', '-', '-', '-', ':', ':', '\n'};
-    std::mutex lock;
     uintptr_t size_of_data_type = 8;
     uintptr_t rows = 0;
     uintptr_t columns = 0;
@@ -171,19 +171,19 @@ public:
      * @param columns Number of columns in the matrix. Default is 0.
      * @param initial_value The initial value to fill the matrix. Default is 0.
      */
-    Matrix<DataType>(int64_t rows = 0, int64_t columns = 0, const DataType& initial_value = static_cast<DataType>(0));
+    Matrix(uintptr_t rows = 0, uintptr_t columns = 0, const DataType& initial_value = static_cast<DataType>(0));
 
     /**
      * @brief Shallow copy constructor. Copies the matrix structure but not the data.
      * @param matrix The source matrix for the shallow copy.
      */
-    Matrix<DataType>(const Matrix<DataType>& matrix);
+    Matrix(const Matrix<DataType>& matrix);
 
     /**
-     * @brief Constructor to create and memory map a matrix from a file.
+     * @brief Constructor to memory map a matrix from a file.
      * @param file_to_load_matrix_from The file path to load the matrix from.
      */
-    Matrix<DataType>(const std::string& file_to_load_matrix_from);
+    Matrix(const std::string& file_to_load_matrix_from);
 
     /**
      * @brief Constructor to create a matrix from a dlib matrix.
@@ -195,7 +195,7 @@ public:
      * @param dlib_matrix The dlib matrix to convert from.
      */
     template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
-    Matrix<DataType>(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix);
+    Matrix(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix);
 
     /**
      * @brief Constructor to create a matrix from an Eigen matrix.
@@ -203,16 +203,22 @@ public:
      * @param m The Eigen matrix to convert from.
      */
     template<typename DataType2>
-    Matrix<DataType>(const Eigen::MatrixBase<DataType2>& m);
+    Matrix(const Eigen::MatrixBase<DataType2>& m);
 
     /**
-     * @brief Converts from an Eigen matrix to this matrix.
-     * @tparam Derived The derived type of Eigen matrix.
-     * @param m The Eigen matrix to convert from.
-     * @return Reference to this matrix after conversion.
+     * @brief Construct a new Matrix object copying a matrix reference
+     * 
+     * @param matrix_expression The matrix to deep copy
      */
-    template <typename Derived>
-    Matrix<DataType>& from_eigen_matrix(const Eigen::MatrixBase<Derived>& m);
+    template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+    Matrix(ReferenceType matrix_expression);
+
+    /**
+     * @brief Assignment operator for shallow copying from another matrix.
+     * @param matrix The source matrix for the shallow copy.
+     * @return Reference to this matrix after shallow copying.
+     */
+    Matrix<DataType>& operator=(const Matrix<DataType>& matrix);
 
     /**
      * @brief Assignment operator from a dlib matrix.
@@ -228,44 +234,52 @@ public:
     Matrix<DataType>& operator=(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix);
 
     /**
-     * @brief Assignment operator for shallow copying from another matrix.
-     * @param matrix The source matrix for the shallow copy.
-     * @return Reference to this matrix after shallow copying.
+     * @brief Assignment operator from an eigen matrix expression.
+     * @tparam DataType2 Data type of the Eigen matrix.
+     * @param m The Eigen matrix to copy from.
+     * @return Reference to this matrix object after assignment.
      */
-    Matrix<DataType>& operator=(const Matrix<DataType>& matrix);
-
-    // Typedefs and functions used to transform to eigen matrices from the eigen library
-    using EigenMapType = Eigen::Map<Eigen::Matrix<DataType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> >;
-    using const_EigenMapType = Eigen::Map<Eigen::Matrix<const DataType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> >;
-    const_EigenMapType to_const_eigen_map()const;
-    EigenMapType to_eigen_map();
+    template<typename DataType2>
+    Matrix<DataType>& operator=(const Eigen::MatrixBase<DataType2>& m);
 
     /**
-     * @brief Performs a shallow copy of another mapped matrix into this matrix.
-     * @param matrix_to_copy The matrix to be shallow copied.
-     * @return Error code indicating success or failure of the operation.
+     * @brief Assignement from a reference to a matrix expression.
+     * 
+     * @param matrix_expression The matrix to copy from
      */
-    std::error_code shallow_copy(const Matrix<DataType>& matrix_to_copy);
+    template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+    Matrix<DataType>& operator=(ReferenceType matrix_expression);
 
     /**
-     * @brief Performs a deep copy of another mapped matrix into this matrix.
-     * @param matrix_to_copy The matrix to be deep copied.
-     * @return Error code indicating success or failure of the operation.
+     * @brief Checks whether the memory mapped file actually contains a matrix.
      */
-    std::error_code deep_copy(const Matrix<DataType>& matrix_to_copy);
-
-    /**
-     * @brief Returns a deep copy of this matrix.
-     * @return A new matrix that is a deep copy of this matrix.
-     */
-    Matrix<DataType> get_a_deep_copy()const;
-
-    // Getters
     bool is_valid()const;
+
+    /**
+     * @brief Get the number of rows in the matrix.
+     */
     uintptr_t rows()const;
+
+    /**
+     * @brief Get the number of columns in the matrix.
+     */
     uintptr_t columns()const;
+
+    /**
+     * @brief Get the capacity of the memory mapped file.
+     * @return The number of entries the matrix can contain in the
+     *         memory mapped file.
+     */
     uintptr_t capacity()const;
-    uintptr_t get_mapped_file_size()const;
+
+    /**
+     * @brief Get the size of the memory mapped file.
+     */
+    std::size_t get_mapped_file_size()const;
+
+    /**
+     * @brief Get the filename of the memory mapped file containing this matrix.
+     */
     const fs::path& get_filename_of_memory_mapped_file()const;
 
     /**
@@ -275,13 +289,20 @@ public:
     void initialize(const DataType& initial_value);
 
     /**
-     * @brief Creates a matrix with a given size.
-     * @param rows The number of rows for the new matrix.
-     * @param columns The number of columns for the new matrix.
-     * @param initial_value The initial value to fill the matrix with.
-     * @return Error code indicating success or failure of the operation.
+     * @brief Create the memory mapped file to hold the 3d matrix and initializes it.
+     * 
+     * @param rows Number of rows of the 3d matrix.
+     * @param columns Number of columns of the 3d matrix.
+     * @param initial_value Value used to initialize all the entries of the 3d matrix.
+     * @param filename_template Filename to use for the memory mapped file (template)
+     * @param directory_where_file_will_reside Directory where memory mapped file will be created.
+     * @return std::error_code Error encountered while trying to create the 3d matrix memory mapped file.
      */
-    std::error_code create_matrix(int64_t rows, int64_t columns, const DataType& initial_value = static_cast<DataType>(0));
+    std::error_code create_matrix(uintptr_t rows,
+                                  uintptr_t columns,
+                                  const DataType& initial_value = static_cast<DataType>(0),
+                                  const fs::path& filename_template = "XXXXXX",
+                                  const fs::path& directory_where_file_will_reside = fs::temp_directory_path());
 
     /**
      * @brief Loads a matrix from a file.
@@ -289,12 +310,6 @@ public:
      * @return Error code indicating success or failure of the operation.
      */
     std::error_code load_matrix(const std::string& file_to_load_matrix_from);
-
-    /**
-     * @brief Gets a lock for synchronized access.
-     * @return Reference to the mutex lock.
-     */
-    std::mutex& get_lock();
 
 
 
@@ -307,7 +322,7 @@ private: // Private functions
      * @param initial_value The initial value to fill new elements with.
      * @return Error code indicating success or failure of the operation.
      */
-    std::error_code resize_(int64_t rows, int64_t columns, const DataType& initial_value = static_cast<DataType>(0));
+    std::error_code resize_(uintptr_t rows, uintptr_t columns, const DataType& initial_value = static_cast<DataType>(0));
 
     /**
      * @brief Access operator for constant access.
@@ -325,28 +340,33 @@ private: // Private functions
      */
     DataType& non_const_at_(int64_t row, int64_t column);
 
-    // Functions used to get the header and footer
-    // of the mapped matrix from the mapped file
-    
-    const MatrixHeader* get_header()const
-    {
-        return reinterpret_cast<const MatrixHeader*>(mapped_file_.cbegin());
-    }
+    /**
+     * @brief Get the Header section.
+     * 
+     * @return const MatrixHeader* 
+     */
+    const MatrixHeader* get_header()const;
 
-    MatrixHeader* get_header()
-    {
-        return reinterpret_cast<MatrixHeader*>(mapped_file_.begin());
-    }
-    
-    const MatrixFooter* get_footer()const
-    {
-        return reinterpret_cast<const MatrixFooter*>(mapped_file_.cbegin() + sizeof(MatrixHeader) + this->size()*sizeof(DataType));
-    }
+    /**
+     * @brief Get the Header section.
+     * 
+     * @return MatrixHeader* 
+     */
+    MatrixHeader* get_header();
 
-    MatrixFooter* get_footer()
-    {
-        return reinterpret_cast<MatrixFooter*>(mapped_file_.begin() + sizeof(MatrixHeader) + this->size()*sizeof(DataType));
-    }
+    /**
+     * @brief Get the Footer section.
+     * 
+     * @return const MatrixFooter* 
+     */
+    const MatrixFooter* get_footer()const;
+
+    /**
+     * @brief Get the Footer section.
+     * 
+     * @return MatrixFooter* 
+     */
+    MatrixFooter* get_footer();
 
 
 
@@ -379,7 +399,7 @@ struct is_type_a_matrix< Matrix<DataType> > : std::true_type
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline Matrix<DataType>::Matrix(int64_t rows, int64_t columns, const DataType& initial_value)
+inline Matrix<DataType>::Matrix(uintptr_t rows, uintptr_t columns, const DataType& initial_value)
 {
     this->resize_(rows, columns, initial_value);
 }
@@ -394,7 +414,10 @@ template<typename DataType>
 
 inline Matrix<DataType>::Matrix(const Matrix<DataType>& matrix)
 {
-    this->shallow_copy(matrix);
+    filename_of_memory_mapped_file_ = matrix.get_filename_of_memory_mapped_file();
+
+    std::error_code mapping_error;
+    mapped_file_.map(filename_of_memory_mapped_file_.string(), mapping_error);
 }
 //-------------------------------------------------------------------
 
@@ -417,7 +440,6 @@ inline Matrix<DataType>::Matrix(const std::string& file_to_load_matrix_from)
 // Constructor from a dlib matrix
 //-------------------------------------------------------------------
 template<typename DataType>
-
 template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
 
 inline Matrix<DataType>::Matrix(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix)
@@ -440,28 +462,11 @@ inline Matrix<DataType>::Matrix(const dlib::matrix<DataType2, NR, NC, mem_manage
 // Constructor from an eigen matrix
 //-------------------------------------------------------------------
 template<typename DataType>
-
 template<typename DataType2>
 
 inline Matrix<DataType>::Matrix(const Eigen::MatrixBase<DataType2>& m)
 {
-    from_eigen_matrix(m);
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Convert from an eigen matrix
-//-------------------------------------------------------------------
-template<typename DataType>
-
-template <typename Derived>
-
-inline Matrix<DataType>& Matrix<DataType>::from_eigen_matrix(const Eigen::MatrixBase<Derived>& m)
-{
-    if(this->rows() != m.rows() || this->columns() != m.cols())
-        this->resize_(m.rows(),m.cols());
+    this->resize_(m.rows(),m.cols());
 
     for(int64_t i = 0; i < m.rows(); ++i)
     {
@@ -470,6 +475,47 @@ inline Matrix<DataType>& Matrix<DataType>::from_eigen_matrix(const Eigen::Matrix
             (*this)(i,j) = m(i,j);
         }
     }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Constructor from a matrix expression reference
+//-------------------------------------------------------------------
+template<typename DataType>
+template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>*>
+
+inline Matrix<DataType>::Matrix(ReferenceType matrix_expression)
+{
+    uintptr_t rows = matrix_expression.rows();
+    uintptr_t columns = matrix_expression.columns();
+
+    this->resize_(rows,columns);
+
+    for(int64_t i = 0; i < rows; ++i)
+    {
+        for(int64_t j = 0; j < columns; ++j)
+        {
+            (*this)(i,j) = matrix_expression(i,j);
+        }
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Assignment operator (does shallow copy)
+//-------------------------------------------------------------------
+template<typename DataType>
+
+inline Matrix<DataType>& Matrix<DataType>::operator=(const Matrix<DataType>& matrix)
+{
+    filename_of_memory_mapped_file_ = matrix.get_filename_of_memory_mapped_file();
+
+    std::error_code mapping_error;
+    mapped_file_.map(filename_of_memory_mapped_file_.string(), mapping_error);
 
     return (*this);
 }
@@ -481,7 +527,6 @@ inline Matrix<DataType>& Matrix<DataType>::from_eigen_matrix(const Eigen::Matrix
 // Assignment from a dlib matrix
 //-------------------------------------------------------------------
 template<typename DataType>
-
 template<typename DataType2, long NR, long NC, typename mem_manager, typename layout>
 
 inline Matrix<DataType>& Matrix<DataType>::operator=(const dlib::matrix<DataType2, NR, NC, mem_manager, layout>& dlib_matrix)
@@ -503,13 +548,23 @@ inline Matrix<DataType>& Matrix<DataType>::operator=(const dlib::matrix<DataType
 
 
 //-------------------------------------------------------------------
-// Assignment operator (does shallow copy)
+// Assignment from an eigen matrix
 //-------------------------------------------------------------------
 template<typename DataType>
+template<typename DataType2>
 
-inline Matrix<DataType>& Matrix<DataType>::operator=(const Matrix<DataType>& matrix)
+inline Matrix<DataType>& Matrix<DataType>::operator=(const Eigen::MatrixBase<DataType2>& m)
 {
-    this->shallow_copy(matrix);
+    this->resize_(m.rows(),m.cols());
+
+    for(int64_t i = 0; i < m.rows(); ++i)
+    {
+        for(int64_t j = 0; j < m.cols(); ++j)
+        {
+            (*this)(i,j) = m(i,j);
+        }
+    }
+
     return (*this);
 }
 //-------------------------------------------------------------------
@@ -517,86 +572,28 @@ inline Matrix<DataType>& Matrix<DataType>::operator=(const Matrix<DataType>& mat
 
 
 //-------------------------------------------------------------------
-// Functions used to transform to eigen matrices from the eigen library
+// Assignment from a reference to a matrix expression
 //-------------------------------------------------------------------
 template<typename DataType>
+template<typename ReferenceType, std::enable_if_t<is_matrix_reference<ReferenceType>{}>*>
 
-inline typename Matrix<DataType>::const_EigenMapType Matrix<DataType>::to_const_eigen_map()const
+inline Matrix<DataType>& Matrix<DataType>::operator=(ReferenceType matrix_expression)
 {
-    return const_EigenMapType(&(*this)(0,0),this->rows(),this->columns());
-}
+    auto rows = matrix_expression.rows();
+    auto columns = matrix_expression.columns();
 
-
-
-template<typename DataType>
-
-inline typename Matrix<DataType>::EigenMapType Matrix<DataType>::to_eigen_map()
-{
-    return EigenMapType(&(*this)(0,0),this->rows(),this->columns());
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Shallow copy of another mapped matrix into this matrix.
-//-------------------------------------------------------------------
-template<typename DataType>
-
-inline std::error_code Matrix<DataType>::shallow_copy(const Matrix<DataType>& matrix_to_copy)
-{
-    filename_of_memory_mapped_file_ = matrix_to_copy.get_filename_of_memory_mapped_file();
-
-    std::error_code mapping_error;
-    mapped_file_.map(filename_of_memory_mapped_file_.string(), mapping_error);
-
-    return mapping_error;
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Deep copy of another mapped matrix into this matrix.
-//-------------------------------------------------------------------
-template<typename DataType>
-
-inline std::error_code Matrix<DataType>::deep_copy(const Matrix<DataType>& matrix_to_copy)
-{
-    std::error_code error;
-
-    error = this->resize_(matrix_to_copy.rows(), matrix_to_copy.columns());
+    std::error_code error = this->resize_(rows, columns);
 
     if(error)
-        return error;
-    
-    for(int64_t i = 0; i < rows(); ++i)
-    {
-        for(int64_t j = 0; j < columns(); ++j)
-        {
-            (*this)(i,j) = matrix_to_copy(i,j);
-        }
-    }
+        return (*this);
 
-    return error;
+    for(int64_t i = 0; i < rows; ++i)
+        for(int64_t j = 0; j < columns; ++j)
+            (*this)(i,j) = matrix_expression(i,j);
+
+    return (*this);
 }
 //-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-// Return a deep copy of this matrix
-//-------------------------------------------------------------------
-template<typename DataType>
-
-inline Matrix<DataType> Matrix<DataType>::get_a_deep_copy()const
-{
-    Matrix<DataType> copy_of_this_matrix;
-    copy_of_this_matrix.deep_copy(*this);
-    return copy_of_this_matrix;
-}
-//-------------------------------------------------------------------
-
 
 
 
@@ -654,18 +651,41 @@ inline const fs::path& Matrix<DataType>::get_filename_of_memory_mapped_file()con
 {
     return filename_of_memory_mapped_file_;
 }
-//-------------------------------------------------------------------
 
 
 
-//-------------------------------------------------------------------
-// Get a lock
-//-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::mutex& Matrix<DataType>::get_lock()
+inline const MatrixHeader* Matrix<DataType>::get_header()const
 {
-    return this->get_header()->lock;
+    return reinterpret_cast<const MatrixHeader*>(mapped_file_.cbegin());
+}
+
+
+
+template<typename DataType>
+
+inline MatrixHeader* Matrix<DataType>::get_header()
+{
+    return reinterpret_cast<MatrixHeader*>(mapped_file_.begin());
+}
+
+
+
+template<typename DataType>
+
+inline const MatrixFooter* Matrix<DataType>::get_footer()const
+{
+    return reinterpret_cast<const MatrixFooter*>(mapped_file_.cbegin() + sizeof(MatrixHeader) + this->size()*sizeof(DataType));
+}
+
+
+
+template<typename DataType>
+
+inline MatrixFooter* Matrix<DataType>::get_footer()
+{
+    return reinterpret_cast<MatrixFooter*>(mapped_file_.begin() + sizeof(MatrixHeader) + this->size()*sizeof(DataType));
 }
 //-------------------------------------------------------------------
 
@@ -717,7 +737,7 @@ inline void Matrix<DataType>::initialize(const DataType& initial_value)
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::error_code Matrix<DataType>::resize_(int64_t rows, int64_t columns, const DataType& initial_value)
+inline std::error_code Matrix<DataType>::resize_(uintptr_t rows, uintptr_t columns, const DataType& initial_value)
 {
     return this->create_matrix(rows, columns, initial_value);
 }
@@ -730,9 +750,13 @@ inline std::error_code Matrix<DataType>::resize_(int64_t rows, int64_t columns, 
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::error_code Matrix<DataType>::create_matrix(int64_t rows,
-                                                       int64_t columns,
-                                                       const DataType& initial_value)
+inline std::error_code
+
+Matrix<DataType>::create_matrix(uintptr_t rows,
+                                uintptr_t columns,
+                                const DataType& initial_value,
+                                const fs::path& filename_template,
+                                const fs::path& directory_where_file_will_reside)
 {
     std::error_code mapping_error;
 
@@ -755,10 +779,19 @@ inline std::error_code Matrix<DataType>::create_matrix(int64_t rows,
             }
             else
             {
+                uintptr_t old_number_of_rows = this->rows();
+                uintptr_t old_number_of_columns = this->columns();
+
                 this->get_header()->rows = rows;
                 this->get_header()->columns = columns;
 
-                this->initialize(initial_value);
+                for(int64_t i = old_number_of_rows; i < this->rows(); ++i)
+                {
+                    for(int64_t j = old_number_of_columns; j < this->columns(); ++j)
+                    {
+                        (*this)(i,j) = initial_value;
+                    }
+                }
             }
 
             return mapping_error;
@@ -769,10 +802,13 @@ inline std::error_code Matrix<DataType>::create_matrix(int64_t rows,
 
     // Calculate the necessary size of the file
     // so that it can hold the matrix
-    std::size_t size_of_file = sizeof(MatrixHeader) + sizeof(MatrixFooter) + rows*columns*sizeof(DataType);
+    uintptr_t size_of_file = sizeof(MatrixHeader) + sizeof(MatrixFooter) + rows*columns*sizeof(DataType);
 
-    // We attempt to create the temp file for the matrix
-    filename_of_memory_mapped_file_ = LazyMatrix::create_file_with_specified_size_and_unique_name(size_of_file, mapping_error, "matrix_XXXXXX", fs::temp_directory_path());
+    // Create the file and size it accordingly
+    filename_of_memory_mapped_file_ = create_file_with_specified_size_and_unique_name(size_of_file,
+                                                                                      mapping_error,
+                                                                                      filename_template,
+                                                                                      directory_where_file_will_reside);
 
     if(mapping_error)
         return mapping_error;
@@ -791,7 +827,7 @@ inline std::error_code Matrix<DataType>::create_matrix(int64_t rows,
     this->get_header()->rows = rows;
     this->get_header()->columns = columns;
 
-    // Write the Matris Footer
+    // Write the Matrix Footer
     std::copy(matrix_footer_byte_sequence.cbegin(),
               matrix_footer_byte_sequence.cend(),
               &this->get_footer()->footer[0]);

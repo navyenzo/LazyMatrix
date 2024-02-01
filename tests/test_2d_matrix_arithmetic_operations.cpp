@@ -133,8 +133,8 @@ TEST_CASE("Strassen vs Naive Matrix Multiplication", "[Matrix2D]")
     auto random_mat2 = LazyMatrix::generate_random_matrix<int>(dimension_length, dimension_length, -10, 10);
 
     // Convert random generators to actual matrices for multiplication
-    auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(*random_mat1);
-    auto mat2 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(*random_mat2);
+    auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(random_mat1);
+    auto mat2 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(random_mat2);
 
      using clock = std::chrono::high_resolution_clock;
 

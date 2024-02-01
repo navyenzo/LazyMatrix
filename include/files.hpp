@@ -102,16 +102,23 @@ inline fs::path get_absolute_path_of_executable_parent_directory()
 
 
 
+#include <fstream>
+#include <filesystem>
+#include <string>
+#include <system_error>
+
+namespace fs = std::filesystem;
+
 //-------------------------------------------------------------------
 /**
  * @brief Create a file with a specified size and unique name based on a template in a specified directory.
  * 
- * This function generates a unique filename, creates the file with the specified size, 
+ * This function generates a unique filename with the specified extension, creates the file with the specified size, 
  * and returns an error code. It handles the creation of the file differently on Windows and Linux.
  * 
  * @param desired_file_size Size of the file to be created.
  * @param file_creation_error Error code for file creation.
- * @param filename_template Template for the filename, should end with "XXXXXX".
+ * @param filename_template Template for the filename, can include extension like "XXX.txt".
  * @param directory_where_file_will_reside Directory where the file will reside.
  * @return fs::path Path to the created file.
  */
@@ -119,64 +126,73 @@ inline fs::path get_absolute_path_of_executable_parent_directory()
 inline fs::path create_file_with_specified_size_and_unique_name(
     std::size_t desired_file_size,
     std::error_code& file_creation_error,
-    std::string filename_template = "XXXXXX",
+    fs::path filename_template = "XXXXXX",
     const fs::path& directory_where_file_will_reside = fs::temp_directory_path())
 {
+    // If filename_template is not absolute, combine it with the specified directory
+    if (!filename_template.is_absolute())
+    {
+        filename_template = directory_where_file_will_reside / filename_template.filename();
+    }
 
-    // Ensure the filename template ends with exactly "XXXXXX"
+    // Process the filename to insert 'X's before the extension
     const size_t x_count = 6;
-    size_t found_x = filename_template.find_last_not_of('X');
-    size_t num_x_to_append = (found_x == std::string::npos) ? x_count : std::min(x_count, x_count - (filename_template.length() - found_x - 1));
-    filename_template.append(num_x_to_append, 'X');
+    std::string filename_str = filename_template.stem().string(); // Extract filename without extension
+    std::string extension_str = filename_template.extension().string(); // Extract extension
+
+    size_t found_x = filename_str.find_last_not_of('X');
+    size_t num_x_to_append = (found_x == std::string::npos) ? x_count : std::min(x_count, x_count - (filename_str.length() - found_x - 1));
+    filename_str.append(num_x_to_append, 'X');
+
+    // Reassemble the filename with the extension
+    filename_template.replace_filename(filename_str + extension_str);
+
+    // Validate and create directories if needed
+    if (!fs::exists(filename_template.parent_path()))
+    {
+        fs::create_directories(filename_template.parent_path());
+    }
 
     fs::path filename; // Variable to store the generated filename
 
     #ifdef _WIN32
-        // Construct the full path for the unique filename in Windows
-        fs::path unique_filename_path = directory_where_file_will_reside / filename_template;
-        std::string unique_filename_string = unique_filename_path.string();
-
-        // Generate a unique filename
+        // Windows-specific file creation
+        std::string unique_filename_string = filename_template.string();
         _mktemp_s(unique_filename_string.data(), unique_filename_string.size() + 1);
-        filename = unique_filename_string; // Update filename with the generated unique filename
+        filename = unique_filename_string;
 
-        // Create and open the file to ensure it exists
         std::ofstream file_stream(filename, std::ios::binary | std::ios::out);
         if (!file_stream)
         {
             file_creation_error.assign(errno, std::generic_category());
-            return fs::path(); // Return an empty path on failure
+            return fs::path();
         }
         file_stream.close();
     #else
-        // Construct the full template path for unique filename in Linux
-        std::string full_template = (directory_where_file_will_reside / filename_template).string();
-
-        // Create and open a unique temporary file using mkstemp
+        // Linux-specific file creation
+        std::string full_template = filename_template.string();
         int fd = mkstemp(&full_template[0]);
         if (fd != -1)
         {
-            close(fd); // Close the file descriptor as we only need the unique filename
-            filename = fs::path(full_template); // Update filename with the generated unique filename
+            close(fd);
+            filename = fs::path(full_template);
         }
         else
         {
-            // Handle errors in file creation
             file_creation_error.assign(errno, std::generic_category());
-            return fs::path(); // Return an empty path on failure
+            return fs::path();
         }
     #endif
 
     // Resize the file to the desired size
     fs::resize_file(filename, desired_file_size, file_creation_error);
 
-    // Additional check to confirm the file size is as expected
     if (!file_creation_error && fs::file_size(filename) != desired_file_size)
     {
         file_creation_error.assign(std::make_error_code(std::errc::io_error).value(), std::generic_category());
     }
 
-    return filename; // Return the path of the created file
+    return filename;
 }
 //-------------------------------------------------------------------
 
