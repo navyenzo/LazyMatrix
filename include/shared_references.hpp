@@ -157,6 +157,9 @@ public:
      */
     uintptr_t rows() const
     {
+        if(!ptr_)
+            return 0;
+            
         return ptr_->rows();
     }
 
@@ -166,6 +169,9 @@ public:
      */
     uintptr_t columns() const
     {
+        if(!ptr_)
+            return 0;
+            
         return ptr_->columns();
     }
 
@@ -175,6 +181,9 @@ public:
      */
     uintptr_t size() const
     {
+        if(!ptr_)
+            return 0;
+
         return ptr_->size();
     }
 
@@ -553,6 +562,9 @@ public:
      */
     uintptr_t pages() const
     {
+        if(!ptr_)
+            return 0;
+            
         return ptr_->pages();
     }
 
@@ -562,6 +574,9 @@ public:
      */
     uintptr_t rows() const
     {
+        if(!ptr_)
+            return 0;
+            
         return ptr_->rows();
     }
 
@@ -571,6 +586,9 @@ public:
      */
     uintptr_t columns() const
     {
+        if(!ptr_)
+            return 0;
+            
         return ptr_->columns();
     }
 
@@ -580,6 +598,9 @@ public:
      */
     uintptr_t size() const
     {
+        if(!ptr_)
+            return 0;
+            
         return ptr_->size();
     }
 

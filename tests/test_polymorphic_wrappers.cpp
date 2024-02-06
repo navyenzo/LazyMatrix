@@ -26,6 +26,44 @@
 
 
 //-------------------------------------------------------------------
+TEST_CASE("Test non-initialized Shared References (when they're nullptr)", "[SharedMatrixRef and SharedMatrix3DRef]")
+{
+    using DataRef = LazyMatrix::ConstSharedMatrixRef<LazyMatrix::Data<double>>;
+    using Data3DRef = LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::Data3D<double>>;
+
+    LazyMatrix::ConstSharedMatrixRef<LazyMatrix::Data<double>> m1;
+    LazyMatrix::SharedMatrixRef<LazyMatrix::Data<double>> m2;
+    LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::Data3D<double>> m3;
+    LazyMatrix::SharedMatrix3DRef<LazyMatrix::Data3D<double>> m4;
+
+    // Let's make sure the references are not valid
+    REQUIRE(!bool(m1));
+    REQUIRE(!bool(m2));
+    REQUIRE(!bool(m3));
+    REQUIRE(!bool(m4));
+
+    // Let's make sure the size functions can still be called
+    // even though the references are not valid
+    REQUIRE(m1.rows() == 0);
+    REQUIRE(m1.columns() == 0);
+    REQUIRE(m1.size() == 0);
+    REQUIRE(m2.rows() == 0);
+    REQUIRE(m2.columns() == 0);
+    REQUIRE(m2.size() == 0);
+    REQUIRE(m3.pages() == 0);
+    REQUIRE(m3.rows() == 0);
+    REQUIRE(m3.columns() == 0);
+    REQUIRE(m3.size() == 0);
+    REQUIRE(m4.pages() == 0);
+    REQUIRE(m4.rows() == 0);
+    REQUIRE(m4.columns() == 0);
+    REQUIRE(m4.size() == 0);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 TEST_CASE("Wrapping a matrix with polymorphic wrapper with non-const access", "[PolymorphicWrapper]")
 {
     // Create a matrix
