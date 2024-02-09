@@ -28,9 +28,6 @@
 //-------------------------------------------------------------------
 TEST_CASE("Test non-initialized Shared References (when they're nullptr)", "[SharedMatrixRef and SharedMatrix3DRef]")
 {
-    using DataRef = LazyMatrix::ConstSharedMatrixRef<LazyMatrix::Data<double>>;
-    using Data3DRef = LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::Data3D<double>>;
-
     LazyMatrix::ConstSharedMatrixRef<LazyMatrix::Data<double>> m1;
     LazyMatrix::SharedMatrixRef<LazyMatrix::Data<double>> m2;
     LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::Data3D<double>> m3;
@@ -50,6 +47,7 @@ TEST_CASE("Test non-initialized Shared References (when they're nullptr)", "[Sha
     REQUIRE(m2.rows() == 0);
     REQUIRE(m2.columns() == 0);
     REQUIRE(m2.size() == 0);
+    
     REQUIRE(m3.pages() == 0);
     REQUIRE(m3.rows() == 0);
     REQUIRE(m3.columns() == 0);

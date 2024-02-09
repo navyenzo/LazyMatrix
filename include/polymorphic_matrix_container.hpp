@@ -55,7 +55,7 @@ class MatrixContainer : public BaseMatrix3D<MatrixContainer<DataType>, false>
 public:
 
     using value_type = DataType;
-    using MatrixBaseRef = ConstSharedMatrixRef<PolymorphicMatrix<DataType>>;
+    using MatrixBaseRef = ConstSharedMatrixRef<PolymorphicMatrix<DataType,false>>;
 
     friend class BaseMatrix3D<MatrixContainer<DataType>, false>;
 
@@ -67,7 +67,7 @@ public:
                 std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
     void add_matrix(const ReferenceType& matrix)
     {
-        MatrixBaseRef wrapped_matrix = wrap_matrix(matrix);
+        MatrixBaseRef wrapped_matrix = wrap_matrix_const(matrix);
         matrices_.push_back(wrapped_matrix);
         
         max_rows_ = std::max(max_rows_, matrix.rows());

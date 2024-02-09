@@ -33,6 +33,8 @@
 
 #include "shared_references.hpp"
 #include "matrix_factory.hpp"
+#include "polymorphic_matrix.hpp"
+#include "polymorphic_matrix3d.hpp"
 #include "output_operators.hpp"
 
 namespace py = pybind11;
@@ -67,105 +69,105 @@ inline void bind_factory_functions(pybind11::module_& m)
     // Wrappers for MatrixFactory::create_matrix function
     auto create_matrix_char = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix<char>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_matrix<char>(rows, columns));
     };
     
     auto create_matrix_int = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix<int>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_matrix<int>(rows, columns));
     };
     
     auto create_matrix_float = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix<float>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_matrix<float>(rows, columns));
     };
     
     auto create_matrix_double = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix<double>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_matrix<double>(rows, columns));
     };
     
     auto create_matrix_string = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix<std::string>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_matrix<std::string>(rows, columns));
     };
 
     // Wrappers for MatrixFactory::create_matrix3d function
     auto create_matrix3d_char = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix3d<char>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_matrix3d<char>(pages, rows, columns));
     };
 
     auto create_matrix3d_int = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix3d<int>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_matrix3d<int>(pages, rows, columns));
     };
 
     auto create_matrix3d_float = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix3d<float>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_matrix3d<float>(pages, rows, columns));
     };
 
     auto create_matrix3d_double = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix3d<double>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_matrix3d<double>(pages, rows, columns));
     };
 
     auto create_matrix3d_string = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_matrix3d<std::string>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_matrix3d<std::string>(pages, rows, columns));
     };
 
     // Wrappers for MatrixFactory::create_simple_matrix function
     auto create_simple_matrix_char = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix<char>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_simple_matrix<char>(rows, columns));
     };
     
     auto create_simple_matrix_int = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix<int>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_simple_matrix<int>(rows, columns));
     };
     
     auto create_simple_matrix_float = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix<float>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_simple_matrix<float>(rows, columns));
     };
     
     auto create_simple_matrix_double = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix<double>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_simple_matrix<double>(rows, columns));
     };
     
     auto create_simple_matrix_string = [](int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix<std::string>(rows, columns);
+        return wrap_matrix(MatrixFactory::create_simple_matrix<std::string>(rows, columns));
     };
 
     // Wrappers for MatrixFactory::create_simple_matrix3d function
     auto create_simple_matrix3d_char = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix3d<char>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_simple_matrix3d<char>(pages, rows, columns));
     };
 
     auto create_simple_matrix3d_int = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix3d<int>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_simple_matrix3d<int>(pages, rows, columns));
     };
 
     auto create_simple_matrix3d_float = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix3d<float>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_simple_matrix3d<float>(pages, rows, columns));
     };
 
     auto create_simple_matrix3d_double = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix3d<double>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_simple_matrix3d<double>(pages, rows, columns));
     };
 
     auto create_simple_matrix3d_string = [](int64_t pages, int64_t rows, int64_t columns)
     {
-        return MatrixFactory::create_simple_matrix3d<std::string>(pages, rows, columns);
+        return wrap_matrix3d(MatrixFactory::create_simple_matrix3d<std::string>(pages, rows, columns));
     };
 
     // Binding the wrapper functions
