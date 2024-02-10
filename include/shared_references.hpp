@@ -435,6 +435,20 @@ public:
     
     /**
      * @brief This function is used for python bindings, it sets the value at
+     *        the specified position.
+     * 
+     * @tparam ValueType 
+     * @param row 
+     * @param column 
+     * @param value 
+     */
+    void set_at(int64_t row, int64_t column, value_type value)
+    {
+        this->ptr_->set_at(row, column, value);
+    }
+    
+    /**
+     * @brief This function is used for python bindings, it sets the value at
      *        the specified position (using circular indexing).
      * 
      * @tparam ValueType 
@@ -852,6 +866,21 @@ public:
     value_type& circ_at(int64_t index)
     {
         return this->ptr_->circ_at(index);
+    }
+
+    /**
+     * @brief This function is used for python bindings, it sets the value at
+     *        the specified position.
+     * 
+     * @tparam ValueType 
+     * @param page
+     * @param row 
+     * @param column 
+     * @param value 
+     */
+    void set_at(int64_t page, int64_t row, int64_t column, value_type value)
+    {
+        this->ptr_->set_at(page, row, column, value);
     }
 
     /**

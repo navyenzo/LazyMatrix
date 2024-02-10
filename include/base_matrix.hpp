@@ -168,6 +168,13 @@ public:
 
     // Setter methods defined here to help define python/c++ interface
     template<typename ValueType>
+    void set_at(int64_t row, int64_t column, ValueType value)
+    {
+        this->at(row, column) = value;
+    }
+
+    // Setter methods defined here to help define python/c++ interface
+    template<typename ValueType>
     void set_circ_at(int64_t row, int64_t column, ValueType value)
     {
         this->circ_at(row, column) = value;

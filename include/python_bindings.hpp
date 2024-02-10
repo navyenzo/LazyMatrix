@@ -30,11 +30,14 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
+#include <pybind11/stl.h>
 
 #include "shared_references.hpp"
 #include "matrix_factory.hpp"
 #include "polymorphic_matrix.hpp"
 #include "polymorphic_matrix3d.hpp"
+#include "output_operators.hpp"
+
 #include "output_operators.hpp"
 
 namespace py = pybind11;
@@ -91,6 +94,11 @@ inline void bind_factory_functions(pybind11::module_& m)
     {
         return wrap_matrix(MatrixFactory::create_matrix<std::string>(rows, columns));
     };
+    
+    auto create_matrix = [](int64_t rows, int64_t columns)
+    {
+        return wrap_matrix(MatrixFactory::create_matrix<Poco::Dynamic::Var>(rows, columns));
+    };
 
     // Wrappers for MatrixFactory::create_matrix3d function
     auto create_matrix3d_char = [](int64_t pages, int64_t rows, int64_t columns)
@@ -118,6 +126,11 @@ inline void bind_factory_functions(pybind11::module_& m)
         return wrap_matrix3d(MatrixFactory::create_matrix3d<std::string>(pages, rows, columns));
     };
 
+    auto create_matrix3d = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return wrap_matrix3d(MatrixFactory::create_matrix3d<Poco::Dynamic::Var>(pages, rows, columns));
+    };
+
     // Wrappers for MatrixFactory::create_simple_matrix function
     auto create_simple_matrix_char = [](int64_t rows, int64_t columns)
     {
@@ -142,6 +155,11 @@ inline void bind_factory_functions(pybind11::module_& m)
     auto create_simple_matrix_string = [](int64_t rows, int64_t columns)
     {
         return wrap_matrix(MatrixFactory::create_simple_matrix<std::string>(rows, columns));
+    };
+    
+    auto create_simple_matrix = [](int64_t rows, int64_t columns)
+    {
+        return wrap_matrix(MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(rows, columns));
     };
 
     // Wrappers for MatrixFactory::create_simple_matrix3d function
@@ -170,6 +188,11 @@ inline void bind_factory_functions(pybind11::module_& m)
         return wrap_matrix3d(MatrixFactory::create_simple_matrix3d<std::string>(pages, rows, columns));
     };
 
+    auto create_simple_matrix3d = [](int64_t pages, int64_t rows, int64_t columns)
+    {
+        return wrap_matrix3d(MatrixFactory::create_simple_matrix3d<Poco::Dynamic::Var>(pages, rows, columns));
+    };
+
     // Binding the wrapper functions
     pybind11::class_<MatrixFactory>(m, "MatrixFactory")
         // create_matrix functions
@@ -178,24 +201,197 @@ inline void bind_factory_functions(pybind11::module_& m)
         .def_static("create_matrix_float", create_matrix_float, "rows"_a, "columns"_a)
         .def_static("create_matrix_double", create_matrix_double, "rows"_a, "columns"_a)
         .def_static("create_matrix_string", create_matrix_string, "rows"_a, "columns"_a)
+        .def_static("create_matrix", create_matrix, "rows"_a, "columns"_a)
         // create_matrix3d functions
         .def_static("create_matrix3d_char", create_matrix3d_char, "pages"_a, "rows"_a, "columns"_a)
         .def_static("create_matrix3d_int", create_matrix3d_int, "pages"_a, "rows"_a, "columns"_a)
         .def_static("create_matrix3d_float", create_matrix3d_float, "pages"_a, "rows"_a, "columns"_a)
         .def_static("create_matrix3d_double", create_matrix3d_double, "pages"_a, "rows"_a, "columns"_a)
         .def_static("create_matrix3d_string", create_matrix3d_string, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_matrix3d", create_matrix3d, "pages"_a, "rows"_a, "columns"_a)
         // create_simple_matrix functions
         .def_static("create_simple_matrix_char", create_simple_matrix_char, "rows"_a, "columns"_a)
         .def_static("create_simple_matrix_int", create_simple_matrix_int, "rows"_a, "columns"_a)
         .def_static("create_simple_matrix_float", create_simple_matrix_float, "rows"_a, "columns"_a)
         .def_static("create_simple_matrix_double", create_simple_matrix_double, "rows"_a, "columns"_a)
         .def_static("create_simple_matrix_string", create_simple_matrix_string, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix", create_simple_matrix, "rows"_a, "columns"_a)
         // create_simple_matrix3d functions
         .def_static("create_simple_matrix3d_char", create_simple_matrix3d_char, "pages"_a, "rows"_a, "columns"_a)
         .def_static("create_simple_matrix3d_int", create_simple_matrix3d_int, "pages"_a, "rows"_a, "columns"_a)
         .def_static("create_simple_matrix3d_float", create_simple_matrix3d_float, "pages"_a, "rows"_a, "columns"_a)
         .def_static("create_simple_matrix3d_double", create_simple_matrix3d_double, "pages"_a, "rows"_a, "columns"_a)
-        .def_static("create_simple_matrix3d_string", create_simple_matrix3d_string, "pages"_a, "rows"_a, "columns"_a);
+        .def_static("create_simple_matrix3d_string", create_simple_matrix3d_string, "pages"_a, "rows"_a, "columns"_a)
+        .def_static("create_simple_matrix3d", create_simple_matrix3d, "pages"_a, "rows"_a, "columns"_a);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Convert a Poco::Dynamic::Var value to a py::object
+ * 
+ * @param var 
+ * @return py::object 
+ */
+//-------------------------------------------------------------------
+inline py::object convertPocoVarToPyObject(const Poco::Dynamic::Var& var)
+{
+    if (var.isEmpty())
+    {
+        return py::none();
+    }
+    else if (var.isInteger())
+    {
+        return py::int_(var.convert<int64_t>()); // Use int64_t for wider integer coverage
+    }
+    else if (var.isNumeric())
+    {
+        return py::float_(var.convert<double>());
+    }
+    else if (var.isString())
+    {
+        return py::str(var.convert<std::string>());
+    }
+    else if (var.isBoolean())
+    {
+        return py::bool_(var.convert<bool>());
+    }
+    else if (var.isArray())
+    {
+        auto& arr = var.extract<Poco::Dynamic::Array>();
+        py::list pyList;
+        for (const auto& item : arr)
+        {
+            pyList.append(convertPocoVarToPyObject(item));
+        }
+        return std::move(pyList);
+    }
+    else if (var.isStruct())
+    {
+        auto& structVar = var.extract<Poco::Dynamic::Struct<std::string>>();
+        py::dict pyDict;
+        for (const auto& [key, value] : structVar)
+        {
+            pyDict[py::str(key)] = convertPocoVarToPyObject(value);
+        }
+        return std::move(pyDict);
+    }
+    else if (var.type() == typeid(Poco::DateTime))
+    {
+        const auto& dt = var.extract<Poco::DateTime>();
+        return py::module_::import("datetime").attr("datetime")(dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
+    }
+    else if (var.type() == typeid(Poco::LocalDateTime))
+    {
+        const auto& ldt = var.extract<Poco::LocalDateTime>();
+        // Adjust for timezone if necessary
+        return py::module_::import("datetime").attr("datetime")(ldt.year(), ldt.month(), ldt.day(), ldt.hour(), ldt.minute(), ldt.second());
+    }
+    else if (var.type() == typeid(Poco::UUID))
+    {
+        const auto& uuid = var.extract<Poco::UUID>();
+        return py::str(uuid.toString());
+    }
+
+    // If the type is not directly supported, default to None
+    // This includes types like Poco::Dynamic::Null or any custom objects
+    // not specifically handled above.
+    return py::none();
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Convert a py::object value to a Poco::Dynamic::Var
+ * 
+ * @param var 
+ * @return py::obpy::objectject 
+ */
+//-------------------------------------------------------------------
+inline Poco::Dynamic::Var convertPyObjectToPocoVar(const py::object& obj)
+{
+    if (obj.is_none())
+    {
+        return Poco::Dynamic::Var(); // Represents a null value in Poco
+    }
+    else if (py::isinstance<py::bool_>(obj))
+    {
+        return Poco::Dynamic::Var(obj.cast<bool>());
+    }
+    else if (py::isinstance<py::int_>(obj))
+    {
+        return Poco::Dynamic::Var(obj.cast<long long>());
+    }
+    else if (py::isinstance<py::float_>(obj))
+    {
+        return Poco::Dynamic::Var(obj.cast<double>());
+    }
+    else if (py::isinstance<py::str>(obj))
+    {
+        return Poco::Dynamic::Var(obj.cast<std::string>());
+    }
+    else if (py::isinstance<py::list>(obj))
+    {
+        Poco::Dynamic::Array arr;
+        for (const py::handle& item : obj)
+        {
+            // Use .cast<py::object>() for explicit conversion
+            arr.push_back(convertPyObjectToPocoVar(item.cast<py::object>()));
+        }
+        return arr;
+    }
+    else if (py::isinstance<py::dict>(obj))
+    {
+        Poco::Dynamic::Struct<std::string> structVar;
+        for (const py::handle& key : obj)
+        {
+            structVar.insert({key.cast<std::string>(), convertPyObjectToPocoVar(obj[key])});
+        }
+        return structVar;
+    }
+
+    // Check if the object is a datetime instance
+    if (py::hasattr(obj, "year") && py::hasattr(obj, "month") && py::hasattr(obj, "day"))
+    {
+        // Assume it's a datetime object
+        int year = py::cast<int>(obj.attr("year"));
+        int month = py::cast<int>(obj.attr("month"));
+        int day = py::cast<int>(obj.attr("day"));
+        int hour = py::cast<int>(obj.attr("hour"));
+        int minute = py::cast<int>(obj.attr("minute"));
+        int second = py::cast<int>(obj.attr("second"));
+        int microsecond = py::cast<int>(obj.attr("microsecond"));
+
+        Poco::DateTime dt(year, month, day, hour, minute, second, microsecond / 1000);
+        return Poco::Dynamic::Var(dt);
+    }
+    
+    // Check if the object can be interpreted as a UUID string
+    else if (py::isinstance<py::str>(obj))
+    {
+        std::string strVal = py::cast<std::string>(obj);
+        // Simple check to decide if strVal might be a UUID; more robust validation may be needed
+        if (strVal.length() == 36)
+        {
+            try
+            {
+                Poco::UUID uuid(strVal);
+                return Poco::Dynamic::Var(uuid);
+            }
+            catch (const std::exception&)
+            {
+                // Not a valid UUID, fall through to the default case
+            }
+        }
+    }
+
+    // Optionally, extend this to handle other specific Python types you expect to encounter
+    // Unsupported types default to an empty Poco::Dynamic::Var
+    return Poco::Dynamic::Var();
 }
 //-------------------------------------------------------------------
 
@@ -205,12 +401,7 @@ inline void bind_factory_functions(pybind11::module_& m)
 /**
  * @brief Bind a SharedMatrixRef class to Python.
  *
- * This template function binds a SharedMatrixRef to a Python class, allowing the
- * Python side to interact with the C++ SharedMatrixRef objects. The binding includes the 
- * member functions of the SharedMatrixRef class. This function is specialized for types
- * recognized as matrix references.
- *
- * @tparam ReferenceType The shared matrix reference type.
+ * @tparam ReferenceType The shared 2d matrix reference type.
  * @param m Reference to the Pybind11 module.
  * @param name The name of the class in the Python module.
  */
@@ -218,7 +409,7 @@ inline void bind_factory_functions(pybind11::module_& m)
 template<typename ReferenceType,
          std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
 
-inline void bind_matrix_ref(py::module &m, const char* name)
+inline void bind_matrix_ref(py::module_ &m, const char* name)
 {
     using ValueType = typename ReferenceType::value_type;
 
@@ -226,14 +417,119 @@ inline void bind_matrix_ref(py::module &m, const char* name)
         .def("rows", &ReferenceType::rows)
         .def("columns", &ReferenceType::columns)
         .def("size", &ReferenceType::size)
-        .def("at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t) const>(&ReferenceType::at))
-        .def("at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t)>(&ReferenceType::at))
-        .def("__call__", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t) const>(&ReferenceType::operator()))
-        .def("__call__", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t)>(&ReferenceType::operator()))
-        .def("circ_at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t) const>(&ReferenceType::circ_at))
-        .def("circ_at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t)>(&ReferenceType::circ_at))
-        .def("set_circ_at", &ReferenceType::set_circ_at)
-        .def("resize", &ReferenceType::resize);
+        // Customized "operator()" function for Poco::Dynamic::Var
+        .def("__call__", [](const ReferenceType& ref, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref(row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref(row, col));
+            }
+        })
+        // Customized "at" method to handle both basic types and Poco::Dynamic::Var
+        .def("at", [](const ReferenceType& ref, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref.at(row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref.at(row, col));
+            }
+        })
+        // Customized "set_at" method to handle setting values
+        .def("set_at", [](ReferenceType& ref, int64_t row, int64_t col, py::object obj)
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Convert py::object to Poco::Dynamic::Var and set it
+                ref.set_at(row, col, convertPyObjectToPocoVar(obj));
+            }
+            else
+            {
+                // For basic types, use pybind11's automatic casting
+                ref.set_at(row, col, obj.cast<ValueType>());
+            }
+        })
+        // Customized "set_at" method to handle setting values
+        .def("set_circ_at", [](ReferenceType& ref, int64_t row, int64_t col, py::object obj)
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Convert py::object to Poco::Dynamic::Var and set it
+                ref.set_circ_at(row, col, convertPyObjectToPocoVar(obj));
+            }
+            else
+            {
+                // For basic types, use pybind11's automatic casting
+                ref.set_circ_at(row, col, obj.cast<ValueType>());
+            }
+        })
+        // Bind other necessary methods similarly, ensuring custom handling for Poco::Dynamic::Var if needed
+        ;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Bind a ConstSharedMatrixRef class to Python.
+ *
+ * @tparam ReferenceType The shared 2d matrix reference type.
+ * @param m Reference to the Pybind11 module.
+ * @param name The name of the class in the Python module.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix_reference<ReferenceType>{}>* = nullptr>
+
+inline void bind_matrix_const_ref(py::module_ &m, const char* name)
+{
+    using ValueType = typename ReferenceType::value_type;
+
+    py::class_<ReferenceType>(m, name)
+        .def("rows", &ReferenceType::rows)
+        .def("columns", &ReferenceType::columns)
+        .def("size", &ReferenceType::size)
+        // Customized "operator()" function for Poco::Dynamic::Var
+        .def("__call__", [](const ReferenceType& ref, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref(row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref(row, col));
+            }
+        })
+        // Customized "at" method to handle both basic types and Poco::Dynamic::Var
+        .def("at", [](const ReferenceType& ref, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref.at(row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref.at(row, col));
+            }
+        })
+        // Bind other necessary methods similarly, ensuring custom handling for Poco::Dynamic::Var if needed
+        ;
 }
 //-------------------------------------------------------------------
 
@@ -243,12 +539,7 @@ inline void bind_matrix_ref(py::module &m, const char* name)
 /**
  * @brief Bind a SharedMatrix3DRef class to Python.
  *
- * This template function binds a SharedMatrix3DRef to a Python class, allowing the
- * Python side to interact with the C++ SharedMatrix3DRef objects. The binding includes the 
- * member functions of the SharedMatrix3DRef class. This function is specialized for types
- * recognized as 3D matrix references.
- *
- * @tparam ReferenceType The shared 3D matrix reference type.
+ * @tparam ReferenceType The shared 3d matrix reference type.
  * @param m Reference to the Pybind11 module.
  * @param name The name of the class in the Python module.
  */
@@ -256,7 +547,7 @@ inline void bind_matrix_ref(py::module &m, const char* name)
 template<typename ReferenceType,
          std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
 
-inline void bind_matrix3d_ref(py::module &m, const char* name)
+inline void bind_matrix3d_ref(py::module_ &m, const char* name)
 {
     using ValueType = typename ReferenceType::value_type;
 
@@ -265,14 +556,141 @@ inline void bind_matrix3d_ref(py::module &m, const char* name)
         .def("rows", &ReferenceType::rows)
         .def("columns", &ReferenceType::columns)
         .def("size", &ReferenceType::size)
-        .def("at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t, int64_t) const>(&ReferenceType::at))
-        .def("at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t, int64_t)>(&ReferenceType::at))
-        .def("__call__", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t, int64_t) const>(&ReferenceType::operator()))
-        .def("__call__", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t, int64_t)>(&ReferenceType::operator()))
-        .def("circ_at", static_cast<ValueType (ReferenceType::*)(int64_t, int64_t, int64_t) const>(&ReferenceType::circ_at))
-        .def("circ_at", static_cast<ValueType& (ReferenceType::*)(int64_t, int64_t, int64_t)>(&ReferenceType::circ_at))
-        .def("set_circ_at", &ReferenceType::set_circ_at)
-        .def("resize", &ReferenceType::resize);
+        // Customized "operator()" function for Poco::Dynamic::Var
+        .def("__call__", [](const ReferenceType& ref, int64_t page, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref(page, row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref(page, row, col));
+            }
+        })
+        // Customized "at" method to handle both basic types and Poco::Dynamic::Var
+        .def("at", [](const ReferenceType& ref, int64_t page, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref.at(page, row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref.at(page, row, col));
+            }
+        })
+        // Customized "set_at" method to handle setting values
+        .def("set_at", [](ReferenceType& ref, int64_t page, int64_t row, int64_t col, py::object obj)
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Convert py::object to Poco::Dynamic::Var and set it
+                ref.set_at(page, row, col, convertPyObjectToPocoVar(obj));
+            }
+            else
+            {
+                // For basic types, use pybind11's automatic casting
+                ref.set_at(page, row, col, obj.cast<ValueType>());
+            }
+        })
+        // Customized "set_at" method to handle setting values
+        .def("set_circ_at", [](ReferenceType& ref, int64_t page, int64_t row, int64_t col, py::object obj)
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Convert py::object to Poco::Dynamic::Var and set it
+                ref.set_circ_at(page, row, col, convertPyObjectToPocoVar(obj));
+            }
+            else
+            {
+                // For basic types, use pybind11's automatic casting
+                ref.set_circ_at(page, row, col, obj.cast<ValueType>());
+            }
+        })
+        // Bind other necessary methods similarly, ensuring custom handling for Poco::Dynamic::Var if needed
+        ;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Bind a ConstSharedMatrix3DRef class to Python.
+ *
+ * @tparam ReferenceType The shared 3d matrix reference type.
+ * @param m Reference to the Pybind11 module.
+ * @param name The name of the class in the Python module.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType,
+         std::enable_if_t<is_matrix3d_reference<ReferenceType>{}>* = nullptr>
+
+inline void bind_matrix3d_const_ref(py::module_ &m, const char* name)
+{
+    using ValueType = typename ReferenceType::value_type;
+
+    py::class_<ReferenceType>(m, name)
+        .def("pages", &ReferenceType::pages)
+        .def("rows", &ReferenceType::rows)
+        .def("columns", &ReferenceType::columns)
+        .def("size", &ReferenceType::size)
+        // Customized "operator()" function for Poco::Dynamic::Var
+        .def("__call__", [](const ReferenceType& ref, int64_t page, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref(page, row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref(page, row, col));
+            }
+        })
+        // Customized "at" method to handle both basic types and Poco::Dynamic::Var
+        .def("at", [](const ReferenceType& ref, int64_t page, int64_t row, int64_t col) -> py::object
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Use the conversion function for Poco::Dynamic::Var
+                return convertPocoVarToPyObject(ref.at(page, row, col));
+            }
+            else
+            {
+                // For basic types, direct conversion using pybind11's automatic casting
+                return py::cast(ref.at(page, row, col));
+            }
+        })
+        // Bind other necessary methods similarly, ensuring custom handling for Poco::Dynamic::Var if needed
+        ;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Bind the factory function and basic matrix types.
+ * 
+ * @param m The python module to bind the functions for.
+ */
+//-------------------------------------------------------------------
+inline void bind_factory_functions_and_matrix_types(py::module_ &m)
+{
+    bind_factory_functions(m);
+
+    bind_matrix_ref<LazyMatrix::SharedMatrixRef<LazyMatrix::Data<Poco::Dynamic::Var>>>(m, "Matrix");
+    bind_matrix_const_ref<LazyMatrix::ConstSharedMatrixRef<LazyMatrix::ConstData<Poco::Dynamic::Var>>>(m, "ConstMatrix");
+
+    bind_matrix3d_ref<LazyMatrix::SharedMatrix3DRef<LazyMatrix::Data3D<Poco::Dynamic::Var>>>(m, "Matrix3D");
+    bind_matrix3d_const_ref<LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::ConstData3D<Poco::Dynamic::Var>>>(m, "ConstMatrix3D");
 }
 //-------------------------------------------------------------------
 

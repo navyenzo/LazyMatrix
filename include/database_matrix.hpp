@@ -37,6 +37,7 @@
 #include <Poco/Data/Session.h>
 #include <Poco/Data/RecordSet.h>
 #include <Poco/Dynamic/Var.h>
+#include <Poco/Dynamic/Struct.h>
 #include <Poco/Data/Statement.h>
 
 #include "base_matrix.hpp"

@@ -116,7 +116,7 @@ private:
  */
 //-------------------------------------------------------------------
 template<typename DataType, bool HasNonConstAccess>
-struct is_type_a_matrix< PolymorphicMatrix3D<DataType,HasNonConstAccess> > : std::true_type {};
+struct is_type_a_matrix3d< PolymorphicMatrix3D<DataType,HasNonConstAccess> > : std::true_type {};
 //-------------------------------------------------------------------
 
 
@@ -244,7 +244,7 @@ private: // Private variables
 //-------------------------------------------------------------------
 template<typename ReferenceType, bool HasNonConstAccess>
 
-struct is_type_a_matrix< PolymorphicMatrix3DWrapper<ReferenceType, HasNonConstAccess> > : std::true_type {};
+struct is_type_a_matrix3d< PolymorphicMatrix3DWrapper<ReferenceType, HasNonConstAccess> > : std::true_type {};
 //-------------------------------------------------------------------
 
 
