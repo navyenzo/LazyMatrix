@@ -493,8 +493,14 @@ enum class ResultType
  *                    the provided string as.
  */
 //-------------------------------------------------------------------
-inline ResultType interpret_string(const std::string_view input_string, Poco::Dynamic::Var& result_var)
+inline
+
+std::pair<Poco::Dynamic::Var, ResultType>
+
+interpret_string(const std::string_view input_string)
 {
+    Poco::Dynamic::Var result_var;
+
     // Check for Vector
     if (is_likely_numeric_array(input_string))
     {
@@ -508,30 +514,30 @@ inline ResultType interpret_string(const std::string_view input_string, Poco::Dy
 
         while (start < end)
         {
-            size_t nextComma = input_string.find_first_of(',', start);
+            size_t next_comma = input_string.find_first_of(',', start);
         
             // If no more commas, or the comma is beyond the end, adjust the endpoint
-            size_t segmentEnd = (nextComma == std::string_view::npos || nextComma > end) ? end : nextComma;
+            size_t segment_end = (next_comma == std::string_view::npos || next_comma > end) ? end : next_comma;
             
 
             double num = 0;
         
             // Check if there are characters to parse (non-empty segment)
-            if (start != segmentEnd)
+            if (start != segment_end)
             {
                 // Extract the segment and parse
-                std::string_view segment = input_string.substr(start, segmentEnd - start);
+                std::string_view segment = input_string.substr(start, segment_end - start);
                 from_string(num, segment.data(), 0, segment.size(), '.');
             } // If segment is empty, num remains 0
 
             elements.push_back(num);
 
             // Move past this segment and the comma, preparing for the next iteration
-            start = segmentEnd + 1;
+            start = segment_end + 1;
         }
         
         result_var = elements;
-        return ResultType::Vector;
+        return {result_var, ResultType::Vector};
     }
 
     // DwateTime
@@ -540,7 +546,7 @@ inline ResultType interpret_string(const std::string_view input_string, Poco::Dy
     if (Poco::DateTimeParser::tryParse(std::string(input_string), date, tzd))
     {
         result_var = date;
-        return ResultType::DateTime;
+        return {result_var, ResultType::DateTime};
     }
 
     // Number
@@ -548,12 +554,12 @@ inline ResultType interpret_string(const std::string_view input_string, Poco::Dy
     if (from_string(num, input_string.data(), 0, input_string.size(), '.'))
     {
         result_var = num;
-        return ResultType::Number;
+        return {result_var, ResultType::Number};
     }
 
     // Default to String
     result_var = std::string(input_string);
-    return ResultType::String;
+    return {result_var, ResultType::String};
 }
 //-------------------------------------------------------------------
 

@@ -40,6 +40,7 @@
 #include "single_include/mio/mio.hpp"
 
 #include "base_matrix.hpp"
+#include "convert_numbers.hpp"
 //-------------------------------------------------------------------
 
 
@@ -119,6 +120,7 @@ public:
     uintptr_t columns()const { return columns_; }
 
     std::string_view string_at(int64_t row, int64_t column)const;
+    std::pair<Poco::Dynamic::Var, ResultType> dynamic_at(int64_t row, int64_t column)const;
 
     const std::string& get_row_header(uintptr_t index)const;
     const std::string& get_column_header(uintptr_t index)const;
@@ -145,12 +147,8 @@ private: // Private functions
 
     std::pair<int, int> find_begin_end_indeces_of_csv_entry(uintptr_t row, uintptr_t column)const;
 
-    
-    
     uintptr_t count_number_of_columns_for_current_row(uintptr_t start_of_row, uintptr_t end_of_row)const;    
     void count_number_of_rows_and_columns();
-
-
 
     void parse_row_headers();
     void parse_column_headers();
@@ -258,6 +256,15 @@ inline decltype(auto) CSVMatrix<std::string_view>::const_at_(int64_t row, int64_
 {
     return this->string_at(row, column);
 }
+
+
+
+// Poco::Dynamic::Var specializations
+template<>
+inline decltype(auto) CSVMatrix<Poco::Dynamic::Var>::const_at_(int64_t row, int64_t column)const
+{
+    return this->dynamic_at(row, column);
+}
 //-------------------------------------------------------------------
 
 
@@ -268,13 +275,37 @@ inline decltype(auto) CSVMatrix<std::string_view>::const_at_(int64_t row, int64_
 //-------------------------------------------------------------------
 template<typename DataType>
 
-inline std::string_view CSVMatrix<DataType>::string_at(int64_t row, int64_t column)const
+inline std::string_view CSVMatrix<DataType>::string_at(int64_t row, int64_t column) const
 {
-    auto [begin,end] = find_begin_end_indeces_of_csv_entry(row, column);
+    auto [begin, end] = find_begin_end_indeces_of_csv_entry(row, column);
+
+    // Check if the string at the specified location
+    // starts and ends with double quotes
+    if(end > begin + 1 &&
+       mapped_csv_[begin] == string_delimiter_ && mapped_csv_[end - 1] == string_delimiter_)
+    {
+        ++begin;
+        --end;
+    }
 
     std::string_view value(&mapped_csv_.data()[begin], end - begin);
 
     return value;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Function used to return a pair consisting of the Type of data
+// at the (row,column) position and a Poco::Dynamic::Var variable
+// contained the data at the (row,column) position
+//-------------------------------------------------------------------
+template<typename DataType>
+
+std::pair<Poco::Dynamic::Var, ResultType> CSVMatrix<DataType>::dynamic_at(int64_t row, int64_t column)const
+{
+    return interpret_string( this->string_at(row,column) );
 }
 //-------------------------------------------------------------------
 

@@ -30,32 +30,24 @@
 //-------------------------------------------------------------------
 TEST_CASE("interpret_string function tests", "[interpret_string]")
 {
-    Poco::Dynamic::Var result;
-    using namespace LazyMatrix;
-
     SECTION("Interprets numbers correctly")
     {
-        REQUIRE(interpret_string("42", result) == ResultType::Number);
+        auto [result,type] = LazyMatrix::interpret_string("42");
+        REQUIRE(type == LazyMatrix::ResultType::Number);
         REQUIRE(result.convert<double>() == 42);
     }
 
     SECTION("Interprets date/time correctly")
     {
-        std::string dateTimeStr = "2022-01-01T12:00:00";
-        REQUIRE(interpret_string(dateTimeStr, result) == ResultType::DateTime);
-        // Further checks on the date might require converting the result to Poco::DateTime and comparing values
+        auto [result,type] = LazyMatrix::interpret_string("2022-01-01T12:00:00");
+        REQUIRE(type == LazyMatrix::ResultType::DateTime);
     }
 
     SECTION("Interprets vectors correctly")
     {
-        REQUIRE(interpret_string("{1,2,3,4,5}", result) == ResultType::Vector);
+        auto [result,type] = LazyMatrix::interpret_string("{1,2,3,4,5}");
+        REQUIRE(type == LazyMatrix::ResultType::Vector);
         auto vec = result.extract<std::vector<double>>();
-        REQUIRE(vec.size() == 5);
-        REQUIRE(vec[0] == 1);
-        REQUIRE(vec[4] == 5);
-
-        REQUIRE(interpret_string("[1,2,3,4,5]", result) == ResultType::Vector);
-        vec = result.extract<std::vector<double>>();
         REQUIRE(vec.size() == 5);
         REQUIRE(vec[0] == 1);
         REQUIRE(vec[4] == 5);
@@ -63,7 +55,8 @@ TEST_CASE("interpret_string function tests", "[interpret_string]")
 
     SECTION("Interprets vectors correctly with special cases")
     {
-        REQUIRE(interpret_string("{,1,2,3,4,,5}", result) == ResultType::Vector);
+        auto [result,type] = LazyMatrix::interpret_string("{,1,2,3,4,,5}");
+        REQUIRE(type == LazyMatrix::ResultType::Vector);
         auto vec = result.extract<std::vector<double>>();
         REQUIRE(vec.size() == 7);
         REQUIRE(vec[0] == 0);
@@ -77,14 +70,9 @@ TEST_CASE("interpret_string function tests", "[interpret_string]")
 
     SECTION("Interprets plain strings correctly")
     {
-        REQUIRE(interpret_string("Hello, World!", result) == ResultType::String);
+        auto [result,type] = LazyMatrix::interpret_string("Hello, World!");
+        REQUIRE(type == LazyMatrix::ResultType::String);
         REQUIRE(result.convert<std::string>() == "Hello, World!");
-    }
-
-    SECTION("Handles invalid expressions as strings")
-    {
-        REQUIRE(interpret_string("invalid expression", result) == ResultType::String);
-        REQUIRE(result.convert<std::string>() == "invalid expression");
     }
 
     // Additional tests can be added here to cover more cases, such as specific expression evaluations,

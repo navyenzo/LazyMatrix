@@ -52,9 +52,6 @@ TEST_CASE("CSVMatrix with double", "[CSVMatrix]")
     LazyMatrix::CSVMatrix<double> matrix;
     matrix.load(filename, false, false);
 
-
-    std::cout << "matrix =\n" << matrix << "\n\n\n";
-
     REQUIRE(matrix(0, 0) == Catch::Approx(1.1));
     REQUIRE(matrix(0, 1) == Catch::Approx(2.2));
     REQUIRE(matrix(1, 2) == Catch::Approx(6.6));
@@ -162,7 +159,8 @@ TEST_CASE("CSVMatrix circular access with circ_at(i, j)", "[CSVMatrix]") {
  * the total number of elements.
  */
 //-------------------------------------------------------------------
-TEST_CASE("CSVMatrix 1D circular access with circ_at(index)", "[CSVMatrix]") {
+TEST_CASE("CSVMatrix 1D circular access with circ_at(index)", "[CSVMatrix]")
+{
     std::string filename = "test_1d_circular.csv";
     createTestCSVFile(filename, "a,b,c\nd,e,f\ng,h,i");
 
@@ -173,6 +171,56 @@ TEST_CASE("CSVMatrix 1D circular access with circ_at(index)", "[CSVMatrix]") {
     REQUIRE(matrix.circ_at(-1) == "i");
     REQUIRE(matrix.circ_at(9) == "a");
     REQUIRE(matrix.circ_at(11) == "c");
+
+    std::remove(filename.c_str());
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Test case for testing the "dynamic_at" function of a CSVMatrix
+ *
+ * The dynamic_at function returns the Data Type at the (row,column)
+ * position of the CSVMatrix as well as the actual value
+ */
+//-------------------------------------------------------------------
+TEST_CASE("CSVMatrix test \"dynamic_at\" function return type an value at (row,column) position", "[CSVMatrix]")
+{
+    std::string filename = "test_double.csv";
+    createTestCSVFile(filename,
+                      "\"{1,2,3}\",1.1,2.2\n"
+                      "3.3,\"Hello\",-5.5\n"
+                      "4.4,5.5,6.6");
+
+    LazyMatrix::CSVMatrix<double> matrix;
+    matrix.load(filename, false, false);
+
+    SECTION("Checking matrix size is read correctly")
+    {
+        REQUIRE(matrix.rows() == 3);
+        REQUIRE(matrix.columns() == 3);
+    }
+
+    SECTION("Check that vectors are interpreted correctly")
+    {
+        auto [value,type] = matrix.dynamic_at(0,0);
+        REQUIRE(type == LazyMatrix::ResultType::Vector);
+        auto vec = value.extract<std::vector<double>>();
+        REQUIRE(vec.size() == 3);
+        REQUIRE(vec[0] == 1);
+        REQUIRE(vec[1] == 2);
+        REQUIRE(vec[2] == 3);
+    }
+
+    SECTION("Check that string is interpreted correctly")
+    {
+        auto [value,type] = matrix.dynamic_at(1,1);
+        REQUIRE(type == LazyMatrix::ResultType::String);
+        auto str = value.extract<std::string>();
+        REQUIRE(str == "Hello");
+    }
 
     std::remove(filename.c_str());
 }
