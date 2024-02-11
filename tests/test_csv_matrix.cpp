@@ -52,6 +52,9 @@ TEST_CASE("CSVMatrix with double", "[CSVMatrix]")
     LazyMatrix::CSVMatrix<double> matrix;
     matrix.load(filename, false, false);
 
+
+    std::cout << "matrix =\n" << matrix << "\n\n\n";
+
     REQUIRE(matrix(0, 0) == Catch::Approx(1.1));
     REQUIRE(matrix(0, 1) == Catch::Approx(2.2));
     REQUIRE(matrix(1, 2) == Catch::Approx(6.6));

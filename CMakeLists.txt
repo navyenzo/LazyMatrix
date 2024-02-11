@@ -90,6 +90,20 @@ FetchContent_MakeAvailable(Poco)
 
 
 ###############################################################
+# ExprTk library for evaluating expression writtent in text
+###############################################################
+FetchContent_Declare(
+  exprtk
+  GIT_REPOSITORY https://github.com/ArashPartow/exprtk.git
+  GIT_TAG master
+)
+
+FetchContent_MakeAvailable(exprtk)
+###############################################################
+
+
+
+###############################################################
 # eigen library
 ###############################################################
 FetchContent_Declare(
@@ -215,6 +229,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     $<INSTALL_INTERFACE:include>
     ${CMAKE_BINARY_DIR}/_deps
     ${CMAKE_BINARY_DIR}/_deps/mio-src
+    ${CMAKE_BINARY_DIR}/_deps/exprtk-src
     ${CMAKE_BINARY_DIR}/_deps/eigen-src
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src

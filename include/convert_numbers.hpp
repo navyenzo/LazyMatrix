@@ -28,6 +28,16 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <string_view>
+#include <charconv>
+#include <regex>
+
+#include <Poco/Dynamic/Var.h>
+#include <Poco/Dynamic/Struct.h>
+#include <Poco/DateTimeParser.h>
+#include <Poco/UUID.h>
+#include <Poco/UUIDGenerator.h>
+#include <Poco/JSON/Parser.h>
 //-------------------------------------------------------------------
 
 
@@ -416,6 +426,135 @@ private:
         return false;
     }
 };
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+inline bool is_likely_numeric_array(const std::string_view str)
+{
+    // Trim leading and trailing white spaces
+    auto start = str.find_first_not_of(" \t\n\r\f\v");
+
+    if (start == std::string_view::npos) return false; // string is all whitespace
+
+    auto end = str.find_last_not_of(" \t\n\r\f\v");
+
+    if ((str[start] == '{' && str[end] == '}') || (str[start] == '[' && str[end] == ']'))
+    {
+        // Adjusted regex pattern to include cases with leading, trailing, or consecutive commas
+        static const std::regex numericArrayPattern(
+            R"(\s*[\[\{]\s*((-?\d+(\.\d+)?([eE][-+]?\d+)?)?\s*(,|;)\s*)*(-?\d+(\.\d+)?([eE][-+]?\d+)?)?\s*[\]\}]\s*)");
+        
+        // Use the entire string for regex matching
+        return std::regex_match(str.begin(), str.end(), numericArrayPattern);
+    }
+    else
+    {
+        return false;
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Enum used to know whether text was successfully converted/evaluated.
+ */
+//-------------------------------------------------------------------
+enum class ResultType
+{
+    None = 0,
+    String,
+    Number,
+    DateTime,
+    Date,
+    Time,
+    Vector,
+    UUID
+};
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief This function attempts to interpret/evaluate a provided string.
+ * 
+ * This function looks at the provided string and attempts to understand
+ * its content, whether it's just a number, or a data/time stamp or a
+ * vector/list or a complex mathematical expression.
+ * If all fails, it just interprets it as a string.
+ * 
+ * @param input_string The string the function attempts to interpret/evaluate.
+ * @param result_var The Poco::Dynamic::Var containing the interpreted result.
+ * @return ResultType This functions returns the type that it was able to interpret
+ *                    the provided string as.
+ */
+//-------------------------------------------------------------------
+inline ResultType interpret_string(const std::string_view input_string, Poco::Dynamic::Var& result_var)
+{
+    // Check for Vector
+    if (is_likely_numeric_array(input_string))
+    {
+        std::vector<double> elements;
+    
+        // Adjust starting point to after the opening bracket
+        size_t start = input_string.find_first_of("{[") + 1;
+    
+        // End at the closing bracket
+        size_t end = input_string.find_last_of("}]");
+
+        while (start < end)
+        {
+            size_t nextComma = input_string.find_first_of(',', start);
+        
+            // If no more commas, or the comma is beyond the end, adjust the endpoint
+            size_t segmentEnd = (nextComma == std::string_view::npos || nextComma > end) ? end : nextComma;
+            
+
+            double num = 0;
+        
+            // Check if there are characters to parse (non-empty segment)
+            if (start != segmentEnd)
+            {
+                // Extract the segment and parse
+                std::string_view segment = input_string.substr(start, segmentEnd - start);
+                from_string(num, segment.data(), 0, segment.size(), '.');
+            } // If segment is empty, num remains 0
+
+            elements.push_back(num);
+
+            // Move past this segment and the comma, preparing for the next iteration
+            start = segmentEnd + 1;
+        }
+        
+        result_var = elements;
+        return ResultType::Vector;
+    }
+
+    // DwateTime
+    Poco::DateTime date;
+    int tzd;
+    if (Poco::DateTimeParser::tryParse(std::string(input_string), date, tzd))
+    {
+        result_var = date;
+        return ResultType::DateTime;
+    }
+
+    // Number
+    double num;
+    if (from_string(num, input_string.data(), 0, input_string.size(), '.'))
+    {
+        result_var = num;
+        return ResultType::Number;
+    }
+
+    // Default to String
+    result_var = std::string(input_string);
+    return ResultType::String;
+}
 //-------------------------------------------------------------------
 
 
