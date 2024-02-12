@@ -55,9 +55,9 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
     py::scoped_interpreter guard{};
 
     // Example input and output matrices setup
-    auto m_iota = LazyMatrix::generate_iota_matrix<double>(3,3,0,1);
-    auto m1 = LazyMatrix::wrap_matrix_const(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(3,3));
-    auto m2 = LazyMatrix::wrap_matrix(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(3,3));
+    auto m_iota = LazyMatrix::generate_iota_matrix<double>(2,2,0,1);
+    auto m1 = LazyMatrix::wrap_matrix_const(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(2,2));
+    auto m2 = LazyMatrix::wrap_matrix(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(2,2));
 
     try
     {
@@ -78,8 +78,11 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
             "print(in0)\n"
             "print('out0:', flush=True)\n"
             "print(out0)\n"
-            "print('about to change value m2(0,0) = -5', flush=True)\n"
+            "print('about to change values of m2', flush=True)\n"
             "out0.set_at(0,0,-5)\n"
+            "out0.set_at(0,1,-6)\n"
+            "out0.set_at(1,0,-7)\n"
+            "out0.set_at(1,1,-8)\n"
             "print('out0 (after modification):', flush=True)\n"
             "print(out0)\n";
 
@@ -105,6 +108,10 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
         program_output << "An unknown exception occurred." << std::endl;
     }
 
-    std::cout << "Program output:\n\n\n" << program_output.str() << "\n\n\n";
+    // Tests
+    REQUIRE(m2(0,0) == -5);
+    REQUIRE(m2(0,1) == -6);
+    REQUIRE(m2(1,0) == -7);
+    REQUIRE(m2(1,1) == -8);
 }
 //-------------------------------------------------------------------
