@@ -417,6 +417,8 @@ inline void bind_matrix_ref(py::module_ &m, const char* name)
         .def("rows", &ReferenceType::rows)
         .def("columns", &ReferenceType::columns)
         .def("size", &ReferenceType::size)
+        .def("__str__", &ReferenceType::to_string)
+        .def("__repr__", &ReferenceType::to_string)
         // Customized "operator()" function for Poco::Dynamic::Var
         .def("__call__", [](const ReferenceType& ref, int64_t row, int64_t col) -> py::object
         {
@@ -500,6 +502,8 @@ inline void bind_matrix_const_ref(py::module_ &m, const char* name)
         .def("rows", &ReferenceType::rows)
         .def("columns", &ReferenceType::columns)
         .def("size", &ReferenceType::size)
+        .def("__str__", &ReferenceType::to_string)
+        .def("__repr__", &ReferenceType::to_string)
         // Customized "operator()" function for Poco::Dynamic::Var
         .def("__call__", [](const ReferenceType& ref, int64_t row, int64_t col) -> py::object
         {
@@ -556,6 +560,8 @@ inline void bind_matrix3d_ref(py::module_ &m, const char* name)
         .def("rows", &ReferenceType::rows)
         .def("columns", &ReferenceType::columns)
         .def("size", &ReferenceType::size)
+        .def("__str__", &ReferenceType::to_string)
+        .def("__repr__", &ReferenceType::to_string)
         // Customized "operator()" function for Poco::Dynamic::Var
         .def("__call__", [](const ReferenceType& ref, int64_t page, int64_t row, int64_t col) -> py::object
         {
@@ -640,6 +646,8 @@ inline void bind_matrix3d_const_ref(py::module_ &m, const char* name)
         .def("rows", &ReferenceType::rows)
         .def("columns", &ReferenceType::columns)
         .def("size", &ReferenceType::size)
+        .def("__str__", &ReferenceType::to_string)
+        .def("__repr__", &ReferenceType::to_string)
         // Customized "operator()" function for Poco::Dynamic::Var
         .def("__call__", [](const ReferenceType& ref, int64_t page, int64_t row, int64_t col) -> py::object
         {
@@ -687,10 +695,12 @@ inline void bind_factory_functions_and_matrix_types(py::module_ &m)
     bind_factory_functions(m);
 
     bind_matrix_ref<LazyMatrix::SharedMatrixRef<LazyMatrix::Data<Poco::Dynamic::Var>>>(m, "Matrix");
-    bind_matrix_const_ref<LazyMatrix::ConstSharedMatrixRef<LazyMatrix::ConstData<Poco::Dynamic::Var>>>(m, "ConstMatrix");
+    bind_matrix_const_ref<LazyMatrix::ConstSharedMatrixRef<LazyMatrix::Data<Poco::Dynamic::Var>>>(m, "ConstMatrix");
+    bind_matrix_const_ref<LazyMatrix::ConstSharedMatrixRef<LazyMatrix::ConstData<Poco::Dynamic::Var>>>(m, "ConstMatrix2");
 
     bind_matrix3d_ref<LazyMatrix::SharedMatrix3DRef<LazyMatrix::Data3D<Poco::Dynamic::Var>>>(m, "Matrix3D");
-    bind_matrix3d_const_ref<LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::ConstData3D<Poco::Dynamic::Var>>>(m, "ConstMatrix3D");
+    bind_matrix3d_const_ref<LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::Data3D<Poco::Dynamic::Var>>>(m, "ConstMatrix3D");
+    bind_matrix3d_const_ref<LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::ConstData3D<Poco::Dynamic::Var>>>(m, "ConstMatrix3D2");
 }
 //-------------------------------------------------------------------
 
@@ -859,71 +869,17 @@ private:
 
 //-------------------------------------------------------------------
 /**
- * \brief Creates a vector of named matrix references suitable for Python script execution.
- *
- * This overloaded function handles cases where at least one matrix is provided. It generates 
- * a vector containing pairs of matrix names and references. The names are automatically 
- * assigned based on the provided prefix followed by a sequential index.
- *
- * \tparam ReferenceType The type of the matrices, ensuring that only matrix types are used.
- * \tparam Matrices Variadic template to handle multiple matrix references.
- * \param prefix A string prefix for naming the matrices (e.g., "in" for input matrices).
- * \param first The first matrix reference.
- * \param rest The rest of the matrix references.
- * \return A vector of pairs of matrix names and matrix references.
- */
-//-------------------------------------------------------------------
-template<typename ReferenceType, typename... Matrices>
-std::vector<std::pair<std::string, ReferenceType&>> create_named_matrix_vector(const std::string& prefix, ReferenceType& first, Matrices&... rest)
-{
-    std::vector<std::pair<std::string, ReferenceType&>> named_matrices;
-    int index = 0;
-
-    auto add_matrix = [&](ReferenceType& matrix)
-    {
-        named_matrices.emplace_back(prefix + std::to_string(index++), matrix);
-    };
-
-    add_matrix(first); // Add the first matrix
-    (add_matrix(rest), ...); // Add the rest of the matrices
-
-    return named_matrices;
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-/**
- * \brief Creates an empty vector of named matrix references.
- *
- * This overloaded function handles cases where no matrices are provided. It simply returns an empty vector.
- * This is useful when you need to provide an empty vector of matrix references to a function or process.
- *
- * \tparam ReferenceType The type of the matrices, ensuring that only matrix types are used.
- * \param prefix A string prefix for naming the matrices. This is not used but is kept for function signature consistency.
- * \return An empty vector of pairs of matrix names and matrix references.
- */
-//-------------------------------------------------------------------
-template<typename ReferenceType>
-std::vector<std::pair<std::string, ReferenceType&>> create_named_matrix_vector(const std::string& prefix)
-{
-    return {}; // Return an empty vector
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
-/**
- * \brief Executes a Python script with given input and output matrices.
- *
- * \tparam ReferenceType The type of the matrices, which must be a matrix type.
- * \param input_matrices Vector of pairs of matrix names and references to matrix objects for input.
- * \param output_matrices Vector of pairs of matrix names and references to matrix objects for output.
- * \param script The Python script to execute.
- * \param module_name The Python module to import before executing the python script
- * \return The standard output captured from the Python script.
+ * @brief This function executes a python script.
+ * 
+ * The function executes the user supplied python script and adds local
+ * variables for input matrices and output matrices that are supplied
+ * to this function via vectors.
+ * 
+ * @tparam ReferenceType The type of shared matrix references
+ * @param input_matrices
+ * @param output_matrices
+ * @param script
+ * @param module_name
  */
 //-------------------------------------------------------------------
 template<typename ReferenceType,
@@ -934,42 +890,53 @@ std::string execute_python_script(const std::vector<ReferenceType>& input_matric
                                   const std::string& script,
                                   const std::string& module_name)
 {
-    std::stringstream python_script_output;
 
-    try {
-        // This captures the output of std::cout, std::cerr
-        // and python out/err
-        PythonStdOutErrStreamRedirect python_output_redirect;
+    py::scoped_interpreter guard{};
 
-        pybind11::dict locals;
-        pybind11::module py_module = pybind11::module::import(module_name.c_str());
+    py::module m = py::module_::import(module_name.c_str());
+    py::dict globals = py::globals();
+    py::dict locals;
 
-        // Automatically assign names to input matrices and expose them to Python
-        for (size_t i = 0; i < input_matrices.size(); ++i) {
-            locals[("in" + std::to_string(i)).c_str()] = pybind11::cast(input_matrices[i]);
-        }
-
-        // Automatically assign names to output matrices and expose them to Python
-        for (size_t i = 0; i < output_matrices.size(); ++i) {
-            locals[("out" + std::to_string(i)).c_str()] = pybind11::cast(output_matrices[i]);
-        }
-
-        // Execute the Python script
-        pybind11::exec(script, py_module.attr("__dict__"), locals);
-
-        // Capture the python script output
-        python_script_output << python_output_redirect.get_captured_output();
-    }
-    catch (const std::exception& e)
+    // Expose input matrices
+    for(size_t i = 0; i < input_matrices.size(); ++i)
     {
-        python_script_output << "C++ Exception: " << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        python_script_output << "Unexpected Exception" << std::endl;
+        std::string var_name = "in" + std::to_string(i);
+        locals[var_name.c_str()] = py::cast(input_matrices[i]);
     }
 
-    return python_script_output.str();
+    // Expose output matrices
+    for(size_t i = 0; i < output_matrices.size(); ++i)
+    {
+        std::string var_name = "out" + std::to_string(i);
+        locals[var_name.c_str()] = py::cast(output_matrices[i]);
+    }
+
+    std::stringstream output;
+    
+    try
+    {
+        // Redirect std::cout, std::cerr, and Python's sys.stdout, sys.stderr
+        LazyMatrix::PythonStdOutErrStreamRedirect redirector;
+
+        py::exec(script, globals, locals);
+
+        // Capture the output
+        output << redirector.get_captured_output();
+    }
+    catch(py::error_already_set& e)
+    {
+        output << "Python error: " << e.what() << std::endl;
+    }
+    catch(const std::exception& e)
+    {
+        output << "C++ exception: " << e.what() << std::endl;
+    }
+    catch(...)
+    {
+        output << "An unknown exception occurred." << std::endl;
+    }
+
+    return output.str();
 }
 //-------------------------------------------------------------------
 

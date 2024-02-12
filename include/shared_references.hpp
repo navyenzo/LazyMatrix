@@ -29,6 +29,12 @@
 #include <memory>
 #include <type_traits>
 
+#include <Poco/Data/Session.h>
+#include <Poco/Data/RecordSet.h>
+#include <Poco/Dynamic/Var.h>
+#include <Poco/Dynamic/Struct.h>
+#include <Poco/Data/Statement.h>
+
 #include "base_matrix.hpp"
 #include "base_matrix3d.hpp"
 #include "numerical_constants.hpp"
@@ -149,6 +155,45 @@ public:
     MatrixType* operator->()
     {
         return ptr_.get();
+    }
+
+    std::string to_string() const
+    {
+        uintptr_t number_of_rows = this->rows();
+        uintptr_t number_of_columns = this->columns();
+
+        std::stringstream os;
+
+        os << "(" << number_of_rows << "x" << number_of_columns << ")\n";
+
+        for(int i = 0; i < number_of_rows; ++i)
+        {
+            for(int j = 0; j < number_of_columns - 1; ++j)
+            {
+                if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+                {
+                    os << ptr_->at(i,j).toString() << ",";
+                }
+                else
+                {
+                    os << ptr_->at(i,j) << ",";
+                }
+            }
+
+            if(number_of_columns > 0)
+            {
+                if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+                {
+                    os << ptr_->at(i,number_of_columns - 1).toString() << "\n";
+                }
+                else
+                {
+                    os << ptr_->at(i,number_of_columns - 1) << "\n";
+                }
+            }
+        }
+
+        return os.str();
     }
 
     /**
@@ -569,6 +614,59 @@ public:
     {
         return ptr_.get();
     }
+
+
+
+
+
+
+
+
+
+    std::string to_string() const
+    {
+        uintptr_t number_of_pages = this->pages();
+        uintptr_t number_of_rows = this->rows();
+        uintptr_t number_of_columns = this->columns();
+
+        std::stringstream os;
+
+        os << "(" << number_of_pages << "x" << number_of_rows << "x" << number_of_columns << ")\n";
+
+        for(int64_t k = 0; k < number_of_pages; ++k)
+        {
+            for(int i = 0; i < number_of_rows; ++i)
+            {
+                for(int j = 0; j < number_of_columns - 1; ++j)
+                {
+                    if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+                    {
+                        os << ptr_->at(k,i,j).toString() << ",";
+                    }
+                    else
+                    {
+                        os << ptr_->at(k,i,j) << ",";
+                    }
+                }
+
+                if(number_of_columns > 0)
+                {
+                    if constexpr (std::is_same_v<value_type, Poco::Dynamic::Var>)
+                    {
+                        os << ptr_->at(k,i,number_of_columns - 1).toString() << "\n";
+                    }
+                    else
+                    {
+                        os << ptr_->at(k,i,number_of_columns - 1) << "\n";
+                    }
+                }
+            }
+        }
+
+        return os.str();
+    }
+
+
 
     /**
      * @brief Forwards the call to the pages() method of the underlying matrix.

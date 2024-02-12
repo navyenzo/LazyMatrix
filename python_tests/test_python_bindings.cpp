@@ -38,27 +38,9 @@ namespace py = pybind11;
 
 
 //-------------------------------------------------------------------
-// Template function to bind the output operator
-//-------------------------------------------------------------------
-template<typename MatrixType>
-void print_matrix(const MatrixType& matrix)
-{
-    std::cout << matrix << std::endl;
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 PYBIND11_EMBEDDED_MODULE(lazymatrix, m)
 {
     LazyMatrix::bind_factory_functions_and_matrix_types(m);
-
-    m.def("print_matrix", &print_matrix<LazyMatrix::SharedMatrixRef<LazyMatrix::Data<Poco::Dynamic::Var>>>);
-    m.def("print_const_matrix", &print_matrix<LazyMatrix::ConstSharedMatrixRef<LazyMatrix::ConstData<Poco::Dynamic::Var>>>);
-
-    m.def("print_matrix3d", &print_matrix<LazyMatrix::SharedMatrix3DRef<LazyMatrix::Data3D<Poco::Dynamic::Var>>>);
-    m.def("print_const_matrix3d", &print_matrix<LazyMatrix::ConstSharedMatrix3DRef<LazyMatrix::ConstData3D<Poco::Dynamic::Var>>>);
 }
 //-------------------------------------------------------------------
 
@@ -67,39 +49,50 @@ PYBIND11_EMBEDDED_MODULE(lazymatrix, m)
 //-------------------------------------------------------------------
 TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
 {
+    std::stringstream program_output;
+
     // Initialize the Python interpreter.
     py::scoped_interpreter guard{};
 
-    std::string program_output;
+    // Example input and output matrices setup
+    auto m_iota = LazyMatrix::generate_iota_matrix<double>(3,3,0,1);
+    auto m1 = LazyMatrix::wrap_matrix_const(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(3,3));
+    auto m2 = LazyMatrix::wrap_matrix(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(3,3));
 
     try
     {
-        // Define the Python script to be executed
+        // This captures the output of std::cout, std::cerr
+        // and python out/err
+        LazyMatrix::PythonStdOutErrStreamRedirect python_output_redirect;
+
+        pybind11::dict locals;
+        pybind11::module py_module = pybind11::module::import("lazymatrix");
+
+        locals["in0"] = m1;
+        locals["out0"] = m2;
+
+
         std::string python_script =
             "import lazymatrix\n"
-            "print('Creating matrices using factory functions:\\n')\n"
-            "matrix1 = lazymatrix.MatrixFactory.create_matrix(3, 3)\n"
-            "matrix1.set_circ_at(0,0,-2)\n"
-            "matrix1.set_circ_at(-1,-1, 'hello')\n"
-            "matrix2 = lazymatrix.MatrixFactory.create_matrix(2, 4)\n"
-            "print('Matrix 1 (double):')\n"
-            "lazymatrix.print_matrix(matrix1)\n"
-            "print('Matrix 2 (float):')\n"
-            "lazymatrix.print_matrix(matrix2)\n";
-
-        // Redirect Python's stdout and stderr to C++
-        LazyMatrix::PythonStdOutErrStreamRedirect output_redirect;
+            "print('in0:', flush=True)\n"
+            "print(in0)\n"
+            "print('out0:', flush=True)\n"
+            "print(out0)\n"
+            "print('about to change value m2(0,0) = -5', flush=True)\n"
+            "out0.set_at(0,0,-5)\n"
+            "print('out0 (after modification):', flush=True)\n"
+            "print(out0)\n";
 
         // Execute the Python script
-        py::exec(python_script);
+        pybind11::exec(python_script, py_module.attr("__dict__"), locals);
 
-        // Output the script execution result
-        program_output = output_redirect.get_captured_output();
+        // Capture the python script output
+        program_output << python_output_redirect.get_captured_output();
     }
     catch (const py::error_already_set& e)
     {
         // Handle exceptions thrown by the Python interpreter
-        std::cerr << "Python error: " << e.what() << std::endl;
+        program_output << "Python error: " << e.what() << std::endl;
     }
     catch (const std::exception& e)
     {
@@ -109,9 +102,9 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
     catch (...)
     {
         // Catch-all for other exceptions
-        std::cerr << "An unknown exception occurred." << std::endl;
+        program_output << "An unknown exception occurred." << std::endl;
     }
 
-    std::cout << "Program output:\n\n\n" << program_output << "\n\n\n";
+    std::cout << "Program output:\n\n\n" << program_output.str() << "\n\n\n";
 }
 //-------------------------------------------------------------------
