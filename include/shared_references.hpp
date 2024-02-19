@@ -1041,6 +1041,120 @@ struct is_matrix3d_reference<SharedMatrix3DRef<T>> : is_type_a_matrix3d<T>
 
 
 //-------------------------------------------------------------------
+/**
+ * @brief Evaluates Source expression into Destination matrix.
+ * 
+ * This function evaluates the source expression and stores the resulting
+ * values into the destination matrix.
+ * If the source expression is just a matrix storage it simply copies
+ * its entries into the destination matrix.
+ * 
+ * @tparam ReferenceType1
+ * @tparam ReferenceType2
+ * @param source_matrix The marix expression to evaluate.
+ * @param destination_matrix The matrix storage where we store the evaluated values.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix_reference<ReferenceType2>{}>* = nullptr>
+
+inline std::error_code evaluate(ReferenceType1 source_matrix,
+                                ReferenceType2 destination_matrix)
+{
+    if constexpr (has_non_const_access<ReferenceType2>::value)
+    {
+        uintptr_t rows = source_matrix.rows();
+        uintptr_t columns = source_matrix.columns();
+
+        std::error_code error = destination_matrix.resize(rows, columns);
+
+        if(error)
+            return error;
+
+        for(int i = 0; i < rows; ++i)
+        {
+            for(int j = 0; j < columns; ++j)
+            {
+                destination_matrix(i,j) = source_matrix(i,j);
+            }
+        }
+
+        return error;
+    }
+    else
+    {
+        // In this case, the user supplied a constant destionation
+        // matrix that we cannot resize or assign things to, so we
+        // return an error
+        return std::make_error_code(std::errc::not_supported);
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+/**
+ * @brief Evaluates Source expression into Destination matrix.
+ * 
+ * This function evaluates the source expression and stores the resulting
+ * values into the destination matrix.
+ * If the source expression is just a matrix storage it simply copies
+ * its entries into the destination matrix.
+ * 
+ * @tparam ReferenceType1
+ * @tparam ReferenceType2
+ * @param source_matrix The marix expression to evaluate.
+ * @param destination_matrix The matrix storage where we store the evaluated values.
+ */
+//-------------------------------------------------------------------
+template<typename ReferenceType1,
+         typename ReferenceType2,
+         std::enable_if_t<is_matrix3d_reference<ReferenceType1>{}>* = nullptr,
+         std::enable_if_t<is_matrix3d_reference<ReferenceType2>{}>* = nullptr>
+
+inline std::error_code evaluate(ReferenceType1 source_matrix,
+                                ReferenceType2 destination_matrix)
+{
+    if constexpr (has_non_const_access<ReferenceType2>::value)
+    {
+        uintptr_t pages = source_matrix.pages();
+        uintptr_t rows = source_matrix.rows();
+        uintptr_t columns = source_matrix.columns();
+
+        std::error_code error = destination_matrix.resize(pages, rows, columns);
+
+        if(error)
+            return error;
+
+        for(int k = 0; k < pages; ++k)
+        {
+            for(int i = 0; i < rows; ++i)
+            {
+                for(int j = 0; j < columns; ++j)
+                {
+                    destination_matrix(k,i,j) = source_matrix(k,i,j);
+                }
+            }
+        }
+
+        return error;
+    }
+    else
+    {
+        // In this case, the user supplied a constant destionation
+        // matrix that we cannot resize or assign things to, so we
+        // return an error
+        return std::make_error_code(std::errc::not_supported);
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 } // namespace LazyMatrix
 //-------------------------------------------------------------------
 
