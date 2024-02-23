@@ -16,23 +16,17 @@ message("CMAKE PREFIX PATH: ${CMAKE_PREFIX_PATH}")
 ###############################################################
 # Check if the MSVC compiler is used
 if(MSVC)
-  message("adding /bigobj compile option")
+  # Apply MSVC-specific flags
   add_compile_options(/bigobj)
+else()
+  # Apply flags for other compilers if necessary
+  # GCC or Clang specific flags can go here
 endif()
 
 # Compiler options
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 # set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3")
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # Adjust or remove flags for Clang
-    # Here, you don't add /bigobj, so it's effectively "removed" for Clang builds
-    # You can add Clang-specific flags here if necessary
-else()
-    # For MSVC or other compilers, /bigobj is added
-    add_compile_options(/bigobj)
-endif()
 
 # Set the output directory for binaries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
