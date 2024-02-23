@@ -149,6 +149,11 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 
 
 
+# This is generally not recommended unless absolutely necessary
+include_directories("${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include/Poco/Data")
+
+
+
 ###############################################################
 # Linking
 ###############################################################
