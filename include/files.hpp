@@ -25,25 +25,31 @@
 
 //-------------------------------------------------------------------
 #ifdef _WIN32
+    #ifndef NOMINMAX
+        #define NOMINMAX // Prevents the Windows headers from defining min() and max() macros
+    #endif
     #include <io.h>
+    #include <Windows.h> // Make sure to include Windows.h after defining NOMINMAX
 #endif
 
 #include <system_error>
 #include <fstream>
 #include <vector>
+#include <string>
+#include <algorithm>
 
-#if __has_include("filesystem")
+#if __has_include(<filesystem>)
     #include <filesystem>
     namespace fs = std::filesystem;
-#else
+#elif __has_include(<experimental/filesystem>)
     #include <experimental/filesystem>
     namespace fs = std::experimental::filesystem;
+#else
+    #error "No filesystem support"
 #endif
 
 #ifdef __linux__
     #include <unistd.h>
-#else
-    #include <libloaderapi.h>
 #endif
 //-------------------------------------------------------------------
 
@@ -102,13 +108,6 @@ inline fs::path get_absolute_path_of_executable_parent_directory()
 
 
 
-#include <fstream>
-#include <filesystem>
-#include <string>
-#include <system_error>
-
-namespace fs = std::filesystem;
-
 //-------------------------------------------------------------------
 /**
  * @brief Create a file with a specified size and unique name based on a template in a specified directory.
@@ -141,7 +140,8 @@ inline fs::path create_file_with_specified_size_and_unique_name(
     std::string extension_str = filename_template.extension().string(); // Extract extension
 
     size_t found_x = filename_str.find_last_not_of('X');
-    size_t num_x_to_append = (found_x == std::string::npos) ? x_count : std::min(x_count, x_count - (filename_str.length() - found_x - 1));
+    //size_t num_x_to_append = (found_x == std::string::npos) ? x_count : std::min(x_count, x_count - (filename_str.length() - found_x - 1));
+    size_t num_x_to_append = (found_x == std::string::npos) ? x_count : (std::min)(x_count, x_count - (filename_str.length() - found_x - 1));
     filename_str.append(num_x_to_append, 'X');
 
     // Reassemble the filename with the extension

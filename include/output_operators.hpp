@@ -197,21 +197,21 @@ inline std::ostream& operator<<(std::ostream& out, const dlib::hsi_pixel& pixel)
  * @return std::ostream& The output stream.
  */
 //-------------------------------------------------------------------
-inline std::ostream& operator<<(std::ostream& out, const dlib::hsv_pixel& pixel)
-{
-    if constexpr (std::is_same_v<decltype(pixel.h), unsigned char>)
-    {
-        return out << "(" << static_cast<int>(pixel.h) << ", "
-                   << static_cast<int>(pixel.s) << ", "
-                   << static_cast<int>(pixel.v) << ")";
-    }
-    else
-    {
-        return out << "(" << pixel.h << ", "
-                   << pixel.s << ", "
-                   << pixel.v << ")";
-    }
-}
+// inline std::ostream& operator<<(std::ostream& out, const dlib::hsv_pixel& pixel)
+// {
+//     if constexpr (std::is_same_v<decltype(pixel.h), unsigned char>)
+//     {
+//         return out << "(" << static_cast<int>(pixel.h) << ", "
+//                    << static_cast<int>(pixel.s) << ", "
+//                    << static_cast<int>(pixel.v) << ")";
+//     }
+//     else
+//     {
+//         return out << "(" << pixel.h << ", "
+//                    << pixel.s << ", "
+//                    << pixel.v << ")";
+//     }
+// }
 //-------------------------------------------------------------------
 
 

@@ -74,7 +74,7 @@ template<> struct is_valid_dlib_pixel_type<dlib::bgr_pixel> : std::true_type {};
 template<> struct is_valid_dlib_pixel_type<dlib::rgb_alpha_pixel> : std::true_type {};
 template<> struct is_valid_dlib_pixel_type<dlib::bgr_alpha_pixel> : std::true_type {};
 template<> struct is_valid_dlib_pixel_type<dlib::hsi_pixel> : std::true_type {};
-template<> struct is_valid_dlib_pixel_type<dlib::hsv_pixel> : std::true_type {};
+//template<> struct is_valid_dlib_pixel_type<dlib::hsv_pixel> : std::true_type {};
 template<> struct is_valid_dlib_pixel_type<dlib::lab_pixel> : std::true_type {};
 
 // Specialize for common grayscale types
