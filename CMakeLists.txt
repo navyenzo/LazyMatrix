@@ -187,6 +187,7 @@ find_package(Poco CONFIG REQUIRED COMPONENTS
     Net
     NetSSL
     Crypto
+    DataSQLite
     Data
     JSON
     XML
@@ -200,7 +201,8 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
     Poco::Net
     Poco::NetSSL
     Poco::Crypto
-    Poco::Data  # This should cover DataSQLite, DataODBC, etc.
+    Poco::DataSQLite
+    Poco::Data
     Poco::JSON
     Poco::XML
     Poco::MongoDB
