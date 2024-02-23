@@ -5,13 +5,28 @@ project(LazyMatrix VERSION 1.0)
 # Print the current build type/target
 message(STATUS "Current Built Type for project LazyMatrix: ${CMAKE_BUILD_TYPE}")
 
+message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
+message(STATUS "Using VCPKG_TARGET_TRIPLET: ${VCPKG_TARGET_TRIPLET}")
+
+set(CMAKE_PREFIX_PATH "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}" ${CMAKE_PREFIX_PATH})
+message("CMAKE PREFIX PATH: ${CMAKE_PREFIX_PATH}")
+
 
 
 ###############################################################
+# Check if the MSVC compiler is used
+if(MSVC)
+  # Apply MSVC-specific flags
+  add_compile_options(/bigobj)
+else()
+  # Apply flags for other compilers if necessary
+  # GCC or Clang specific flags can go here
+endif()
+
 # Compiler options
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3")
+# set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3")
 
 # Set the output directory for binaries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -46,50 +61,6 @@ FetchContent_MakeAvailable(mio)
 
 
 ###############################################################
-# NOTE: This library depends on both Poco libraries (for databases)
-#       as well as Eigen library for Matrix and advanced mathematical
-#       functions. Poco library defines an "uninstall" target and
-#       Eigen library defines an "uninstall" target only if one has
-#       not already been defined.  This means that in order to
-#       bring in Poco and Eigen libraries using FetchContent, Poco
-#       library has to be fetched before eigen library
-###############################################################
-
-
-
-###############################################################
-# Poco library
-###############################################################
-# Include the FetchContent module
-include(FetchContent)
-
-# Declare the FetchContent for Poco
-FetchContent_Declare(
-  Poco
-  GIT_REPOSITORY https://github.com/pocoproject/poco.git
-  GIT_TAG devel
-)
-
-# Set the Poco specific arguments before calling FetchContent_MakeAvailable
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE INTERNAL "")
-set(ENABLE_FOUNDATION ON CACHE INTERNAL "")
-set(ENABLE_DATA ON CACHE INTERNAL "")
-set(ENABLE_DATA_ODBC ON CACHE INTERNAL "")
-set(ENABLE_DATA_SQLITE ON CACHE INTERNAL "")
-set(ENABLE_DATA_MYSQL ON CACHE INTERNAL "")
-set(ENABLE_DATA_POSTGRESQL ON CACHE INTERNAL "")
-set(ENABLE_ZIP ON CACHE INTERNAL "")
-set(ENABLE_PAGECOMPILER ON CACHE INTERNAL "")
-set(ENABLE_PAGECOMPILER_FILE2PAGE ON CACHE INTERNAL "")
-
-# Make Poco available for the current project
-FetchContent_MakeAvailable(Poco)
-###############################################################
-
-
-
-###############################################################
 # ExprTk library for evaluating expression writtent in text
 ###############################################################
 FetchContent_Declare(
@@ -99,19 +70,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(exprtk)
-###############################################################
-
-
-
-###############################################################
-# eigen library
-###############################################################
-FetchContent_Declare(
-  eigen
-  GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-  GIT_TAG master
-)
-FetchContent_MakeAvailable(eigen)
 ###############################################################
 
 
@@ -129,79 +87,23 @@ FetchContent_MakeAvailable(xoshiro)
 
 
 
-###############################################################
-# dlib library
-###############################################################
-# Enable position independent code
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# ###############################################################
+# # SQLParser library (needed for Poco library)
+# ###############################################################
+# FetchContent_Declare(
+#   sqlparser
+#   GIT_REPOSITORY https://github.com/hyrise/sql-parser.git
+#   GIT_TAG master
+# )
+# FetchContent_MakeAvailable(sqlparser)
 
-# Fetch dlib library
-FetchContent_Declare(
-    dlib
-    GIT_REPOSITORY https://github.com/davisking/dlib.git
-    GIT_TAG master
-    CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-)
+# include_directories(${CMAKE_BINARY_DIR}/_deps)
 
-# Adjust CMAKE_CXX_FLAGS for dlib based on the build type
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(DLIB_ENABLE_ASSERTS_FLAG "-DENABLE_ASSERTS")
-else()
-    set(DLIB_ENABLE_ASSERTS_FLAG "")
-endif()
-
-# Set required definitions for dlib image support
-set(DLIB_PNG_SUPPORT ON CACHE BOOL "Enable PNG support in dlib" FORCE)
-set(DLIB_JPEG_SUPPORT ON CACHE BOOL "Enable JPEG support in dlib" FORCE)
-set(DLIB_GIF_SUPPORT ON CACHE BOOL "Enable GIF support in dlib" FORCE)
-
-# Fetch and add dlib
-FetchContent_GetProperties(dlib)
-if(NOT dlib_POPULATED)
-    FetchContent_Populate(dlib)
-    add_subdirectory(${dlib_SOURCE_DIR} ${dlib_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
-
-add_library(dlib_custom INTERFACE)
-target_include_directories(dlib_custom INTERFACE ${dlib_SOURCE_DIR}/include)
-target_compile_options(dlib_custom INTERFACE ${DLIB_ENABLE_ASSERTS_FLAG})
-target_link_libraries(dlib_custom INTERFACE dlib::dlib)
-###############################################################
-
-
-
-
-###############################################################
-# pybind11 (For creating python interfaces to LazyMatrix objects)
-###############################################################
-FetchContent_Declare(
-  pybind11
-  GIT_REPOSITORY https://github.com/pybind/pybind11.git
-  GIT_TAG        master
-)
-
-FetchContent_MakeAvailable(pybind11)
-###############################################################
-
-
-
-###############################################################
-# SQLParser library (needed for Poco library)
-###############################################################
-FetchContent_Declare(
-  sqlparser
-  GIT_REPOSITORY https://github.com/hyrise/sql-parser.git
-  GIT_TAG master
-)
-FetchContent_MakeAvailable(sqlparser)
-
-include_directories(${CMAKE_BINARY_DIR}/_deps)
-
-# Copy the "sql-parser-src" to the "sql-parser" directory as
-# this is needed for the Poco library
-file(COPY ${CMAKE_BINARY_DIR}/_deps/sqlparser-src/src 
-     DESTINATION ${CMAKE_BINARY_DIR}/_deps/sql-parser)
-###############################################################
+# # Copy the "sql-parser-src" to the "sql-parser" directory as
+# # this is needed for the Poco library
+# file(COPY ${CMAKE_BINARY_DIR}/_deps/sqlparser-src/src 
+#      DESTINATION ${CMAKE_BINARY_DIR}/_deps/sql-parser)
+# ###############################################################
 
 
 
@@ -241,11 +143,17 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 
 
 
+# This is generally not recommended unless absolutely necessary
+include_directories("${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include/Poco/Data")
+
+
+
 ###############################################################
 # Linking
 ###############################################################
-# Linking dlib_custom to LazyMatrix
-target_link_libraries(LazyMatrix INTERFACE dlib_custom)
+# Linking dlib
+find_package(dlib CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
 
 # Find the required libraries for non-vcpkg (particularly on Linux)
 find_package(ZLIB REQUIRED MODULE)
@@ -267,49 +175,48 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
     LazyMatrix_GIF
 )
 
-# Link to Poco libraries
-target_link_libraries(${PROJECT_NAME} INTERFACE
-    Poco::Prometheus
-    Poco::Encodings
-    Poco::JWT
-    Poco::Zip
-    Poco::ActiveRecord
-    Poco::MongoDB
-    Poco::DataPostgreSQL
-    Poco::DataMySQL
-    Poco::DataODBC
-    Poco::DataSQLite
-    Poco::Data
-    Poco::Redis
-    Poco::JSON
-    Poco::XML
-    Poco::Util
-    Poco::NetSSL
-    Poco::Crypto
-    Poco::Net
-    Poco::Foundation
+# Link to Eigen library
+find_package(Eigen3 CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} INTERFACE Eigen3::Eigen)
+
+# Find the Poco libraries
+find_package(Poco CONFIG REQUIRED COMPONENTS
+    Foundation
+    Util
+    Net
+    NetSSL
+    Crypto
+    DataSQLite
+    Data
+    JSON
+    XML
+    MongoDB
+    Redis
 )
 
-# Link against libdl
-target_link_libraries(${PROJECT_NAME} INTERFACE dl)
+target_link_libraries(${PROJECT_NAME} INTERFACE
+    Poco::Foundation
+    Poco::Util
+    Poco::Net
+    Poco::NetSSL
+    Poco::Crypto
+    Poco::DataSQLite
+    Poco::Data
+    Poco::JSON
+    Poco::XML
+    Poco::MongoDB
+    Poco::Redis
+)
+
+if(UNIX AND NOT APPLE)
+    # Link against libdl only on UNIX-like systems (excluding macOS)
+    target_link_libraries(${PROJECT_NAME} INTERFACE dl)
+endif()
 
 # Find the required libraries for non-vcpkg (particularly on Linux)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-
-# Link python libraries to LazyMatrix
-target_link_libraries(${PROJECT_NAME} INTERFACE Python3::Python Python3::Module)
-###############################################################
-
-
-
-###############################################################
-# Linker options for Windows or other platforms
-###############################################################
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME} INTERFACE stdc++fs)
-else()
-    target_link_libraries(${PROJECT_NAME} INTERFACE stdc++fs pthread)
-endif()
+find_package(pybind11 CONFIG)
+target_link_libraries(${PROJECT_NAME} INTERFACE pybind11::pybind11 Python3::Python Python3::Module)
 ###############################################################
 
 
