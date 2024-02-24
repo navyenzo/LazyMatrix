@@ -104,6 +104,37 @@ add_dependencies(${PROJECT_NAME} Poco)
 
 
 ###############################################################
+# Find all required packages
+###############################################################
+find_package(dlib CONFIG REQUIRED)
+
+find_package(ZLIB REQUIRED MODULE)
+find_package(PNG REQUIRED MODULE)
+find_package(JPEG REQUIRED MODULE)
+find_package(GIF REQUIRED MODULE)
+
+# Create alias targets for each dependency
+add_library(LazyMatrix_ZLIB ALIAS ZLIB::ZLIB)
+add_library(LazyMatrix_PNG ALIAS PNG::PNG)
+add_library(LazyMatrix_JPEG ALIAS JPEG::JPEG)
+add_library(LazyMatrix_GIF ALIAS GIF::GIF)
+
+find_package(Eigen3 CONFIG REQUIRED)
+
+
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(pybind11 CONFIG)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+find_package(Poco CONFIG REQUIRED COMPONENTS Foundation Util Net NetSSL Crypto DataSQLite Data JSON XML MongoDB Redis)
+get_target_property(PocoFoundationIncludeDirs Poco::Foundation INTERFACE_INCLUDE_DIRECTORIES)
+###############################################################
+
+
+
+###############################################################
 # Specify the include directories for the interface library
 ###############################################################
 target_include_directories(${PROJECT_NAME} INTERFACE 
@@ -116,7 +147,9 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
     ${pybind11_SOURCE_DIR}/include
-    "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include/Poco/Data"
+    ${Poco_INCLUDE_DIRS}
+    "${PocoFoundationIncludeDirs}"
+    "${PocoFoundationIncludeDirs}/Poco/Data"
     include_directories(${Python3_INCLUDE_DIRS})
 )
 ###############################################################
@@ -126,81 +159,21 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 ###############################################################
 # Linking
 ###############################################################
-# Linking dlib
-find_package(dlib CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
 
-# Find the required libraries for non-vcpkg (particularly on Linux)
-find_package(ZLIB REQUIRED MODULE)
-find_package(PNG REQUIRED MODULE)
-find_package(JPEG REQUIRED MODULE)
-find_package(GIF REQUIRED MODULE)
+target_link_libraries(${PROJECT_NAME} INTERFACE LazyMatrix_ZLIB LazyMatrix_PNG LazyMatrix_JPEG LazyMatrix_GIF)
 
-# Create alias targets for each dependency
-add_library(LazyMatrix_ZLIB ALIAS ZLIB::ZLIB)
-add_library(LazyMatrix_PNG ALIAS PNG::PNG)
-add_library(LazyMatrix_JPEG ALIAS JPEG::JPEG)
-add_library(LazyMatrix_GIF ALIAS GIF::GIF)
-
-# Link the alias libraries to LazyMatrix
-target_link_libraries(${PROJECT_NAME} INTERFACE 
-    LazyMatrix_ZLIB 
-    LazyMatrix_PNG 
-    LazyMatrix_JPEG 
-    LazyMatrix_GIF
-)
-
-# Link to Eigen library
-find_package(Eigen3 CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Eigen3::Eigen)
 
-# Find the Poco libraries
-find_package(Poco CONFIG REQUIRED COMPONENTS
-    Foundation
-    Util
-    Net
-    NetSSL
-    Crypto
-    DataSQLite
-    Data
-    JSON
-    XML
-    MongoDB
-    Redis
-)
-
-target_link_libraries(${PROJECT_NAME} INTERFACE
-    Poco::Foundation
-    Poco::Util
-    Poco::Net
-    Poco::NetSSL
-    Poco::Crypto
-    Poco::DataSQLite
-    Poco::Data
-    Poco::JSON
-    Poco::XML
-    Poco::MongoDB
-    Poco::Redis
-)
+target_link_libraries(${PROJECT_NAME} INTERFACE Poco::Foundation Poco::Util Poco::Net Poco::NetSSL Poco::Crypto Poco::DataSQLite Poco::Data Poco::JSON Poco::XML Poco::MongoDB Poco::Redis)
 
 if(UNIX AND NOT APPLE)
     # Link against libdl only on UNIX-like systems (excluding macOS)
     target_link_libraries(${PROJECT_NAME} INTERFACE dl)
 endif()
 
-# Find the required libraries for non-vcpkg (particularly on Linux)
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-find_package(pybind11 CONFIG)
 target_link_libraries(${PROJECT_NAME} INTERFACE pybind11::pybind11 Python3::Python Python3::Module)
-###############################################################
 
-
-
-###############################################################
-# Add threading support
-###############################################################
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
 ###############################################################
 
