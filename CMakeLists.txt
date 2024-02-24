@@ -116,15 +116,10 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
     ${pybind11_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/_deps/poco/include
+    "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include/Poco/Data"
     include_directories(${Python3_INCLUDE_DIRS})
 )
 ###############################################################
-
-
-
-# This is generally not recommended unless absolutely necessary
-include_directories("${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include/Poco/Data")
 
 
 
