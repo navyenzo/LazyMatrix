@@ -87,26 +87,6 @@ FetchContent_MakeAvailable(xoshiro)
 
 
 
-# ###############################################################
-# # SQLParser library (needed for Poco library)
-# ###############################################################
-# FetchContent_Declare(
-#   sqlparser
-#   GIT_REPOSITORY https://github.com/hyrise/sql-parser.git
-#   GIT_TAG master
-# )
-# FetchContent_MakeAvailable(sqlparser)
-
-# include_directories(${CMAKE_BINARY_DIR}/_deps)
-
-# # Copy the "sql-parser-src" to the "sql-parser" directory as
-# # this is needed for the Poco library
-# file(COPY ${CMAKE_BINARY_DIR}/_deps/sqlparser-src/src 
-#      DESTINATION ${CMAKE_BINARY_DIR}/_deps/sql-parser)
-# ###############################################################
-
-
-
 ###############################################################
 # Define LazyMatrix as an interface library
 ###############################################################
