@@ -6,9 +6,6 @@
 # Ignore build folder
 build/
 
-# Ignore .vscode folder
-.vscode/*
-
 # Node artifact files
 node_modules/
 dist/
