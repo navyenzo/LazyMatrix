@@ -95,6 +95,38 @@ FetchContent_MakeAvailable(xoshiro)
 
 
 ###############################################################
+# Poco library
+###############################################################
+# Include the FetchContent module
+include(FetchContent)
+
+# Declare the FetchContent for Poco
+FetchContent_Declare(
+  Poco
+  GIT_REPOSITORY https://github.com/pocoproject/poco.git
+  GIT_TAG devel
+)
+
+# Set the Poco specific arguments before calling FetchContent_MakeAvailable
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE INTERNAL "")
+set(ENABLE_FOUNDATION ON CACHE INTERNAL "")
+set(ENABLE_DATA ON CACHE INTERNAL "")
+set(ENABLE_DATA_ODBC ON CACHE INTERNAL "")
+set(ENABLE_DATA_SQLITE ON CACHE INTERNAL "")
+set(ENABLE_DATA_MYSQL ON CACHE INTERNAL "")
+set(ENABLE_DATA_POSTGRESQL ON CACHE INTERNAL "")
+set(ENABLE_ZIP ON CACHE INTERNAL "")
+set(ENABLE_PAGECOMPILER ON CACHE INTERNAL "")
+set(ENABLE_PAGECOMPILER_FILE2PAGE ON CACHE INTERNAL "")
+
+# Make Poco available for the current project
+FetchContent_MakeAvailable(Poco)
+###############################################################
+
+
+
+###############################################################
 # Define LazyMatrix as an interface library
 ###############################################################
 add_library(${PROJECT_NAME} INTERFACE)
@@ -135,8 +167,8 @@ find_package(pybind11 CONFIG)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-find_package(Poco CONFIG REQUIRED COMPONENTS Foundation Util Net NetSSL Crypto DataSQLite Data JSON XML MongoDB Redis)
-get_target_property(PocoFoundationIncludeDirs Poco::Foundation INTERFACE_INCLUDE_DIRECTORIES)
+# find_package(Poco CONFIG REQUIRED COMPONENTS Foundation Util Net NetSSL Crypto DataSQLite Data JSON XML MongoDB Redis)
+# get_target_property(PocoFoundationIncludeDirs Poco::Foundation INTERFACE_INCLUDE_DIRECTORIES)
 ###############################################################
 
 
@@ -172,7 +204,30 @@ target_link_libraries(${PROJECT_NAME} INTERFACE LazyMatrix_ZLIB LazyMatrix_PNG L
 
 target_link_libraries(${PROJECT_NAME} INTERFACE Eigen3::Eigen)
 
-target_link_libraries(${PROJECT_NAME} INTERFACE Poco::Foundation Poco::Util Poco::Net Poco::NetSSL Poco::Crypto Poco::DataSQLite Poco::Data Poco::JSON Poco::XML Poco::MongoDB Poco::Redis)
+# target_link_libraries(${PROJECT_NAME} INTERFACE Poco::Foundation Poco::Util Poco::Net Poco::NetSSL Poco::Crypto Poco::DataSQLite Poco::Data Poco::JSON Poco::XML Poco::MongoDB Poco::Redis)
+
+# Link to Poco libraries
+target_link_libraries(${PROJECT_NAME} INTERFACE
+    Poco::Prometheus
+    Poco::Encodings
+    Poco::JWT
+    Poco::Zip
+    Poco::ActiveRecord
+    Poco::MongoDB
+    Poco::DataPostgreSQL
+    Poco::DataMySQL
+    Poco::DataODBC
+    Poco::DataSQLite
+    Poco::Data
+    Poco::Redis
+    Poco::JSON
+    Poco::XML
+    Poco::Util
+    Poco::NetSSL
+    Poco::Crypto
+    Poco::Net
+    Poco::Foundation
+)
 
 if(UNIX AND NOT APPLE)
     # Link against libdl only on UNIX-like systems (excluding macOS)
