@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 
 project(LazyMatrix VERSION 1.0)
 
+# Include toolchain file
+include(toolchains/toolchain.cmake)
+
 # Print the current build type/target
 message(STATUS "Current Built Type for project LazyMatrix: ${CMAKE_BUILD_TYPE}")
 

@@ -8,7 +8,7 @@ set(VCPKG_ROOT $ENV{VCPKG_ROOT} CACHE PATH "Path to vcpkg installation")
 
 # Default triplet values
 set(VCPKG_DEFAULT_TRIPLET_LINUX "x64-linux")
-set(VCPKG_DEFAULT_TRIPLET_WINDOWS "x64-windows-static")
+set(VCPKG_DEFAULT_TRIPLET_WINDOWS "x64-windows-static-release")
 set(VCPKG_DEFAULT_TRIPLET_WINDOWS_MINGW "x64-mingw-static")
 set(VCPKG_DEFAULT_TRIPLET_MAC "x64-osx")
 
