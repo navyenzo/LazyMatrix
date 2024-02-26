@@ -2,18 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(LazyMatrix VERSION 1.0)
 
-# Include toolchain file
-include(toolchains/toolchain.cmake)
-
-# Print the current build type/target
-message(STATUS "Current Built Type for project LazyMatrix: ${CMAKE_BUILD_TYPE}")
-
-message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
-message(STATUS "Using VCPKG_TARGET_TRIPLET: ${VCPKG_TARGET_TRIPLET}")
-
-set(CMAKE_PREFIX_PATH "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}" ${CMAKE_PREFIX_PATH})
-message("CMAKE PREFIX PATH: ${CMAKE_PREFIX_PATH}")
-
 
 
 ###############################################################
@@ -46,6 +34,22 @@ set(EXTERNAL_PROJECT_COMPILER_ARGS
 # These modules are needed for external libraries
 include(FetchContent)
 include(ExternalProject)
+###############################################################
+
+
+
+###############################################################
+# Include toolchain file
+include(toolchains/toolchain.cmake)
+
+# Print the current build type/target
+message(STATUS "Current Built Type for project LazyMatrix: ${CMAKE_BUILD_TYPE}")
+
+message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
+message(STATUS "Using VCPKG_TARGET_TRIPLET: ${VCPKG_TARGET_TRIPLET}")
+
+set(CMAKE_PREFIX_PATH "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}" ${CMAKE_PREFIX_PATH})
+message("CMAKE PREFIX PATH: ${CMAKE_PREFIX_PATH}")
 ###############################################################
 
 
