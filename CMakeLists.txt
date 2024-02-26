@@ -186,9 +186,25 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
     ${pybind11_SOURCE_DIR}/include
-    ${Poco_INCLUDE_DIRS}
-    "${PocoFoundationIncludeDirs}"
-    "${PocoFoundationIncludeDirs}/Poco/Data"
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Foundation/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Data/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Encodings/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/JSON/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/JWT/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/MongoDB/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Net/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/NetSSL_OpenSSL/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/NetSSL_Win/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/PDF/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Prometheus/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Redis/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/SevenZip/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Util/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/Zip/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
+    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
     include_directories(${Python3_INCLUDE_DIRS})
 )
 ###############################################################
