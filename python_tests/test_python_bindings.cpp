@@ -58,6 +58,7 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
     auto m_iota = LazyMatrix::generate_iota_matrix<double>(2,2,0,1);
     auto m1 = LazyMatrix::wrap_matrix_const(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(2,2));
     auto m2 = LazyMatrix::wrap_matrix(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(2,2));
+    auto m3 = LazyMatrix::wrap_matrix(LazyMatrix::MatrixFactory::create_simple_matrix<Poco::Dynamic::Var>(2,2));
 
     try
     {
@@ -70,6 +71,7 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
 
         locals["in0"] = m1;
         locals["out0"] = m2;
+        locals["out1"] = m3;
 
 
         std::string python_script =
@@ -84,7 +86,11 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
             "out0.set_at(1,0,-7)\n"
             "out0.set_at(1,1,-8)\n"
             "print('out0 (after modification):', flush=True)\n"
-            "print(out0)\n";
+            "print(out0)\n"
+            "print('about to set all matrix entries of matrix \"out1\" to a constant value')\n"
+            "out1.set_all_values_to_a_constant(5)\n"
+            "print('out1 (after modification):')\n"
+            "print(out1)";
 
         // Execute the Python script
         pybind11::exec(python_script, py_module.attr("__dict__"), locals);
@@ -113,5 +119,10 @@ TEST_CASE("Python bindings for LazyMatrix", "[python_bindings]")
     REQUIRE(m2(0,1) == -6);
     REQUIRE(m2(1,0) == -7);
     REQUIRE(m2(1,1) == -8);
+
+    REQUIRE(m3(0,0) == 5);
+    REQUIRE(m3(0,1) == 5);
+    REQUIRE(m3(1,0) == 5);
+    REQUIRE(m3(1,1) == 5);
 }
 //-------------------------------------------------------------------

@@ -517,6 +517,15 @@ public:
     {
         return this->ptr_->resize(rows, columns);
     }
+
+    /**
+     * @brief Set all the matrix values to a constant
+     * @param value The value to set all matrix entries to
+     */
+    void set_all_values_to_a_constant(value_type value)
+    {
+        this->ptr_->set_all_values_to_a_constant(value);
+    }
 };
 //-------------------------------------------------------------------
 
@@ -1004,10 +1013,18 @@ public:
      * @param columns 
      * @return std::error_code 
      */
-    
     std::error_code resize(uintptr_t pages, uintptr_t rows, uintptr_t columns)
     {
         return this->ptr_->resize(pages, rows, columns);
+    }
+
+    /**
+     * @brief Set all the matrix values to a constant
+     * @param value The value to set all matrix entries to
+     */
+    void set_all_values_to_a_constant(value_type value)
+    {
+        this->ptr_->set_all_values_to_a_constant(value);
     }
 };
 //-------------------------------------------------------------------

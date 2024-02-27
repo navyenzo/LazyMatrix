@@ -31,6 +31,26 @@
 
 
 //-------------------------------------------------------------------
+TEST_CASE("Setting matrix entries to a constant value", "[Matrix2D]")
+{
+    // Create matrix
+    auto mat = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
+
+    // Set matrix values to a constant
+    mat->set_all_values_to_a_constant(5);
+
+    // Check to make sure that the matrix
+    // entries have been correctly set
+    REQUIRE(mat(0,0) == 5);
+    REQUIRE(mat(0,1) == 5);
+    REQUIRE(mat(1,0) == 5);
+    REQUIRE(mat(1,1) == 5);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 TEST_CASE("2D Matrix Addition", "[Matrix2D]")
 {
     // Create matrices

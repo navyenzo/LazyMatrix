@@ -475,6 +475,20 @@ inline void bind_matrix_ref(py::module_ &m, const char* name)
                 ref.set_circ_at(row, col, obj.cast<ValueType>());
             }
         })
+        // Customized "set_at" method to handle setting values
+        .def("set_all_values_to_a_constant", [](ReferenceType& ref, py::object obj)
+        {
+            if constexpr (std::is_same_v<ValueType, Poco::Dynamic::Var>)
+            {
+                // Convert py::object to Poco::Dynamic::Var and set it
+                ref.set_all_values_to_a_constant(convertPyObjectToPocoVar(obj));
+            }
+            else
+            {
+                // For basic types, use pybind11's automatic casting
+                ref.set_all_values_to_a_constant(obj.cast<ValueType>());
+            }
+        })
         // Bind other necessary methods similarly, ensuring custom handling for Poco::Dynamic::Var if needed
         ;
 }

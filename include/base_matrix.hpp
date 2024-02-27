@@ -180,6 +180,18 @@ public:
         this->circ_at(row, column) = value;
     }
 
+    // Set all matrix values to a constant defined here to help define pythong/c++ interface
+    template<typename ValueType>
+    void set_all_values_to_a_constant(ValueType value)
+    {
+        int64_t matrix_size = int64_t(this->size());
+        
+        for(int64_t i = 0; i < matrix_size; ++i)
+        {
+            this->at(i) = value;
+        }
+    }
+
 
 
 private:
