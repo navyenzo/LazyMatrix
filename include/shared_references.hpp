@@ -157,6 +157,10 @@ public:
         return ptr_.get();
     }
 
+    /**
+     * @brief Function used to serialize matrix to a string.
+     * @return std::string 
+     */
     std::string to_string() const
     {
         uintptr_t number_of_rows = this->rows();
@@ -519,12 +523,41 @@ public:
     }
 
     /**
-     * @brief Set all the matrix values to a constant
-     * @param value The value to set all matrix entries to
+     * @brief Set all the matrix values to a constant.
+     * @param value The value to set all matrix entries to.
      */
     void set_all_values_to_a_constant(value_type value)
     {
         this->ptr_->set_all_values_to_a_constant(value);
+    }
+
+    /**
+     * @brief This function copies a matrix into this matrix.
+     * 
+     * @tparam MatrixType2 The type of matrix we're trying to copy.
+     * @param matrix_to_copy The matrix we're trying to copy.
+     * @return std::error_code Error encountered, if any, while trying to resize this matrix.
+     */
+    template<typename MatrixType2>
+    std::error_code copy(ConstSharedMatrixRef<MatrixType2> matrix_to_copy)
+    {
+        uintptr_t number_of_rows = matrix_to_copy.rows();
+        uintptr_t number_of_columns = matrix_to_copy.columns();
+
+        auto error = this->resize(number_of_rows, number_of_columns);
+
+        if(error)
+            return error;
+
+        for(int64_t i = 0; i < int64_t(number_of_rows); ++i)
+        {
+            for(int64_t j = 0; j < int64_t(number_of_columns); ++j)
+            {
+                this->at(i,j) = matrix_to_copy(i,j);
+            }
+        }
+        
+        return error;
     }
 };
 //-------------------------------------------------------------------
@@ -624,14 +657,10 @@ public:
         return ptr_.get();
     }
 
-
-
-
-
-
-
-
-
+    /**
+     * @brief Function used to serialize matrix to a string.
+     * @return std::string 
+     */
     std::string to_string() const
     {
         uintptr_t number_of_pages = this->pages();
@@ -1025,6 +1054,39 @@ public:
     void set_all_values_to_a_constant(value_type value)
     {
         this->ptr_->set_all_values_to_a_constant(value);
+    }
+
+    /**
+     * @brief This function copies a matrix into this matrix.
+     * 
+     * @tparam MatrixType2 The type of matrix we're trying to copy.
+     * @param matrix_to_copy The matrix we're trying to copy.
+     * @return std::error_code Error encountered, if any, while trying to resize this matrix.
+     */
+    template<typename MatrixType2>
+    std::error_code copy(ConstSharedMatrix3DRef<MatrixType2> matrix_to_copy)
+    {
+        uintptr_t number_of_pages = matrix_to_copy.pages();
+        uintptr_t number_of_rows = matrix_to_copy.rows();
+        uintptr_t number_of_columns = matrix_to_copy.columns();
+
+        auto error = this->resize(number_of_pages, number_of_rows, number_of_columns);
+
+        if(error)
+            return error;
+        
+        for(int64_t k = 0; k < int64_t(number_of_pages); ++k)
+        {
+            for(int64_t i = 0; i < int64_t(number_of_rows); ++i)
+            {
+                for(int64_t j = 0; j < int64_t(number_of_columns); ++j)
+                {
+                    this->at(k,i,j) = matrix_to_copy(k,i,j);
+                }
+            }
+        }
+        
+        return error;
     }
 };
 //-------------------------------------------------------------------

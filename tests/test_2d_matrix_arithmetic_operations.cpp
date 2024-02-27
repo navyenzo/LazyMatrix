@@ -51,6 +51,33 @@ TEST_CASE("Setting matrix entries to a constant value", "[Matrix2D]")
 
 
 //-------------------------------------------------------------------
+TEST_CASE("Copying from another matrix", "[Matrix2D]")
+{
+    // Create matrices
+    auto mat1 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(2,2,0);
+    auto mat2 = LazyMatrix::MatrixFactory::create_simple_matrix<int>(0,0);
+
+    // Set the first matrix values to a constant
+    mat1(0,0) = 1;
+    mat1(0,1) = 2;
+    mat1(1,0) = 3;
+    mat1(1,1) = 4;
+
+    // Copy the first matrix into the second matrix
+    mat2.copy(mat1);
+
+    // Check to make sure that the matrix
+    // entries have been correctly set
+    REQUIRE(mat2(0,0) == mat1(0,0));
+    REQUIRE(mat2(0,1) == mat1(0,1));
+    REQUIRE(mat2(1,0) == mat1(1,0));
+    REQUIRE(mat2(1,1) == mat1(1,1));
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 TEST_CASE("2D Matrix Addition", "[Matrix2D]")
 {
     // Create matrices
