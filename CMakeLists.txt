@@ -7,11 +7,12 @@ project(LazyMatrix VERSION 1.0)
 ###############################################################
 # Check if the MSVC compiler is used
 if(MSVC)
-  # Apply MSVC-specific flags
-  add_compile_options(/bigobj)
+    # Apply MSVC-specific flags
+    add_compile_options(/bigobj)
 else()
-  # Apply flags for other compilers if necessary
-  # GCC or Clang specific flags can go here
+    # Apply flags for other compilers if necessary
+    # GCC or Clang specific flags can go here
+    add_compile_options(-fexceptions) # Enable exceptions
 endif()
 
 # Compiler options
@@ -50,6 +51,11 @@ message(STATUS "Using VCPKG_TARGET_TRIPLET: ${VCPKG_TARGET_TRIPLET}")
 
 set(CMAKE_PREFIX_PATH "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}" ${CMAKE_PREFIX_PATH})
 message("CMAKE PREFIX PATH: ${CMAKE_PREFIX_PATH}")
+
+# We need these compile definitions when compiling in windows
+if(WIN32)
+  add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX)
+endif()
 ###############################################################
 
 
@@ -97,8 +103,11 @@ FetchContent_MakeAvailable(xoshiro)
 ###############################################################
 # Poco library
 ###############################################################
-# Include the FetchContent module
-include(FetchContent)
+# Conditionally add the unixODBC include directory to the compiler flags
+# if MSYS2 is being used to compile library
+# if(DEFINED ENV{MSYS2_ROOT} AND NOT "$ENV{MSYS2_ROOT}" STREQUAL "")
+#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I$ENV{MSYS2_ROOT}/mingw64/include/unixodbc")
+# endif()
 
 # Declare the FetchContent for Poco
 FetchContent_Declare(
@@ -112,7 +121,7 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE INTERNAL "")
 set(ENABLE_FOUNDATION ON CACHE INTERNAL "")
 set(ENABLE_DATA ON CACHE INTERNAL "")
-set(ENABLE_DATA_ODBC ON CACHE INTERNAL "")
+set(ENABLE_DATA_ODBC OFF CACHE INTERNAL "") # Disable ODBC for now as it's causing problems in windows
 set(ENABLE_DATA_SQLITE ON CACHE INTERNAL "")
 set(ENABLE_DATA_MYSQL ON CACHE INTERNAL "")
 set(ENABLE_DATA_POSTGRESQL ON CACHE INTERNAL "")
@@ -122,6 +131,26 @@ set(ENABLE_PAGECOMPILER_FILE2PAGE ON CACHE INTERNAL "")
 
 # Make Poco available for the current project
 FetchContent_MakeAvailable(Poco)
+###############################################################
+
+
+
+###############################################################
+# SQLParser library (needed for Poco library)
+###############################################################
+FetchContent_Declare(
+  sqlparser
+  GIT_REPOSITORY https://github.com/hyrise/sql-parser.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(sqlparser)
+
+include_directories(${CMAKE_BINARY_DIR}/_deps)
+
+# Copy the "sql-parser-src" to the "sql-parser" directory as
+# this is needed for the Poco library
+file(COPY ${CMAKE_BINARY_DIR}/_deps/sqlparser-src/src 
+     DESTINATION ${CMAKE_BINARY_DIR}/_deps/sql-parser)
 ###############################################################
 
 
@@ -145,6 +174,8 @@ add_dependencies(${PROJECT_NAME} Poco)
 ###############################################################
 # Find all required packages
 ###############################################################
+# find_package(ODBC)
+
 find_package(dlib CONFIG REQUIRED)
 
 find_package(ZLIB REQUIRED MODULE)
@@ -167,7 +198,7 @@ find_package(pybind11 CONFIG)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-# find_package(Poco CONFIG REQUIRED COMPONENTS Foundation Util Net NetSSL Crypto DataSQLite Data JSON XML MongoDB Redis)
+# find_package(Poco CONFIG REQUIRED COMPONENTS Prometheus Encodings JWT Zip ActiveRecord DataMySQL DataSQLite Data Redis JSON XML Util NetSSL Crypto Net Foundation)
 # get_target_property(PocoFoundationIncludeDirs Poco::Foundation INTERFACE_INCLUDE_DIRECTORIES)
 ###############################################################
 
@@ -186,27 +217,52 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     ${CMAKE_BINARY_DIR}/_deps/xoshiro-src
     ${CMAKE_BINARY_DIR}/_deps/dlib-src
     ${pybind11_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Foundation/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Data/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Encodings/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/JSON/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/JWT/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/MongoDB/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Net/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/NetSSL_OpenSSL/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/NetSSL_Win/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/PDF/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Prometheus/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Redis/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/SevenZip/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Util/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/Zip/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
-    ${CMAKE_BINARY_DIR}/_deps/poco-src/XML/include
     include_directories(${Python3_INCLUDE_DIRS})
+    # "${PocoFoundationIncludeDirs}"
+    # "${PocoFoundationIncludeDirs}/Poco/Data"
+    # ${ODBC_INCLUDE_DIRS}
+    ${poco_SOURCE_DIR}/Foundation/include
+    ${poco_SOURCE_DIR}/Util/include
+    ${poco_SOURCE_DIR}/Net/include
+    ${poco_SOURCE_DIR}/JSON/include
+    ${poco_SOURCE_DIR}/XML/include
+    ${poco_SOURCE_DIR}/Data/include
+    ${poco_SOURCE_DIR}/Data/SQLite/include
+    ${poco_SOURCE_DIR}/Data/MySQL/include
+    # ${poco_SOURCE_DIR}/Data/ODBC/include
+    ${poco_SOURCE_DIR}/Data/PostgreSQL/include
 )
+###############################################################
+
+
+
+###############################################################
+# In case we're using MSYS2 in windows, we need to set the path
+# to the MariaDB because otherwise Poco::DataMySQL won't find
+# MySQL::client target
+###############################################################
+if(WIN32)
+    if(DEFINED ENV{MSYS2_ROOT} AND EXISTS "$ENV{MSYS2_ROOT}")
+        # MariaDB Client Library
+        set(MARIADB_LIBRARY_PATH "${MSYS2_ROOT}/mingw64/lib/libmariadb.a") # For static linking
+        set(MARIADB_INCLUDE_DIR "${MSYS2_ROOT}/mingw64/include/mariadb")
+        add_library(MySQL::client STATIC IMPORTED)
+        set_target_properties(MySQL::client PROPERTIES
+            IMPORTED_LOCATION "${MARIADB_LIBRARY_PATH}"
+            INTERFACE_INCLUDE_DIRECTORIES "${MARIADB_INCLUDE_DIR}"
+        )
+
+        set(PG_LIBRARY_PATH "${MSYS2_ROOT}/mingw64/lib/libpq.dll.a") # Dynamic linking import library
+        set(PG_IMPORT_LIB_PATH "${MSYS2_ROOT}/mingw64/lib/libpq.lib") # Adjust this path to the actual import library if different
+        set(PG_INCLUDE_DIR "${MSYS2_ROOT}/mingw64/include")
+        add_library(PostgreSQL::client SHARED IMPORTED)
+        set_target_properties(PostgreSQL::client PROPERTIES
+            IMPORTED_LOCATION "${PG_LIBRARY_PATH}"
+            IMPORTED_IMPLIB "${PG_IMPORT_LIB_PATH}" # Set the IMPORTED_IMPLIB property
+            INTERFACE_INCLUDE_DIRECTORIES "${PG_INCLUDE_DIR}"
+        )
+    endif()
+endif()
 ###############################################################
 
 
@@ -214,36 +270,16 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 ###############################################################
 # Linking
 ###############################################################
+# target_link_libraries(${PROJECT_NAME} INTERFACE ${ODBC_LIBRARIES})
+
 target_link_libraries(${PROJECT_NAME} INTERFACE dlib::dlib)
 
 target_link_libraries(${PROJECT_NAME} INTERFACE LazyMatrix_ZLIB LazyMatrix_PNG LazyMatrix_JPEG LazyMatrix_GIF)
 
 target_link_libraries(${PROJECT_NAME} INTERFACE Eigen3::Eigen)
 
-# target_link_libraries(${PROJECT_NAME} INTERFACE Poco::Foundation Poco::Util Poco::Net Poco::NetSSL Poco::Crypto Poco::DataSQLite Poco::Data Poco::JSON Poco::XML Poco::MongoDB Poco::Redis)
-
 # Link to Poco libraries
-target_link_libraries(${PROJECT_NAME} INTERFACE
-    Poco::Prometheus
-    Poco::Encodings
-    Poco::JWT
-    Poco::Zip
-    Poco::ActiveRecord
-    Poco::MongoDB
-    Poco::DataPostgreSQL
-    Poco::DataMySQL
-    Poco::DataODBC
-    Poco::DataSQLite
-    Poco::Data
-    Poco::Redis
-    Poco::JSON
-    Poco::XML
-    Poco::Util
-    Poco::NetSSL
-    Poco::Crypto
-    Poco::Net
-    Poco::Foundation
-)
+target_link_libraries(${PROJECT_NAME} INTERFACE Poco::Prometheus Poco::Encodings Poco::JWT Poco::Zip Poco::ActiveRecord Poco::DataMySQL Poco::DataSQLite Poco::Data Poco::Redis Poco::JSON Poco::XML Poco::Util Poco::NetSSL Poco::Crypto Poco::Net Poco::Foundation)
 
 if(UNIX AND NOT APPLE)
     # Link against libdl only on UNIX-like systems (excluding macOS)

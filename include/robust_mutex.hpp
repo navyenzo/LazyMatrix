@@ -28,6 +28,13 @@
 
 // Check if we are compiling on Windows
 #ifdef _WIN32
+    #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+    #endif
+    #ifndef NOMINMAX
+        #define NOMINMAX // Prevents the Windows headers from defining min() and max() macros
+    #endif
+    
     #include <windows.h>
 #else
     // POSIX headers

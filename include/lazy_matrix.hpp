@@ -27,17 +27,6 @@
 
 
 //-------------------------------------------------------------------
-// We need to include this file when in windows, otherwise we get a
-// "No Target Architecture" error
-//-------------------------------------------------------------------
-#ifdef _WIN32
-    #include <windows.h>
-#endif
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 // File and directory manipulation utilities
 #include "files.hpp"
 

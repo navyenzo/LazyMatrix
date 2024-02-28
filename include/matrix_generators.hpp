@@ -23,8 +23,9 @@
 
 
 //-------------------------------------------------------------------
-#include <time.h>
 #include <cstdint>
+#include <chrono>
+#include <ctime>
 
 #include "base_matrix.hpp"
 #include "numerical_constants.hpp"
