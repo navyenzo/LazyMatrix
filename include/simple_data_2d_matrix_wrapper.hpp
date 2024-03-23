@@ -87,31 +87,50 @@ public:
     {
         return 1;
     }
-    
-    
-    
+
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) { return row_header_; }
+    std::string get_column_header(int64_t column_index) { return column_header_; }
+    void set_row_header(int64_t row_index, const std::string& row_header) { row_header_ = row_header; }
+    void set_column_header(int64_t column_index, const std::string& column_header) { column_header_ = column_header; }
+
+
+
+private: // Private functions
+
     /**
-     * @brief Const access of the wrapped value, ignoring row and column indices.
+     * @brief Dummy "resize" function needed for the matrix interface, but
+     *        here it doesn't do anything
      * 
-     * @param row Row index (ignored).
-     * @param column Column index (ignored).
-     * @return The wrapped value.
+     * @param rows 
+     * @param columns 
+     * @return std::error_code 
      */
-    ScalarDataType at_(int64_t row, int64_t column) const
+    std::error_code resize_(uintptr_t rows, uintptr_t columns)
     {
-        return value_; // Since it's a single value, ignore row and column indices
+        return std::error_code();
     }
 
     /**
-     * @brief Non-const access of the wrapped value, ignoring row and column indices.
-     * 
-     * @param row Row index (ignored).
-     * @param column Column index (ignored).
-     * @return The wrapped value.
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A copy of the value of the element at the specified position.
      */
-    ScalarDataType at_(int64_t row, int64_t column)
+    value_type const_at_(int64_t row, int64_t column)const
     {
-        return value_; // Since it's a single value, ignore row and column indices
+        return value_;
+    }
+
+    /**
+     * @brief Accesses the element at the specified position.
+     * @param row Row index.
+     * @param column Column index.
+     * @return A reference to the element at the specified position.
+     */
+    value_type& non_const_at_(int64_t row, int64_t column)
+    {
+        return value_;
     }
 
 
@@ -119,6 +138,8 @@ public:
 private:
 
     ScalarDataType value_;
+    std::string row_header_ = "row: 0";
+    std::string column_header_ = "col: 0";
 };
 //-------------------------------------------------------------------
 

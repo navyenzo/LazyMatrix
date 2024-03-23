@@ -111,6 +111,39 @@ public:
         return left_side_expression_.columns() + right_side_expression_.columns();
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index)
+    {
+        if(row_index < left_side_expression_.rows())
+            return left_side_expression_.get_row_header(row_index);
+        else
+            return right_side_expression_.get_row_header(row_index);
+    }
+    
+    std::string get_column_header(int64_t column_index)
+    {
+        if(column_index < left_side_expression_.columns())
+            return left_side_expression_.get_column_header(column_index);
+        else
+            return right_side_expression_.get_column_header(column_index - left_side_expression_.columns());
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header)
+    {
+        if(row_index < left_side_expression_.rows())
+            left_side_expression_.set_row_header(row_index, row_header);
+        else
+            right_side_expression_.set_row_header(row_index, row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header)
+    {
+        if(column_index < left_side_expression_.columns())
+            left_side_expression_.set_column_header(column_index, column_header);
+        else
+            right_side_expression_.set_column_header(column_index - left_side_expression_.columns(), column_header);
+    }
+
 
 
 private: // Private functions

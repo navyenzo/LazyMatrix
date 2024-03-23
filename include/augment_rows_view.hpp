@@ -119,6 +119,39 @@ public:
         return std::max(this->top_side_expression_.columns(), this->bottom_side_expression_.columns());
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index)
+    {
+        if(row_index < top_side_expression_.rows())
+            return top_side_expression_.get_row_header(row_index);
+        else
+            return bottom_side_expression_.get_row_header(row_index - top_side_expression_.rows());
+    }
+    
+    std::string get_column_header(int64_t column_index)
+    {
+        if(column_index < top_side_expression_.columns())
+            return top_side_expression_.get_column_header(column_index);
+        else
+            return bottom_side_expression_.get_column_header(column_index);
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header)
+    {
+        if(row_index < top_side_expression_.rows())
+            top_side_expression_.set_row_header(row_index, row_header);
+        else
+            bottom_side_expression_.set_row_header(row_index - top_side_expression_.rows(), row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header)
+    {
+        if(column_index < top_side_expression_.columns())
+            top_side_expression_.set_column_header(column_index, column_header);
+        else
+            bottom_side_expression_.set_column_header(column_index, column_header);
+    }
+
 
 
 private: // Private functions
