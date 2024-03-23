@@ -42,6 +42,10 @@
 // Circular iterator for cyclic traversing
 #include "circular_iterator.hpp"
 
+// Page, Row and Column Header naming
+#include "row_and_column_headers.hpp"
+#include "page_and_row_and_column_headers.hpp"
+
 // Base matrix class for 2D matrices
 #include "base_matrix.hpp"
 

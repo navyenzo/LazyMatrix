@@ -319,6 +319,12 @@ public:
      */
     const std::string& get_last_error() const;
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) { return headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) { return headers_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) { headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) { } // We DO NOT allow users to set column names
+
 
 
 private: // Private functions
@@ -374,9 +380,11 @@ private: // Private variables
     mutable uintptr_t cache_window_size_ = 100;         ///< Size of the cache window.
 
     mutable uintptr_t rows_ = 0;                        ///< Number of rows in the matrix.
-    mutable std::vector<std::string> column_names_;     ///< Names of columns in the matrix.
 
     mutable std::string last_error_;                    ///< Last error message, if any.
+
+    // Row and Column Headers
+    mutable RowAndColumnNames headers_;
 };
 //-------------------------------------------------------------------
 
@@ -445,7 +453,7 @@ inline void DatabaseMatrix::count_columns()const
 {
     try
     {
-        column_names_.clear();
+        headers_.clear_column_header_names();
 
         // Clear the cache
         cache_window_.clear();
@@ -464,10 +472,10 @@ inline void DatabaseMatrix::count_columns()const
         Poco::Data::RecordSet record_set(column_statement);
         for (size_t i = 0; i < record_set.columnCount(); ++i)
         {
-            column_names_.push_back(record_set.columnName(i));
+            headers_.set_column_header(i, record_set.columnName(i));
         }
 
-        if (column_names_.empty())
+        if (headers_.get_number_of_set_column_header_names() == 0)
         {
             last_error_ = "No columns found for table " + table_name_.get();
         }
@@ -493,7 +501,7 @@ inline uintptr_t DatabaseMatrix::rows() const
 //-------------------------------------------------------------------
 inline uintptr_t DatabaseMatrix::columns() const
 {
-    return column_names_.size();
+    return headers_.get_number_of_set_column_header_names();
 }
 //-------------------------------------------------------------------
 

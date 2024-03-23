@@ -25,6 +25,7 @@
 //-------------------------------------------------------------------
 #include <iostream>
 #include <cstdint>
+#include "page_and_row_and_column_headers.hpp"
 //-------------------------------------------------------------------
 
 
@@ -205,6 +206,14 @@ public:
         }
     }
 
+    // Functions used to handle row and column header names
+    std::string get_page_header(int64_t page_index) { return underlying().get_page_header(page_index); }
+    std::string get_row_header(int64_t row_index) { return underlying().get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) { return underlying().get_column_header(column_index); }
+    void set_page_header(int64_t page_index, const std::string& page_header) { underlying().set_page_header(page_index, page_header); }
+    void set_row_header(int64_t row_index, const std::string& row_header) { underlying().set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) { underlying().set_column_header(column_index, column_header); }
+
 
 
 private:
@@ -304,6 +313,14 @@ public:
         int64_t circ_index = (this->size() + index % this->size()) % this->size();
         return (*this)(circ_index);
     }
+
+    // Functions used to handle row and column header names
+    std::string get_page_header(int64_t page_index) { return underlying().get_page_header(page_index); }
+    std::string get_row_header(int64_t row_index) { return underlying().get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) { return underlying().get_column_header(column_index); }
+    void set_page_header(int64_t page_index, const std::string& page_header) { underlying().set_page_header(page_index, page_header); }
+    void set_row_header(int64_t row_index, const std::string& row_header) { underlying().set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) { underlying().set_column_header(column_index, column_header); }
 
 
 

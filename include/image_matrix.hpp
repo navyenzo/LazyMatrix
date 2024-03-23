@@ -95,6 +95,53 @@ template<> struct is_valid_dlib_pixel_type<int> : std::true_type {};
 
 
 //-------------------------------------------------------------------
+template<typename PixelType>
+
+inline PixelType get_default_pixel_value()
+{
+    if constexpr (std::is_same_v<PixelType, dlib::rgb_pixel>)
+    {
+        return dlib::rgb_pixel(0, 0, 0); // Black pixel for RGB
+    }
+    else if constexpr (std::is_same_v<PixelType, dlib::bgr_pixel>)
+    {
+        return dlib::bgr_pixel(0, 0, 0); // Black pixel for BGR
+    }
+    else if constexpr (std::is_same_v<PixelType, dlib::rgb_alpha_pixel>)
+    {
+        return dlib::rgb_alpha_pixel(0, 0, 0, 0); // Transparent black pixel for RGBA
+    }
+    else if constexpr (std::is_same_v<PixelType, dlib::bgr_alpha_pixel>)
+    {
+        return dlib::bgr_alpha_pixel(0, 0, 0, 0); // Transparent black pixel for BGRA
+    }
+    else if constexpr (std::is_same_v<PixelType, dlib::hsi_pixel>)
+    {
+        return dlib::hsi_pixel(0, 0, 0); // Black pixel in HSI color space
+    }
+    else if constexpr (std::is_same_v<PixelType, dlib::lab_pixel>)
+    {
+        return dlib::lab_pixel(0, 0, 0); // Black pixel in LAB color space
+    }
+    else if constexpr (std::is_integral_v<PixelType> || std::is_floating_point_v<PixelType>)
+    {
+        return PixelType(0); // Zero for grayscale (int, float, double)
+    }
+    else if constexpr (std::is_same_v<PixelType, std::complex<float>> || std::is_same_v<PixelType, std::complex<double>>)
+    {
+        return PixelType(0, 0); // Zero for complex numbers
+    }
+    else
+    {
+        // Fallback for any non-specialized types, might not be valid for all cases
+        return PixelType{};
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 /**
  * @brief A class that represents an image matrix, serving as an interface to dlib's image handling.
  * 
@@ -135,13 +182,25 @@ public:
      * message indicating the misuse.
      */
     static_assert(is_valid_dlib_pixel_type<PixelType>::value, "Invalid pixel type for ImageMatrix. Please use a valid dlib pixel type.");
+    
+    /**
+     * @brief Default constructor. Initializes an image matrix with given rows and columns.
+     * @param rows Number of rows in the matrix. Default is 0.
+     * @param columns Number of columns in the matrix. Default is 0.
+     * @param initial_value The initial value to fill the matrix. Default is 0.
+     */
+    explicit ImageMatrix(uintptr_t rows = 0, uintptr_t columns = 0, const PixelType& initial_value = get_default_pixel_value<PixelType>())
+    {
+        image_data_.set_size(rows, columns);
+        image_data_ = initial_value;
+    }
 
     /**
      * @brief Constructs an ImageMatrix by loading an image from the given file path.
      * 
      * @param filename The path to the image file.
      */
-    ImageMatrix(const std::string& filename)
+    explicit ImageMatrix(const std::string& filename)
     {
         dlib::load_image(image_data_, filename);
     }
@@ -165,6 +224,12 @@ public:
     {
         return image_data_.nc();
     }
+
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) { return headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) { return headers_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) { headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) { headers_.set_column_header(column_index, column_header); }
 
 
 
@@ -212,6 +277,8 @@ private: // Private functions
 private: // Private variables
 
     dlib::matrix<PixelType> image_data_;  ///< The underlying dlib matrix storing the image data.
+
+    RowAndColumnNames headers_; ///< Row and Column Headers
 };
 //-------------------------------------------------------------------
 

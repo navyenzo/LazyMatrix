@@ -180,6 +180,12 @@ public:
         return columns_;
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) { return headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) { return headers_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) { headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) { headers_.set_column_header(column_index, column_header); }
+
 
 
 private: // Private functions
@@ -241,6 +247,9 @@ private: // Private variables
     uintptr_t rows_ = 0;                 ///< The number of rows in the matrix.
     uintptr_t columns_ = 0;              ///< The number of columns in the matrix.
     std::vector<DataType> data_;         ///< The flat array storing matrix elements.
+
+    // Row and Column Headers
+    RowAndColumnNames headers_;
 };
 //-------------------------------------------------------------------
 

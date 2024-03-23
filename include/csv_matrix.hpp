@@ -122,15 +122,18 @@ public:
     std::string_view string_at(int64_t row, int64_t column)const;
     std::pair<Poco::Dynamic::Var, ResultType> dynamic_at(int64_t row, int64_t column)const;
 
-    const std::string& get_row_header(uintptr_t index)const;
-    const std::string& get_column_header(uintptr_t index)const;
-
 
 
     // Function used to load (actually map the file, not load) the data from a CSV file
     std::error_code load(const std::string& csv_data_filename,
                          bool does_first_row_contain_column_header_names,
                          bool does_first_column_contain_row_header_names);
+
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) { return headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) { return headers_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) { headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) { headers_.set_column_header(column_index, column_header); }
 
 
 
@@ -164,10 +167,6 @@ private: // Private variables
     // The memory map holding the csv data
     mio::shared_mmap_sink mapped_csv_;
 
-    // Maps holding row and column header names (if any)
-    std::unordered_map<int,std::string> row_headers_;
-    std::unordered_map<int,std::string> column_headers_;
-
     // Boolean flags used to indicate whether
     // the csv file contains row and column headers
     bool does_first_row_contain_column_header_names_ = false;
@@ -188,6 +187,9 @@ private: // Private variables
     // Default string returned when user asks
     // for a (row,column) that is not found
     std::string default_value = "0";
+
+    // Row and Column Headers
+    RowAndColumnNames headers_;
 };
 //-------------------------------------------------------------------
 
@@ -312,41 +314,6 @@ std::pair<Poco::Dynamic::Var, ResultType> CSVMatrix<DataType>::dynamic_at(int64_
 
 
 //-------------------------------------------------------------------
-// Functions used to get the name of a row or column
-// - If the user specifies a row or column index out
-//   of range than the function returns the "no_name_found"
-//   string
-//-------------------------------------------------------------------
-template<typename DataType>
-
-inline const std::string& CSVMatrix<DataType>::get_row_header(uintptr_t index)const
-{
-    auto name_found_iter = row_headers_.find(index);
-
-    if(name_found_iter == row_headers_.cend())
-        return no_name_found_;
-    
-    return (name_found_iter->second);
-}
-
-
-
-template<typename DataType>
-
-inline const std::string& CSVMatrix<DataType>::get_column_header(uintptr_t index)const
-{
-    auto name_found_iter = column_headers_.find(index);
-
-    if(name_found_iter == column_headers_.cend())
-        return no_name_found_;
-    
-    return (name_found_iter->second);
-}
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 // Function used to load (actually map not load) the data from
 // a CSV file
 // - This function doesn't load anything, it actually memory maps
@@ -456,7 +423,7 @@ inline void CSVMatrix<DataType>::parse_row_headers()
 
         auto header = std::string(&mapped_csv_.data()[header_begin], &mapped_csv_.data()[header_end]);
 
-        row_headers_[header_index] = header;
+        this->set_row_header(header_index, header);
 
         ++header_index;
 
@@ -498,7 +465,7 @@ inline void CSVMatrix<DataType>::parse_column_headers()
 
         auto header = std::string(&mapped_csv_.data()[header_begin], &mapped_csv_.data()[header_end]);
 
-        column_headers_[header_index] = header;
+        this->set_column_header(header_index, header);
 
         ++header_index;
 
