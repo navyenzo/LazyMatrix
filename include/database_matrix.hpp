@@ -320,10 +320,10 @@ public:
     const std::string& get_last_error() const;
 
     // Functions used to handle row and column header names
-    std::string get_row_header(int64_t row_index) { return headers_.get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) { return headers_.get_column_header(column_index); }
-    void set_row_header(int64_t row_index, const std::string& row_header) { headers_.set_row_header(row_index, row_header); }
-    void set_column_header(int64_t column_index, const std::string& column_header) { } // We DO NOT allow users to set column names
+    std::string get_row_header(int64_t row_index) const { return headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const { return headers_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const { headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) const { } // We DO NOT allow users to set column names
 
 
 

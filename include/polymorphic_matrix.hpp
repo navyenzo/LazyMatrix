@@ -71,10 +71,10 @@ public:
     virtual std::error_code resize(uintptr_t rows, uintptr_t columns) = 0;
 
     // Functions used to handle page, row and column header names
-    virtual std::string get_row_header(int64_t row_index) = 0;
-    virtual std::string get_column_header(int64_t column_index) = 0;
-    virtual void set_row_header(int64_t row_index, const std::string& row_header) = 0;
-    virtual void set_column_header(int64_t column_index, const std::string& column_header) = 0;
+    virtual std::string get_row_header(int64_t row_index) const = 0;
+    virtual std::string get_column_header(int64_t column_index) const = 0;
+    virtual void set_row_header(int64_t row_index, const std::string& row_header) const = 0;
+    virtual void set_column_header(int64_t column_index, const std::string& column_header) const = 0;
 
 private:
 
@@ -107,10 +107,10 @@ public:
     virtual std::error_code resize(uintptr_t rows, uintptr_t columns) = 0;
 
     // Functions used to handle page, row and column header names
-    virtual std::string get_row_header(int64_t row_index) = 0;
-    virtual std::string get_column_header(int64_t column_index) = 0;
-    virtual void set_row_header(int64_t row_index, const std::string& row_header) = 0;
-    virtual void set_column_header(int64_t column_index, const std::string& column_header) = 0;
+    virtual std::string get_row_header(int64_t row_index) const = 0;
+    virtual std::string get_column_header(int64_t column_index) const = 0;
+    virtual void set_row_header(int64_t row_index, const std::string& row_header) const = 0;
+    virtual void set_column_header(int64_t column_index, const std::string& column_header) const = 0;
 
 private:
 
@@ -173,10 +173,10 @@ public:
     }
 
     // Functions used to handle page, row and column header names
-    std::string get_row_header(int64_t row_index) override { return matrix_.get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) override { return matrix_.get_column_header(column_index); }
-    void set_row_header(int64_t row_index, const std::string& row_header) override { matrix_.set_row_header(row_index, row_header); }
-    void set_column_header(int64_t column_index, const std::string& column_header) override { matrix_.set_column_header(column_index, column_header); }
+    std::string get_row_header(int64_t row_index) const override { return matrix_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const override { return matrix_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const override { matrix_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) const override { matrix_.set_column_header(column_index, column_header); }
 
 
 
@@ -234,10 +234,10 @@ public:
     }
 
     // Functions used to handle page, row and column header names
-    std::string get_row_header(int64_t row_index) override { return matrix_.get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) override { return matrix_.get_column_header(column_index); }
-    void set_row_header(int64_t row_index, const std::string& row_header) override { matrix_.set_row_header(row_index, row_header); }
-    void set_column_header(int64_t column_index, const std::string& column_header) override { matrix_.set_column_header(column_index, column_header); }
+    std::string get_row_header(int64_t row_index) const override { return matrix_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const override { return matrix_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const override { matrix_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) const override { matrix_.set_column_header(column_index, column_header); }
 
 
 

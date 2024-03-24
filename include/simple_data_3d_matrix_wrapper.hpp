@@ -97,12 +97,12 @@ public:
     }
 
     // Functions used to handle page and row and column header names
-    std::string get_page_header(int64_t page_index) { return page_header_; }
-    std::string get_row_header(int64_t row_index) { return row_header_; }
-    std::string get_column_header(int64_t column_index) { return column_header_; }
-    void set_page_header(int64_t page_index, const std::string& page_header) { page_header_ = page_header; }
-    void set_row_header(int64_t row_index, const std::string& row_header) { row_header_ = row_header; }
-    void set_column_header(int64_t column_index, const std::string& column_header) { column_header_ = column_header; }
+    std::string get_page_header(int64_t page_index) const { return page_header_; }
+    std::string get_row_header(int64_t row_index) const { return row_header_; }
+    std::string get_column_header(int64_t column_index) const { return column_header_; }
+    void set_page_header(int64_t page_index, const std::string& page_header) const { page_header_ = page_header; }
+    void set_row_header(int64_t row_index, const std::string& row_header) const { row_header_ = row_header; }
+    void set_column_header(int64_t column_index, const std::string& column_header) const { column_header_ = column_header; }
 
 
 
@@ -151,9 +151,9 @@ private: // Private functions
 private:
 
     ScalarDataType value_;
-    std::string page_header_ = "page: 0";
-    std::string row_header_ = "row: 0";
-    std::string column_header_ = "col: 0";
+    mutable std::string page_header_ = "page: 0";
+    mutable std::string row_header_ = "row: 0";
+    mutable std::string column_header_ = "col: 0";
 };
 //-------------------------------------------------------------------
 

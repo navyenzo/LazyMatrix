@@ -120,7 +120,7 @@ public:
     }
 
     // Functions used to handle row and column header names
-    std::string get_row_header(int64_t row_index)
+    std::string get_row_header(int64_t row_index) const
     {
         if(row_index < top_side_expression_.rows())
             return top_side_expression_.get_row_header(row_index);
@@ -128,7 +128,7 @@ public:
             return bottom_side_expression_.get_row_header(row_index - top_side_expression_.rows());
     }
     
-    std::string get_column_header(int64_t column_index)
+    std::string get_column_header(int64_t column_index) const
     {
         if(column_index < top_side_expression_.columns())
             return top_side_expression_.get_column_header(column_index);
@@ -136,7 +136,7 @@ public:
             return bottom_side_expression_.get_column_header(column_index);
     }
 
-    void set_row_header(int64_t row_index, const std::string& row_header)
+    void set_row_header(int64_t row_index, const std::string& row_header) const
     {
         if(row_index < top_side_expression_.rows())
             top_side_expression_.set_row_header(row_index, row_header);
@@ -144,7 +144,7 @@ public:
             bottom_side_expression_.set_row_header(row_index - top_side_expression_.rows(), row_header);
     }
 
-    void set_column_header(int64_t column_index, const std::string& column_header)
+    void set_column_header(int64_t column_index, const std::string& column_header) const
     {
         if(column_index < top_side_expression_.columns())
             top_side_expression_.set_column_header(column_index, column_header);

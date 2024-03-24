@@ -308,10 +308,10 @@ public:
     }
 
     // Functions used to handle row and column header names
-    std::string get_row_header(int64_t row_index) { return ptr_->get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) { return ptr_->get_column_header(column_index); }
-    void set_row_header(int64_t row_index, const std::string& row_header) { ptr_->set_row_header(row_index, row_header); }
-    void set_column_header(int64_t column_index, const std::string& column_header) { ptr_->set_column_header(column_index, column_header); }
+    std::string get_row_header(int64_t row_index) const { return ptr_->get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const { return ptr_->get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const { ptr_->set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) const { ptr_->set_column_header(column_index, column_header); }
 
 
 
@@ -835,12 +835,12 @@ public:
     }
 
     // Functions used to handle row and column header names
-    std::string get_page_header(int64_t page_index) { return ptr_->get_page_header(page_index); }
-    std::string get_row_header(int64_t row_index) { return ptr_->get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) { return ptr_->get_column_header(column_index); }
-    void set_page_header(int64_t page_index, const std::string& page_header) { ptr_->set_page_header(page_index, page_header); }
-    void set_row_header(int64_t row_index, const std::string& row_header) { ptr_->set_row_header(row_index, row_header); }
-    void set_column_header(int64_t column_index, const std::string& column_header) { ptr_->set_column_header(column_index, column_header); }
+    std::string get_page_header(int64_t page_index) const { return ptr_->get_page_header(page_index); }
+    std::string get_row_header(int64_t row_index) const { return ptr_->get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const { return ptr_->get_column_header(column_index); }
+    void set_page_header(int64_t page_index, const std::string& page_header) const { ptr_->set_page_header(page_index, page_header); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const { ptr_->set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) const { ptr_->set_column_header(column_index, column_header); }
 
 
 

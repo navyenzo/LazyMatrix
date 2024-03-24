@@ -130,10 +130,10 @@ public:
                          bool does_first_column_contain_row_header_names);
 
     // Functions used to handle row and column header names
-    std::string get_row_header(int64_t row_index) { return headers_.get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) { return headers_.get_column_header(column_index); }
-    void set_row_header(int64_t row_index, const std::string& row_header) { headers_.set_row_header(row_index, row_header); }
-    void set_column_header(int64_t column_index, const std::string& column_header) { headers_.set_column_header(column_index, column_header); }
+    std::string get_row_header(int64_t row_index) const { return headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const { return headers_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const { headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) const { headers_.set_column_header(column_index, column_header); }
 
 
 
@@ -189,7 +189,7 @@ private: // Private variables
     std::string default_value = "0";
 
     // Row and Column Headers
-    RowAndColumnNames headers_;
+    mutable RowAndColumnNames headers_;
 };
 //-------------------------------------------------------------------
 

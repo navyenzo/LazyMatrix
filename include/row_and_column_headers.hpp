@@ -57,7 +57,7 @@ public:
     }
 
     // Get row header
-    std::string get_row_header(int64_t row_index)
+    std::string get_row_header(int64_t row_index) const
     {
         auto row_header_iter = row_headers_.find(row_index);
         if(row_header_iter != row_headers_.cend())
@@ -67,7 +67,7 @@ public:
     }
 
     // Get column header
-    std::string get_column_header(int64_t column_index)
+    std::string get_column_header(int64_t column_index) const
     {
         auto column_header_iter = column_headers_.find(column_index);
         if(column_header_iter != column_headers_.cend())
@@ -77,7 +77,7 @@ public:
     }
 
     // Set row header
-    void set_row_header(int64_t row_index, const std::string& row_header)
+    void set_row_header(int64_t row_index, const std::string& row_header) const
     {
         if(row_header.empty())
             column_headers_.erase(row_index);
@@ -86,7 +86,7 @@ public:
     }
 
     // Set column header
-    void set_column_header(int64_t column_index, const std::string& column_header)
+    void set_column_header(int64_t column_index, const std::string& column_header) const
     {
         if(column_header.empty())
             column_headers_.erase(column_index);
@@ -122,8 +122,8 @@ public:
 
 private:
 
-    std::unordered_map<int64_t, std::string> row_headers_;
-    std::unordered_map<int64_t, std::string> column_headers_;
+    mutable std::unordered_map<int64_t, std::string> row_headers_;
+    mutable std::unordered_map<int64_t, std::string> column_headers_;
 };
 //-------------------------------------------------------------------
 
