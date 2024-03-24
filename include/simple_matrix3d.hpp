@@ -142,6 +142,14 @@ public:
         return columns_;
     }
 
+    // Functions used to handle page, row and column header names
+    std::string get_page_header(int64_t page_index) { return headers_.get_page_header(page_index); }
+    std::string get_row_header(int64_t row_index) { return headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) { return headers_.get_column_header(column_index); }
+    void set_page_header(int64_t page_index, const std::string& page_header) { headers_.set_page_header(page_index, page_header); }
+    void set_row_header(int64_t row_index, const std::string& row_header) { headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) { headers_.set_column_header(column_index, column_header); }
+
 
 
 private: // Private functions
@@ -209,6 +217,8 @@ private: // Private variables
     uintptr_t rows_ = 0;                ///< The number of rows in the 3d matrix.
     uintptr_t columns_ = 0;             ///< The number of columns in the 3d matrix.
     std::vector<DataType> data_;        ///< The flat array storing matrix elements.
+
+    PageAndRowAndColumnNames headers_;  ///< Page, Row and Column Headers
 };
 //-------------------------------------------------------------------
 

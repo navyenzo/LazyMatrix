@@ -70,6 +70,12 @@ public:
     virtual uintptr_t size() const = 0;
     virtual std::error_code resize(uintptr_t rows, uintptr_t columns) = 0;
 
+    // Functions used to handle page, row and column header names
+    virtual std::string get_row_header(int64_t row_index) = 0;
+    virtual std::string get_column_header(int64_t column_index) = 0;
+    virtual void set_row_header(int64_t row_index, const std::string& row_header) = 0;
+    virtual void set_column_header(int64_t column_index, const std::string& column_header) = 0;
+
 private:
 
     virtual DataType const_at_(int64_t row, int64_t column) const = 0;
@@ -99,6 +105,12 @@ public:
     virtual uintptr_t columns() const = 0;
     virtual uintptr_t size() const = 0;
     virtual std::error_code resize(uintptr_t rows, uintptr_t columns) = 0;
+
+    // Functions used to handle page, row and column header names
+    virtual std::string get_row_header(int64_t row_index) = 0;
+    virtual std::string get_column_header(int64_t column_index) = 0;
+    virtual void set_row_header(int64_t row_index, const std::string& row_header) = 0;
+    virtual void set_column_header(int64_t column_index, const std::string& column_header) = 0;
 
 private:
 
@@ -160,6 +172,12 @@ public:
         }
     }
 
+    // Functions used to handle page, row and column header names
+    std::string get_row_header(int64_t row_index) override { return matrix_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) override { return matrix_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) override { matrix_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) override { matrix_.set_column_header(column_index, column_header); }
+
 
 
 private: // Private functionserror:
@@ -214,6 +232,12 @@ public:
             return std::error_code();
         }
     }
+
+    // Functions used to handle page, row and column header names
+    std::string get_row_header(int64_t row_index) override { return matrix_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) override { return matrix_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) override { matrix_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) override { matrix_.set_column_header(column_index, column_header); }
 
 
 
