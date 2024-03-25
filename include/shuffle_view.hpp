@@ -110,6 +110,27 @@ public:
         return this->expression_.columns();
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) const
+    {
+        return expression_.get_row_header(row_indeces_[row_index]);
+    }
+    
+    std::string get_column_header(int64_t column_index) const
+    {
+        return expression_.get_column_header(column_indeces_[column_index]);
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header) const
+    {
+        expression_.set_row_header(row_indeces_[row_index], row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header) const
+    {
+        expression_.set_column_header(column_indeces_[column_index], column_header);
+    }
+
 
 
 private: // Private functions

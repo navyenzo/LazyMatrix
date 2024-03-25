@@ -189,6 +189,39 @@ public:
         return index_of_row_or_column_to_use_to_sort_;
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) const
+    {
+        if(sort_by_rows_)
+            return expression_.get_row_index(row_index);
+        else
+            return expression_.get_row_index(sorted_indeces_[row_index]);
+    }
+    
+    std::string get_column_header(int64_t column_index) const
+    {
+        if(sort_by_rows_)
+            return expression_.get_column_index(sorted_indeces_[column_index]);
+        else
+            return expression_.get_row_index(column_index);
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header) const
+    {
+        if(sort_by_rows_)
+            expression_.set_row_index(row_index, row_header);
+        else
+            expression_.set_row_index(sorted_indeces_[row_index], row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header) const
+    {
+        if(sort_by_rows_)
+            expression_.set_column_index(sorted_indeces_[column_index], column_header);
+        else
+            expression_.set_row_index(column_index, column_header);
+    }
+
 
 
 private: // Private functions
