@@ -255,12 +255,12 @@ public:
     std::error_code load_matrix(const std::string& file_to_load_matrix_from);
 
     // Functions used to handle page, row and column header names
-    std::string get_page_header(int64_t page_index) const { return headers_.get_page_header(page_index); }
-    std::string get_row_header(int64_t row_index) const { return headers_.get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) const { return headers_.get_column_header(column_index); }
-    void set_page_header(int64_t page_index, const std::string& page_header) const { headers_.set_page_header(page_index, page_header); }
-    void set_row_header(int64_t row_index, const std::string& row_header) const { headers_.set_row_header(row_index, row_header); }
-    void set_column_header(int64_t column_index, const std::string& column_header) const { headers_.set_column_header(column_index, column_header); }
+    std::string get_page_header(int64_t page_index) const { return this->headers_.get_page_header(page_index); }
+    std::string get_row_header(int64_t row_index) const { return this->headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const { return this->headers_.get_column_header(column_index); }
+    void set_page_header(int64_t page_index, const std::string& page_header) const { this->headers_.set_page_header(page_index, page_header); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const { this->headers_.set_row_header(row_index, row_header); }
+    void set_column_header(int64_t column_index, const std::string& column_header) const { this->headers_.set_column_header(column_index, column_header); }
 
 
 
@@ -334,8 +334,6 @@ private: // Private variables
     
     mio::shared_mmap_sink mapped_file_;             ///< The memory mapped file containing the 3d matrix object.
     fs::path filename_of_memory_mapped_file_;       ///< The filename of the memory mapped file.
-
-    mutable PageAndRowAndColumnNames headers_;      ///< Page, Row and Column Headers
 };
 //-------------------------------------------------------------------
 

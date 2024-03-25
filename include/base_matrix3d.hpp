@@ -232,6 +232,8 @@ private:
     {
         return static_cast<const MatrixType&>(*this);
     }
+
+    mutable PageAndRowAndColumnNames headers_; ///< Row and Column Headers
 };
 //-------------------------------------------------------------------
 
@@ -334,6 +336,8 @@ private:
     {
         return static_cast<const MatrixType&>(*this);
     }
+
+    mutable PageAndRowAndColumnNames headers_; ///< Row and Column Headers
 };
 //-------------------------------------------------------------------
 

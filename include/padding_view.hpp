@@ -137,6 +137,39 @@ public:
         return padded_columns_;
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) const
+    {
+        if(row_index < expression_.rows())
+            return expression_.get_row_header(row_index);
+        else
+            return this->headers_.get_row_header(row_index);
+    }
+    
+    std::string get_column_header(int64_t column_index) const
+    {
+        if(column_index < expression_.columns())
+            return expression_.get_column_header(column_index);
+        else
+            return this->headers_.get_column_header(column_index - expression_.columns());
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header) const
+    {
+        if(row_index < expression_.rows())
+            expression_.set_row_header(row_index, row_header);
+        else
+            this->headers_.set_row_header(row_index, row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header) const
+    {
+        if(column_index < expression_.columns())
+            expression_.set_column_header(column_index, column_header);
+        else
+            this->headers_.set_column_header(column_index - expression_.columns(), column_header);
+    }
+
 
 
 private: // Private functions
@@ -144,7 +177,6 @@ private: // Private functions
     /**
      * @brief Dummy "resize" function needed for the matrix interface, but
      *        here it doesn't do anything
-     * 
      * @param rows 
      * @param columns 
      * @return std::error_code 

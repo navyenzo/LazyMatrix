@@ -210,6 +210,8 @@ private:
     // Accessors for the derived type.
     const MatrixType& underlying()const { return static_cast<const MatrixType&>(*this); }
     MatrixType& underlying() { return static_cast<MatrixType&>(*this); }
+
+    mutable RowAndColumnNames headers_; ///< Row and Column Headers
 };
 //-------------------------------------------------------------------
 
@@ -296,6 +298,8 @@ private:
 
     // Accessors for the derived type.
     const MatrixType& underlying()const { return static_cast<const MatrixType&>(*this); }
+
+    mutable RowAndColumnNames headers_; ///< Row and Column Headers
 };
 //-------------------------------------------------------------------
 

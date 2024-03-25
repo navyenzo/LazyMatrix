@@ -320,9 +320,9 @@ public:
     const std::string& get_last_error() const;
 
     // Functions used to handle row and column header names
-    std::string get_row_header(int64_t row_index) const { return headers_.get_row_header(row_index); }
-    std::string get_column_header(int64_t column_index) const { return headers_.get_column_header(column_index); }
-    void set_row_header(int64_t row_index, const std::string& row_header) const { headers_.set_row_header(row_index, row_header); }
+    std::string get_row_header(int64_t row_index) const { return this->headers_.get_row_header(row_index); }
+    std::string get_column_header(int64_t column_index) const { return this->headers_.get_column_header(column_index); }
+    void set_row_header(int64_t row_index, const std::string& row_header) const { this->headers_.set_row_header(row_index, row_header); }
     void set_column_header(int64_t column_index, const std::string& column_header) const { } // We DO NOT allow users to set column names
 
 
@@ -382,9 +382,6 @@ private: // Private variables
     mutable uintptr_t rows_ = 0;                        ///< Number of rows in the matrix.
 
     mutable std::string last_error_;                    ///< Last error message, if any.
-
-    // Row and Column Headers
-    mutable RowAndColumnNames headers_;
 };
 //-------------------------------------------------------------------
 
@@ -453,7 +450,7 @@ inline void DatabaseMatrix::count_columns()const
 {
     try
     {
-        headers_.clear_column_header_names();
+        this->headers_.clear_column_header_names();
 
         // Clear the cache
         cache_window_.clear();
@@ -472,7 +469,7 @@ inline void DatabaseMatrix::count_columns()const
         Poco::Data::RecordSet record_set(column_statement);
         for (size_t i = 0; i < record_set.columnCount(); ++i)
         {
-            headers_.set_column_header(i, record_set.columnName(i));
+            this->headers_.set_column_header(i, record_set.columnName(i));
         }
 
         if (headers_.get_number_of_set_column_header_names() == 0)
@@ -501,7 +498,7 @@ inline uintptr_t DatabaseMatrix::rows() const
 //-------------------------------------------------------------------
 inline uintptr_t DatabaseMatrix::columns() const
 {
-    return headers_.get_number_of_set_column_header_names();
+    return this->headers_.get_number_of_set_column_header_names();
 }
 //-------------------------------------------------------------------
 

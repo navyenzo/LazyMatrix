@@ -125,6 +125,39 @@ public:
         return this->expression_.columns();
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) const
+    {
+        if(!should_rows_be_reversed_)
+            return expression_.get_row_header(row_index);
+        else
+            return expression_.get_row_header(expression_.rows() - 1 - row_index);
+    }
+    
+    std::string get_column_header(int64_t column_index) const
+    {
+        if(!should_columns_be_reversed_)
+            return expression_.get_column_header(column_index);
+        else
+            return expression_.get_column_header(expression_.columns() - 1 - column_index);
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header) const
+    {
+        if(!should_rows_be_reversed_)
+            return expression_.set_row_header(row_index, row_header);
+        else
+            return expression_.set_row_header(expression_.rows() - 1 - row_index, row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header) const
+    {
+        if(!should_columns_be_reversed_)
+            return expression_.set_column_header(column_index, column_header);
+        else
+            return expression_.set_column_header(expression_.columns() - 1 - column_index, column_header);
+    }
+
 
 
 private: // Private functions
