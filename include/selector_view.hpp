@@ -129,6 +129,39 @@ public:
             return uintptr_t(1);
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) const
+    {
+        if(are_we_selecting_a_row_)
+            return expression_.get_row_header(selected_vector_);
+        else
+            return expression_.get_row_header(row_index);
+    }
+    
+    std::string get_column_header(int64_t column_index) const
+    {
+        if(are_we_selecting_a_row_)
+            return expression_.get_column_header(column_index);
+        else
+            return expression_.get_column_header(selected_vector_);
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header) const
+    {
+        if(are_we_selecting_a_row_)
+            expression_.set_row_header(selected_vector_, row_header);
+        else
+            expression_.set_row_header(row_index, row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header) const
+    {
+        if(are_we_selecting_a_row_)
+            expression_.set_column_header(column_index, column_header);
+        else
+            expression_.set_column_header(selected_vector_, column_header);
+    }
+
 
 
 private: // Private functions
@@ -290,6 +323,39 @@ public:
             return selected_vectors_.size();
     }
 
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) const
+    {
+        if(are_we_selecting_rows_)
+            return expression_.get_row_header(selected_vectors_[row_index]);
+        else
+            return expression_.get_row_header(row_index);
+    }
+    
+    std::string get_column_header(int64_t column_index) const
+    {
+        if(are_we_selecting_rows_)
+            return expression_.get_column_header(column_index);
+        else
+            return expression_.get_column_header(selected_vectors_[column_index]);
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header) const
+    {
+        if(are_we_selecting_rows_)
+            expression_.set_row_header(selected_vectors_[row_index], row_header);
+        else
+            expression_.set_row_header(row_index, row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header) const
+    {
+        if(are_we_selecting_rows_)
+            expression_.set_column_header(column_index, column_header);
+        else
+            expression_.set_column_header(selected_vectors_[column_index], column_header);
+    }
+
 
 
 private: // Private functions
@@ -448,6 +514,27 @@ public:
             return expression_.columns();
         else
             return selected_rows_.size();
+    }
+
+    // Functions used to handle row and column header names
+    std::string get_row_header(int64_t row_index) const
+    {
+        return expression_.get_row_header(selected_rows_[row_index]);
+    }
+    
+    std::string get_column_header(int64_t column_index) const
+    {
+        return expression_.get_column_header(selected_columns_[column_index]);
+    }
+
+    void set_row_header(int64_t row_index, const std::string& row_header) const
+    {
+        expression_.set_row_header(selected_rows_[row_index], row_header);
+    }
+
+    void set_column_header(int64_t column_index, const std::string& column_header) const
+    {
+        expression_.set_column_header(selected_columns_[column_index], column_header);
     }
 
 
